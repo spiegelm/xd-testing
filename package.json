@@ -1,0 +1,17 @@
+{
+  "name": "xd-test-gallery",
+  "version": "0.1.0",
+  "description": "",
+  "main": "test.js",
+  "dependencies": {
+    "chromedriver": "^2.20.0",
+    "selenium-standalone": "^4.8.0",
+    "selenium-webdriver": "^2.48.2",
+    "webdriverio": "^3.4.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": ""
+}
