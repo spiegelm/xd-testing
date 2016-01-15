@@ -56,6 +56,5 @@ browserA.url(baseUrl).then(function() {
             } else {
                 console.log('ERROR! different images.');
             }
-            assertEquals(src, imageUrlA);
-    });
+    }).endAll();
 });
