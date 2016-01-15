@@ -12,6 +12,7 @@ WebdriverIO: WebDriver implementation. Selenium 2.0 javascript bindings for node
     # Adjust the URL via the variable baseUrl in test_webdriver_io.js
     
     # Start the selenium server
+    npm install
     chmod +x start_selenium.sh
     ./start_selenium.sh
     
