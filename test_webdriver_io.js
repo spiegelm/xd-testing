@@ -42,13 +42,13 @@ browserA.url(baseUrl).then(function () {
     console.log('A: clicked first image in galery');
 }).waitForVisible('#image img').then(function () {
     console.log('A: #image img is visible');
+}).scroll(0, 1000).then(function() {
+    console.log('A: scrolled down to the end');
 }).getAttribute('#image img', 'src').then(function (src) {
     imageUrlA = src;
     console.log('A: image src ' + src);
 }).getUrl().then(function (url) {
-    browserB.url(url).then(function () {
-        console.log('B: loaded ' + url);
-    }).waitForExist('#image img').then(function () {
+    browserB.waitForVisible('#image img', 3000).then(function () {
         console.log('B: image found');
     }).pause(3000).then(function () {
         console.log('B: waited for 3000ms');
@@ -60,5 +60,10 @@ browserA.url(baseUrl).then(function () {
         } else {
             console.log('ERROR! different images.');
         }
+        browserA.saveScreenshot('./browserA.png', function (err, screenshot, response) {
+            console.log('A: saved screenshot');
+        })
+    }).saveScreenshot('./browserB.png', function (err, screenshot, response) {
+        console.log('B: saved screenshot');
     }).endAll();
 });

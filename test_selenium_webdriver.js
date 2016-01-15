@@ -77,12 +77,25 @@ driverA.getCurrentUrl().then(function(url) {
     driverB.sleep(3000).then(function() {
         console.log('B: waited for 3000ms ("image found")');
     });
+    driverA.executeScript('scroll(0, 1000)');
     //waitForExist('#image img').then(function() {
     //    console.log('B: image found');
 
     driverB.findElement(By.css('#image img')).getAttribute('src').then(function(src) {
         console.log('A: imageUrlA ' + imageUrlA);
         console.log('B: image src ' + src);
+        driverA.takeScreenshot().then(function (image, err) {
+            require('fs').writeFile('browserA.png', image, 'base64', function(err) {
+                console.log('A: save screenshot');
+                console.log('err' + err);
+            });
+        });
+        driverB.takeScreenshot().then(function (image, err) {
+            require('fs').writeFile('browserB.png', image, 'base64', function (err) {
+                console.log('B: save screenshot');
+                console.log('err' + err);
+            });
+        });
         if (src == imageUrlA) {
             console.log('SUCCESS, images are equal!');
         } else {
