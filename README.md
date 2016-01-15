@@ -8,14 +8,14 @@ Unit under testing: gallery-polymer from XD-MCD/Examples/Gallery
 
 WebdriverIO: WebDriver implementation. Selenium 2.0 javascript bindings for nodejs
 
-        # Ensure gallery-polymer.js is up and running at http://me.local:8082/gallery.html
-        # Adjust the URL via the variable baseUrl in test_webdriver_io.js
-        
-        # Start the selenium server
-        chmod +x start_selenium.sh
-        ./start_selenium.sh
-        
-        # In a different terminal:
-        npm install
-        node test_webdriver_io.js
+    # Ensure gallery-polymer.js is up and running at http://me.local:8082/gallery.html
+    # Adjust the URL via the variable baseUrl in test_webdriver_io.js
+    
+    # Start the selenium server
+    chmod +x start_selenium.sh
+    ./start_selenium.sh
+    
+    # In a different terminal:
+    npm install
+    node test_webdriver_io.js
 
