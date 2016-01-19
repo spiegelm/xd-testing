@@ -4,6 +4,8 @@
   "description": "",
   "main": "test.js",
   "dependencies": {
+    "buster": "^0.7.18",
+    "buster-selenium": "0.0.6",
     "chromedriver": "^2.20.0",
     "selenium-standalone": "^4.8.0",
     "selenium-webdriver": "^2.48.2",
