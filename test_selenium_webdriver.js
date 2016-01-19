@@ -85,15 +85,15 @@ driverA.getCurrentUrl().then(function(url) {
         console.log('A: imageUrlA ' + imageUrlA);
         console.log('B: image src ' + src);
         driverA.takeScreenshot().then(function (image, err) {
-            require('fs').writeFile('browserA.png', image, 'base64', function(err) {
+            require('fs').writeFile('screenshots/browserA.png', image, 'base64', function(err) {
                 console.log('A: save screenshot');
                 console.log('err' + err);
             });
         });
         driverB.takeScreenshot().then(function (image, err) {
-            require('fs').writeFile('browserB.png', image, 'base64', function (err) {
+            require('fs').writeFile('screenhots/browserB.png', image, 'base64', function (err) {
                 console.log('B: save screenshot');
-                console.log('err' + err);
+                console.log('err: ' + err);
             });
         });
         if (src == imageUrlA) {

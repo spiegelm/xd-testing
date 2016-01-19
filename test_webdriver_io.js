@@ -60,10 +60,12 @@ browserA.url(baseUrl).then(function () {
         } else {
             console.log('ERROR! different images.');
         }
-        browserA.saveScreenshot('./browserA.png', function (err, screenshot, response) {
-            console.log('A: saved screenshot');
+        browserA.saveScreenshot('./screenshots/browserA.png', function (err, screenshot, response) {
+            console.log('A: save screenshot');
+            console.log('err: ' + err);
         })
-    }).saveScreenshot('./browserB.png', function (err, screenshot, response) {
-        console.log('B: saved screenshot');
+    }).saveScreenshot('./screenshots/browserB.png', function (err, screenshot, response) {
+        console.log('B: save screenshot');
+        console.log('err: ' + err);
     }).endAll();
 });
