@@ -89,6 +89,7 @@ buster.testCase("XD-MVC Example Gallery", {
 
                 console.log('A: executed script');
                 console.log(ret.value);
+                expect(ret.value).toBe(3);
             }).execute(injectEventLogger).then(function() {
                 console.log('A: injected event logger');
             }).getUrl().then(function(url) {
@@ -105,7 +106,7 @@ buster.testCase("XD-MVC Example Gallery", {
                         return self.browserA.execute(getEventCounter).then(function(ret) {
                             console.log('A: got eventCounter: ');
                             console.log(ret.value);
-                            expect(ret.value.XDconnection).toBeGreaterThan(0);
+                            expect(ret.value.XDconnection).toBe(1);
 
                             //self.browserA.endAll();
                         });
