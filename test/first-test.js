@@ -133,26 +133,23 @@ buster.testCase("XD-MVC Example Gallery", {
         var self = this;
 
         return self.browserA.url(this.baseUrl).then(function () {
-            return self.browserB.url(self.baseUrl).then(function () {
+            return self.browserB.url(self.baseUrl);
+        }).setCookie({name: 'test_cookieA', value: 'A'})
+        .getCookie('test_cookieA').then(function (cookie) {
 
-                return self.browserA.setCookie({name: 'test_cookieA', value: 'A'})
-                    .getCookie('test_cookieA').then(function (cookie) {
+            refute.isNull(cookie);
+            assert.equals(cookie.name, 'test_cookieA');
+            assert.equals(cookie.value, 'A');
 
-                    refute.isNull(cookie);
-                    assert.equals(cookie.name, 'test_cookieA');
-                    assert.equals(cookie.value, 'A');
+            return self.browserB.setCookie({name: 'test_cookieB', value: 'B'})
+            .getCookie('test_cookieB').then(function (cookie) {
 
-                    return self.browserB.setCookie({name: 'test_cookieB', value: 'B'})
-                    .getCookie('test_cookieB').then(function (cookie) {
+                refute.isNull(cookie);
+                assert.equals(cookie.name, 'test_cookieB');
+                assert.equals(cookie.value, 'B');
 
-                        refute.isNull(cookie);
-                        assert.equals(cookie.name, 'test_cookieB');
-                        assert.equals(cookie.value, 'B');
-
-                    }).getCookie('test_cookieA').then(function (cookie) {
-                        assert.isNull(cookie);
-                    });
-                });
+            }).getCookie('test_cookieA').then(function (cookie) {
+                assert.isNull(cookie);
             });
         });
     },
@@ -162,26 +159,23 @@ buster.testCase("XD-MVC Example Gallery", {
     'should not share local storage across browser sessions': function () {
         var self = this;
 
-        return self.browserA.url(this.baseUrl).then(function () {
-            return self.browserB.url(self.baseUrl).then(function () {
+        var getItem = function(key) {
+            console.log('localStorage.getItem ' + key);
+            return localStorage.getItem(key);
+        };
 
-                var getItem = function(key) {
-                    console.log('localStorage.getItem ' + key);
-                    return localStorage.getItem(key);
-                };
+        var setItem = function(key, value) {
+            localStorage.setItem(key, value);
+        };
 
-                var setItem = function(key, value) {
-                    localStorage.setItem(key, value);
-                };
+        return self.browserA.url(self.baseUrl).then(function () {
+            return self.browserB.url(self.baseUrl);
+        }).execute(setItem, 'test_storageA', 'A')
+        .execute(getItem, 'test_storageA').then(function (ret) {
+            assert.equals(ret.value, 'A');
 
-                return self.browserA.execute(setItem, 'test_storageA', 'A').then(function(ret) {
-                }).execute(getItem, 'test_storageA').then(function (ret) {
-                    assert.equals(ret.value, 'A');
-
-                    return self.browserB.execute(getItem, 'test_storageA').then(function (ret) {
-                        assert.isNull(ret.value);
-                    });
-                });
+            return self.browserB.execute(getItem, 'test_storageA').then(function (ret) {
+                assert.isNull(ret.value);
             });
         });
     //});
