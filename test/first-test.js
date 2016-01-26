@@ -107,8 +107,6 @@ buster.testCase("XD-MVC Example Gallery", {
                             console.log('A: got eventCounter: ');
                             console.log(ret.value);
                             expect(ret.value.XDconnection).toBe(1);
-
-                            //self.browserA.endAll();
                         });
                     });
                 });
@@ -117,21 +115,21 @@ buster.testCase("XD-MVC Example Gallery", {
     },
 
     //it('should not share cookies across browser sessions', function (done) {
-    'should not share cookies across browser sessions': function (done) {
+    'should not share cookies across browser sessions': function () {
         var self = this;
 
-        self.browserA.url(this.baseUrl).then(function () {
-            self.browserB.url(self.baseUrl).then(function () {
+        return self.browserA.url(this.baseUrl).then(function () {
+            return self.browserB.url(self.baseUrl).then(function () {
 
-                self.browserA.setCookie({name: 'test_cookieA', value: 'A'})
+                return self.browserA.setCookie({name: 'test_cookieA', value: 'A'})
                     .getCookie('test_cookieA').then(function (cookie) {
 
                     refute.isNull(cookie);
                     assert.equals(cookie.name, 'test_cookieA');
                     assert.equals(cookie.value, 'A');
 
-                    self.browserB.setCookie({name: 'test_cookieB', value: 'B'})
-                        .getCookie('test_cookieB').then(function (cookie) {
+                    return self.browserB.setCookie({name: 'test_cookieB', value: 'B'})
+                    .getCookie('test_cookieB').then(function (cookie) {
 
                         refute.isNull(cookie);
                         assert.equals(cookie.name, 'test_cookieB');
@@ -139,9 +137,6 @@ buster.testCase("XD-MVC Example Gallery", {
 
                     }).getCookie('test_cookieA').then(function (cookie) {
                         assert.isNull(cookie);
-
-                        self.browserA.endAll();
-                        done();
                     });
                 });
             });
@@ -150,11 +145,11 @@ buster.testCase("XD-MVC Example Gallery", {
 //});
 
 //it('should not share local storage across browser sessions', function (done) {
-    'should not share local storage across browser sessions': function (done) {
+    'should not share local storage across browser sessions': function () {
         var self = this;
 
-        self.browserA.url(this.baseUrl).then(function () {
-            self.browserB.url(self.baseUrl).then(function () {
+        return self.browserA.url(this.baseUrl).then(function () {
+            return self.browserB.url(self.baseUrl).then(function () {
 
                 var getItem = function(key) {
                     console.log('localStorage.getItem ' + key);
@@ -165,14 +160,12 @@ buster.testCase("XD-MVC Example Gallery", {
                     localStorage.setItem(key, value);
                 };
 
-                self.browserA.execute(setItem, 'test_storageA', 'A').then(function(ret) {
+                return self.browserA.execute(setItem, 'test_storageA', 'A').then(function(ret) {
                 }).execute(getItem, 'test_storageA').then(function (ret) {
                     assert.equals(ret.value, 'A');
 
-                    self.browserB.execute(getItem, 'test_storageA').then(function (ret) {
+                    return self.browserB.execute(getItem, 'test_storageA').then(function (ret) {
                         assert.isNull(ret.value);
-                        self.browserA.endAll();
-                        done();
                     });
                 });
             });
@@ -229,7 +222,7 @@ buster.testCase("XD-MVC Example Gallery", {
                 } else {
                     console.log('ERROR! different images.');
                 }
-                self.browserA.saveScreenshot('./screenshots/browserA.png', function (err, screenshot, response) {
+                return self.browserA.saveScreenshot('./screenshots/browserA.png', function (err, screenshot, response) {
                     console.log('A: save screenshot');
                     console.log('err: ' + err);
                 })
@@ -237,8 +230,6 @@ buster.testCase("XD-MVC Example Gallery", {
                 console.log('B: save screenshot');
                 console.log('err: ' + err);
 
-                //// Tell test runner we're done with the async test
-                //done();
             }).endAll();
         });
     //});
