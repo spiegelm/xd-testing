@@ -188,21 +188,12 @@ buster.testCase("XD-MVC Example Gallery", {
 
         var imageUrlA;
 
-        return this.browserA.url(this.baseUrl).then(function () {
-            console.log('A: initialized');
-            // Wait until application is loaded
-
-        }).getUrl().then(function (url) {
-            console.log('A: url ' + url);
-            self.browserB.url(url).then(function () {
-                console.log('B: url ' + url);
-            });
+        return this.setupConnectedBrowsers().then(function () {
+            console.log('setup two connected browsers');
         }).waitForVisible('h2.gallery-overview').then(function () {
             console.log('A: h2.gallery-overview is visible');
         }).click('//*[text()="Bike Tours"]').then(function () {
             console.log('A: clicked Bike Tours');
-        }).pause(3000).then(function () {
-            console.log('A: waited for 3000ms');
         }).waitForVisible('#gallery img:nth-of-type(1)').then(function () {
             console.log('A: first image is visible');
         }).click('#gallery img:nth-of-type(1)').then(function () {
@@ -217,8 +208,6 @@ buster.testCase("XD-MVC Example Gallery", {
         }).getUrl().then(function (url) {
             return self.browserB.waitForVisible('#image img', 3000).then(function () {
                 console.log('B: image found');
-            }).pause(3000).then(function () {
-                console.log('B: waited for 3000ms');
             }).getAttribute('#image img', 'src').then(function (src) {
                 console.log('A: imageUrlA ' + imageUrlA);
                 console.log('B: image src ' + src);
@@ -230,16 +219,14 @@ buster.testCase("XD-MVC Example Gallery", {
                 } else {
                     console.log('ERROR! different images.');
                 }
-                return self.browserA.saveScreenshot('./screenshots/browserA.png', function (err, screenshot, response) {
-                    console.log('A: save screenshot');
-                    console.log('err: ' + err);
-                })
             }).saveScreenshot('./screenshots/browserB.png', function (err, screenshot, response) {
                 console.log('B: save screenshot');
                 console.log('err: ' + err);
-
-            }).endAll();
-        });
+            });
+        }).saveScreenshot('./screenshots/browserA.png', function (err, screenshot, response) {
+            console.log('A: save screenshot');
+            console.log('err: ' + err);
+        }).endAll();
     //});
     }
 });
