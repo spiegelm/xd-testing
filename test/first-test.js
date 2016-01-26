@@ -6,6 +6,7 @@ if (typeof module == "object" && typeof require == "function") {
 }
 
 var webdriverio = require('webdriverio');
+var q = require('q');
 
 
 var assert = buster.referee.assert;
@@ -44,12 +45,48 @@ var getEventCounter = function() {
     return window.eventLogger.eventCounter;
 };
 
+var setupConnectedBrowsers = function() {
+    var setup = q.defer();
+
+    var self = this;
+
+    return self.browserA.url(self.baseUrl).then(function () {
+        console.log('A: init');
+    }).execute(function () {
+        return 1 + 2;
+    }).then(function(ret) {
+
+        console.log('A: executed script');
+        console.log(ret.value);
+        expect(ret.value).toBe(3);
+    }).execute(injectEventLogger).then(function() {
+        console.log('A: injected event logger');
+    }).getUrl().then(function(url) {
+        return self.browserB.url(url).then(function () {
+            console.log('B: init');
+
+            return self.browserA.waitUntil(function() {
+                return self.browserA.execute(getEventCounter).then(function(ret) {
+                    console.log('A: got eventCounter: ');
+                    console.log(ret.value);
+                    return ret.value.XDconnection > 0;
+                });
+            });
+        });
+    })
+
+};
+
+
 //var specs = describe("XD-Test-gallery", function() {
 buster.testCase("XD-MVC Example Gallery", {
 
     //before(function() {
     setUp: function () {
         this.baseUrl = "http://me.local:8082/gallery.html";
+
+        // Bind function to this reference
+        this.setupConnectedBrowsers = setupConnectedBrowsers.bind(this);
 
         // Set timeout
         this.timeout = 1000 * 30; // 30s
@@ -81,36 +118,13 @@ buster.testCase("XD-MVC Example Gallery", {
         'should count XDconnection events': function() {
             var self = this;
 
-            return self.browserA.url(self.baseUrl).then(function () {
-                console.log('A: init');
-            }).execute(function () {
-                return 1 + 2;
-            }).then(function(ret) {
-
-                console.log('A: executed script');
-                console.log(ret.value);
-                expect(ret.value).toBe(3);
-            }).execute(injectEventLogger).then(function() {
-                console.log('A: injected event logger');
-            }).getUrl().then(function(url) {
-                return self.browserB.url(url).then(function () {
-                    console.log('B: init');
-
-                    return self.browserA.waitUntil(function() {
-                        return self.browserA.execute(getEventCounter).then(function(ret) {
-                            console.log('A: got eventCounter: ');
-                            console.log(ret.value);
-                            return ret.value.XDconnection > 0;
-                        });
-                    }).then(function() {
-                        return self.browserA.execute(getEventCounter).then(function(ret) {
-                            console.log('A: got eventCounter: ');
-                            console.log(ret.value);
-                            expect(ret.value.XDconnection).toBe(1);
-                        });
-                    });
+            return self.setupConnectedBrowsers().then(function() {
+                return self.browserA.execute(getEventCounter).then(function(ret) {
+                    console.log('A: got eventCounter: ');
+                    console.log(ret.value);
+                    expect(ret.value.XDconnection).toBe(1);
                 });
-            })
+            });
         }
     },
 
