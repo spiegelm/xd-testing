@@ -156,36 +156,23 @@ buster.testCase("XD-MVC Example Gallery", {
         this.devices = webdriverio.multiremote(this.deviceOptions);
         //attachCustomFunctions(this.devices);
 
-
-
-
         var self = this;
+        var tileWidth = Math.floor(1600 / this.devicesCount());
 
         return this.devices.init()
-            .windowHandleSize({width: 500, height: 600})
+            .windowHandleSize({width: tileWidth , height: 600})
             .then(function() {
+                // Align windows on screen
+                var x = 0;
+                Object.keys(self.deviceOptions).forEach(function(deviceName) {
+                    self.devices.select(deviceName).windowHandlePosition({x: x, y: 0});
+                    x += tileWidth;
+                });
+
+                // legacy variables
                 self.deviceA = self.devices.select('A');
                 self.deviceB = self.devices.select('B');
             });
-
-
-        //var options = {desiredCapabilities: {browserName: 'chrome'}};
-        //var clientA = webdriverio.remote(options);
-        //var clientB = webdriverio.remote(options);
-
-        //this.deviceA = this.devices.select('A');
-        //this.deviceA
-        //    .windowHandleSize({width: 500, height: 600});
-        //    .windowHandlePosition({x: 0, y: 0});
-        //this.deviceB = this.devices.select('B');
-        //this.deviceB
-        //    .windowHandleSize({width: 500, height: 600})
-        //    .windowHandlePosition({x: 500, y: 0});
-        //this.deviceC = this.devices.select('C');
-        //this.deviceC
-        //    .windowHandleSize({width: 500, height: 600})
-        //    .windowHandlePosition({x: 1000, y: 0});
-
     },
 
     //after(function () {
