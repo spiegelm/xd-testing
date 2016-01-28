@@ -284,28 +284,39 @@ buster.testCase("XD-MVC Example Gallery", {
             console.log('A: clicked first image in galery');
         }).waitForVisible('#image img').then(function () {
             console.log('A: #image img is visible');
-        }).scroll(0, 1000).then(function () {
+        }).scroll(0, 10000).then(function () {
             console.log('A: scrolled down to the end');
         }).getAttribute('#image img', 'src').then(function (src) {
             imageUrlA = src;
             console.log('A: image src ' + src);
         }).getUrl().then(function (url) {
-            return self.deviceB.waitForVisible('#image img', 3000).then(function () {
+
+            var allButA = Object.keys(self.deviceOptions).filter(function(deviceName) {
+                return deviceName != 'A';
+            });
+            var i = 0;
+            return multiAction(self.devices, allButA, function(device) {
+                return device.waitForVisible('#image img', 3000);
+            }).then(function() {
                 console.log('B: image found');
-            }).getAttribute('#image img', 'src').then(function (src) {
-                console.log('A: imageUrlA ' + imageUrlA);
-                console.log('B: image src ' + src);
+                return multiAction(self.devices, allButA, function(device) {
+                    return device.getAttribute('#image img', 'src');
+                });
+            }).then(function (srcs) {
+                Object.keys(srcs).forEach(function(key) {
+                    var src = srcs[key];
+                    console.log('A: imageUrlA ' + imageUrlA);
+                    console.log('B: image src ' + src);
+                    assert.equals(src, imageUrlA);
+                });
 
-                assert.equals(src, imageUrlA);
-
-                if (src == imageUrlA) {
-                    console.log('SUCCESS, images are equal!');
-                } else {
-                    console.log('ERROR! different images.');
-                }
-            }).saveScreenshot('./screenshots/deviceB.png', function (err, screenshot, response) {
-                console.log('B: save screenshot');
-                console.log('err: ' + err);
+                return multiAction(self.devices, allButA, function(device) {
+                    return device.saveScreenshot('./screenshots/device' + i + '.png', function (err, screenshot, response) {
+                        console.log(i + ': save screenshot');
+                        console.log('err: ' + err);
+                        i++;
+                    });
+                });
             });
         }).saveScreenshot('./screenshots/deviceA.png', function (err, screenshot, response) {
             console.log('A: save screenshot');
