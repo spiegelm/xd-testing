@@ -108,8 +108,6 @@ var devicesCount = function() {
     return Object.keys(self.deviceOptions).length;
 };
 
-// Custom function: Do function/callback/promise for multiple browsers, except A
-
 /**
  * Executes callback on devices matching deviceNames.
  * Returns an promise.
