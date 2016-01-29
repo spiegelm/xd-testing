@@ -33,49 +33,51 @@ var getEventCounter = function() {
     return window.eventLogger.eventCounter;
 };
 
-var setupConnectedBrowsers = function() {
-    var setup = q.defer();
+var utility = {
+    setupConnectedBrowsers: function() {
+        var self = this;
 
-    var self = this;
-    var deviceA = self.devices.select('A');
+        var deviceA = self.devices.select('A');
 
-    return deviceA.url(self.baseUrl).then(function () {
-        console.log('A: init');
-    }).execute(function () {
-        return 1 + 2;
-    }).then(function(ret) {
+        return deviceA.url(self.baseUrl).then(function () {
+            console.log('A: init');
+        }).execute(function () {
+            return 1 + 2;
+        }).then(function (ret) {
 
-        console.log('A: executed script');
-        console.log(ret.value);
-        assert.equal(ret.value, 3);
-    }).execute(injectEventLogger).then(function() {
-        console.log('A: injected event logger');
-    }).getUrl().then(function(url) {
-        var allButA = Object.keys(self.deviceOptions).filter(function(deviceName) {
-            return deviceName != 'A';
-        });
-        return multiAction(self.devices, allButA, function(device) {
-            return device.url(url);
-        //return self.deviceB.url(url).then(function () {
-        }).then(function() {
-            console.log('init urls');
+            console.log('A: executed script');
+            console.log(ret.value);
+            assert.equal(ret.value, 3);
+        }).execute(injectEventLogger).then(function () {
+            console.log('A: injected event logger');
+        }).getUrl().then(function (url) {
 
-            return deviceA.waitUntil(function() {
-                return deviceA.execute(getEventCounter).then(function(ret) {
-                    console.log('A: got eventCounter: ');
-                    console.log(ret.value);
-                    console.log('devices.length: ' + self.devicesCount());
-                    return ret.value.XDconnection == self.devicesCount() - 1;
-                    //return ret.value.XDconnection == devicesButA.count();
+            var allButA = Object.keys(self.deviceOptions).filter(function (deviceName) {
+                return deviceName != 'A';
+            });
+            return multiAction(self.devices, allButA, function (device) {
+                return device.url(url);
+                //return self.deviceB.url(url).then(function () {
+            }).then(function () {
+                console.log('init urls');
+
+                return deviceA.waitUntil(function () {
+                    return deviceA.execute(getEventCounter).then(function (ret) {
+                        console.log('A: got eventCounter: ');
+                        console.log(ret.value);
+                        console.log('devices.length: ' + self.devicesCount());
+                        return ret.value.XDconnection == self.devicesCount() - 1;
+                        //return ret.value.XDconnection == devicesButA.count();
+                    });
                 });
             });
-        });
-    })
-};
+        })
+    },
 
-var devicesCount = function() {
-    var self = this;
-    return Object.keys(self.deviceOptions).length;
+    devicesCount : function() {
+        var self = this;
+        return Object.keys(self.deviceOptions).length;
+    }
 };
 
 
@@ -96,36 +98,29 @@ function multiAction (devices, deviceNames, callback) {
 }
 
 describe('XD-MVC Example Gallery', function() {
+    var self = this;
 
-    // Set timeout
+    // Set test timeout
     this.timeout(15 * 1000);
 
-    beforeEach(function () {
-        this.baseUrl = "http://me.local:8082/gallery.html";
+    self.deviceOptions = {};
+    self.devices = {};
+    self.baseUrl = "http://me.local:8082/gallery.html";
 
-        // Bind function to this reference
-        this.setupConnectedBrowsers = setupConnectedBrowsers.bind(this);
-        this.devicesCount = devicesCount.bind(this);
+    // Bind function to this reference
+    self.setupConnectedBrowsers = utility.setupConnectedBrowsers.bind(self);
+    self.devicesCount = utility.devicesCount.bind(self);
 
+    var initWithDevices = function(devices) {
+        self.deviceOptions = devices;
         // New browser instance with WebdriverIO
-        this.deviceOptions = {
-            A: {
-                desiredCapabilities: {browserName: 'chrome'}
-            },
-            B: {
-                desiredCapabilities: {browserName: 'chrome'}
-            },
-            C: {
-                desiredCapabilities: {browserName: 'chrome'}
-            }
-        };
-        this.devices = webdriverio.multiremote(this.deviceOptions);
+        self.devices = webdriverio.multiremote(self.deviceOptions);
         //attachCustomFunctions(this.devices);
 
-        var self = this;
-        var tileWidth = Math.floor(1600 / this.devicesCount());
+        var tileWidth = Math.floor(1600 / self.devicesCount());
 
-        return this.devices.init()
+        return self.devices.init()
+            .timeoutsAsyncScript(5 * 1000)
             .windowHandleSize({width: tileWidth, height: 600})
             .then(function () {
                 // Align windows on screen
@@ -139,18 +134,23 @@ describe('XD-MVC Example Gallery', function() {
                 self.deviceA = self.devices.select('A');
                 self.deviceB = self.devices.select('B');
             });
+    }.bind(this);
+
+
+    beforeEach(function () {
     });
 
     afterEach(function() {
         // Close browser before completing a test
-        return this.devices.end();
+        return self.devices.end();
     });
 
     describe('eventLogger', function() {
         it ('should count XDconnection events', function() {
-            var self = this;
 
-            return self.setupConnectedBrowsers().then(function() {
+            return initWithDevices({A: templates.windows_chrome, B: templates.windows_chrome}).then(function() {
+                return self.setupConnectedBrowsers();
+            }).then(function() {
                 return self.deviceA.execute(getEventCounter).then(function(ret) {
                     console.log('A: got eventCounter: ');
                     console.log(ret.value);
@@ -161,33 +161,34 @@ describe('XD-MVC Example Gallery', function() {
     });
 
     it('should not share cookies across browser sessions', function () {
-        var self = this;
 
-        return self.deviceA.url(this.baseUrl).then(function () {
-            return self.deviceB.url(self.baseUrl);
-        }).setCookie({name: 'test_cookieA', value: 'A'})
-        .getCookie('test_cookieA').then(function (cookie) {
-
-            assert.notEqual(cookie, null);
-            assert.equal(cookie.name, 'test_cookieA');
-            assert.equal(cookie.value, 'A');
-
-            return self.deviceB.setCookie({name: 'test_cookieB', value: 'B'})
-            .getCookie('test_cookieB').then(function (cookie) {
+        return initWithDevices({A: templates.windows_chrome, B: templates.windows_chrome}).then(function() {
+            return self.setupConnectedBrowsers();
+        }).then(function() {
+            return self.deviceA.url(this.baseUrl).then(function () {
+                return self.deviceB.url(self.baseUrl);
+            }).setCookie({name: 'test_cookieA', value: 'A'})
+            .getCookie('test_cookieA').then(function (cookie) {
 
                 assert.notEqual(cookie, null);
-                assert.equal(cookie.name, 'test_cookieB');
-                assert.equal(cookie.value, 'B');
+                assert.equal(cookie.name, 'test_cookieA');
+                assert.equal(cookie.value, 'A');
 
-            }).getCookie('test_cookieA').then(function (cookie) {
-                assert.equal(cookie, null);
+                return self.deviceB.setCookie({name: 'test_cookieB', value: 'B'})
+                .getCookie('test_cookieB').then(function (cookie) {
+
+                    assert.notEqual(cookie, null);
+                    assert.equal(cookie.name, 'test_cookieB');
+                    assert.equal(cookie.value, 'B');
+
+                }).getCookie('test_cookieA').then(function (cookie) {
+                    assert.equal(cookie, null);
+                });
             });
         });
     });
 
     it('should not share local storage across browser sessions', function () {
-        var self = this;
-
         var getItem = function(key) {
             return localStorage.getItem(key);
         };
@@ -196,73 +197,105 @@ describe('XD-MVC Example Gallery', function() {
             localStorage.setItem(key, value);
         };
 
-        return self.deviceA.url(self.baseUrl).then(function () {
-            return self.deviceB.url(self.baseUrl);
-        }).execute(setItem, 'test_storageA', 'A')
-        .execute(getItem, 'test_storageA').then(function (ret) {
-            assert.equal(ret.value, 'A');
+        return initWithDevices({A: templates.windows_chrome, B: templates.windows_chrome}).then(function() {
+            return self.setupConnectedBrowsers();
+        }).then(function() {
+            return self.deviceA.url(self.baseUrl).then(function () {
+                return self.deviceB.url(self.baseUrl);
+            }).execute(setItem, 'test_storageA', 'A')
+            .execute(getItem, 'test_storageA').then(function (ret) {
+                assert.equal(ret.value, 'A');
 
-            return self.deviceB.execute(getItem, 'test_storageA').then(function (ret) {
-                return assert.equal(ret.value, null);
+                return self.deviceB.execute(getItem, 'test_storageA').then(function (ret) {
+                    return assert.equal(ret.value, null);
+                });
             });
         });
     });
 
-    it('should show the selected image on the other devices', function () {
+    var templates = {
+        windows_chrome: {
+            name: 'Chrome (Win)',
+            desiredCapabilities: {browserName: 'chrome'}
+        },
+        nexus4: {
+            name: 'Nexus 4',
+            desiredCapabilities: {browserName: 'chrome'}
+        }
+    };
 
-        var self = this;
+    describe.only('should show the selected image on the other devices', function () {
 
-        var imageUrlA;
+        var setups = [
+            {devices: {A: templates.windows_chrome, B: templates.nexus4}},
+            {devices: {A: templates.windows_chrome, B: templates.nexus4, C: templates.nexus4}}
+        ];
 
-        return this.setupConnectedBrowsers().then(function () {
-            console.log('setup two connected browsers');
-        }).waitForVisible('h2.gallery-overview').then(function () {
-            console.log('A: h2.gallery-overview is visible');
-        }).click('//*[text()="Bike Tours"]').then(function () {
-            console.log('A: clicked Bike Tours');
-        }).waitForVisible('#gallery img:nth-of-type(1)').then(function () {
-            console.log('A: first image is visible');
-        }).click('#gallery img:nth-of-type(1)').then(function () {
-            console.log('A: clicked first image in galery');
-        }).waitForVisible('#image img').then(function () {
-            console.log('A: #image img is visible');
-        }).scroll(0, 10000).then(function () {
-            console.log('A: scrolled down to the end');
-        }).getAttribute('#image img', 'src').then(function (src) {
-            imageUrlA = src;
-            console.log('A: image src ' + src);
-        }).getUrl().then(function (url) {
+        setups.forEach(function(setup) {
 
-            var allButA = Object.keys(self.deviceOptions).filter(function(deviceName) {
-                return deviceName != 'A';
-            });
-            var i = 0;
-            return multiAction(self.devices, allButA, function(device) {
-                return device.waitForVisible('#image img', 3000);
-            }).then(function() {
-                console.log('B: image found');
-                return multiAction(self.devices, allButA, function(device) {
-                    return device.getAttribute('#image img', 'src');
-                });
-            }).then(function (srcs) {
-                Object.keys(srcs).forEach(function(key) {
-                    var src = srcs[key];
-                    console.log('A: imageUrlA ' + imageUrlA);
-                    console.log('B: image src ' + src);
-                    assert.equal(src, imageUrlA);
-                });
+            // Assemble setup name
+            var setupName = Object.keys(setup.devices).map(function(key) {
+                var dev = setup.devices[key];
+                return dev.name;
+            }).join(', ');
 
-                return multiAction(self.devices, allButA, function(device) {
-                    return device.saveScreenshot('./screenshots/device' + i + '.png', function (err, screenshot, response) {
-                        console.log(i + ': save screenshot');
+            it('on ' + setupName, function() {
+
+                var imageUrlA;
+
+                return initWithDevices(setup.devices).then(function() {
+                    return self.setupConnectedBrowsers();
+                }).then(function() {
+                    self.deviceA.waitForVisible('h2.gallery-overview', 5000).then(function () {
+                        console.log('A: h2.gallery-overview is visible');
+                    }).click('//*[text()="Bike Tours"]').then(function () {
+                        console.log('A: clicked Bike Tours');
+                    }).waitForVisible('#gallery img:nth-of-type(1)').then(function () {
+                        console.log('A: first image is visible');
+                    }).click('#gallery img:nth-of-type(1)').then(function () {
+                        console.log('A: clicked first image in galery');
+                    }).waitForVisible('#image img').then(function () {
+                        console.log('A: #image img is visible');
+                    }).scroll(0, 10000).then(function () {
+                        console.log('A: scrolled down to the end');
+                    }).getAttribute('#image img', 'src').then(function (src) {
+                        imageUrlA = src;
+                        console.log('A: image src ' + src);
+                    }).getUrl().then(function (url) {
+
+                        var allButA = Object.keys(self.deviceOptions).filter(function (deviceName) {
+                            return deviceName != 'A';
+                        });
+                        var i = 0;
+                        return multiAction(self.devices, allButA, function (device) {
+                            return device.waitForVisible('#image img', 3000);
+                        }).then(function () {
+                            console.log('B: image found');
+                            return multiAction(self.devices, allButA, function (device) {
+                                return device.getAttribute('#image img', 'src');
+                            });
+                        }).then(function (srcs) {
+                            Object.keys(srcs).forEach(function (key) {
+                                var src = srcs[key];
+                                console.log('A: imageUrlA ' + imageUrlA);
+                                console.log('B: image src ' + src);
+                                assert.equal(src, imageUrlA);
+                            });
+
+                            return multiAction(self.devices, allButA, function (device) {
+                                return device.saveScreenshot('./screenshots/device' + i + '.png', function (err, screenshot, response) {
+                                    console.log(i + ': save screenshot');
+                                    console.log('err: ' + err);
+                                    i++;
+                                });
+                            });
+                        });
+                    }).saveScreenshot('./screenshots/deviceA.png', function (err, screenshot, response) {
+                        console.log('A: save screenshot');
                         console.log('err: ' + err);
-                        i++;
                     });
                 });
             });
-        }).saveScreenshot('./screenshots/deviceA.png', function (err, screenshot, response) {
-            console.log('A: save screenshot');
-            console.log('err: ' + err);
-        }).endAll();
+        });
     });
 });
