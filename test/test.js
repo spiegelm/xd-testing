@@ -1,21 +1,8 @@
 "use strict";
 
-// Node.js tests
-if (typeof module == "object" && typeof require == "function") {
-    var buster = require("buster");
-}
-
+var assert = require('assert');
 var webdriverio = require('webdriverio');
 var q = require('q');
-//q.longStackSupport = true;
-
-
-var assert = buster.referee.assert;
-var expect = buster.referee.expect;
-var refute = buster.referee.refute;
-
-//buster.spec.expose(); // Make BDD functions global
-
 
 var injectEventLogger = function() {
 
@@ -60,17 +47,16 @@ var setupConnectedBrowsers = function() {
 
         console.log('A: executed script');
         console.log(ret.value);
-        expect(ret.value).toBe(3);
+        assert.equal(ret.value, 3);
     }).execute(injectEventLogger).then(function() {
         console.log('A: injected event logger');
     }).getUrl().then(function(url) {
-        //return self.deviceB.url(url).then(function () {
-
         var allButA = Object.keys(self.deviceOptions).filter(function(deviceName) {
             return deviceName != 'A';
         });
         return multiAction(self.devices, allButA, function(device) {
             return device.url(url);
+        //return self.deviceB.url(url).then(function () {
         }).then(function() {
             console.log('init urls');
 
@@ -84,29 +70,14 @@ var setupConnectedBrowsers = function() {
                 });
             });
         });
-
-        //var devicesButA = self.devices.select('B');
-        ////var devicesButA = self.devices.but('A');
-        //return devicesButA.url(url).then(function () {
-        //    console.log('but A: init');
-        //
-        //    return deviceA.waitUntil(function() {
-        //        return deviceA.execute(getEventCounter).then(function(ret) {
-        //            console.log('A: got eventCounter: ');
-        //            console.log(ret.value);
-        //            return ret.value.XDconnection > 0;
-        //            //return ret.value.XDconnection == devicesButA.count();
-        //        });
-        //    });
-        //});
     })
-
 };
 
 var devicesCount = function() {
     var self = this;
     return Object.keys(self.deviceOptions).length;
 };
+
 
 /**
  * Executes callback on devices matching deviceNames.
@@ -124,24 +95,19 @@ function multiAction (devices, deviceNames, callback) {
     return q.all(promises);
 }
 
+describe('XD-MVC Example Gallery', function() {
 
-//var specs = describe("XD-Test-gallery", function() {
-buster.testCase("XD-MVC Example Gallery", {
+    // Set timeout
+    this.timeout(15 * 1000);
 
-    //before(function() {
-    setUp: function () {
+    beforeEach(function () {
         this.baseUrl = "http://me.local:8082/gallery.html";
 
         // Bind function to this reference
         this.setupConnectedBrowsers = setupConnectedBrowsers.bind(this);
         this.devicesCount = devicesCount.bind(this);
 
-        // Set timeout
-        this.timeout = 1000 * 30; // 30s
-
         // New browser instance with WebdriverIO
-
-
         this.deviceOptions = {
             A: {
                 desiredCapabilities: {browserName: 'chrome'}
@@ -160,11 +126,11 @@ buster.testCase("XD-MVC Example Gallery", {
         var tileWidth = Math.floor(1600 / this.devicesCount());
 
         return this.devices.init()
-            .windowHandleSize({width: tileWidth , height: 600})
-            .then(function() {
+            .windowHandleSize({width: tileWidth, height: 600})
+            .then(function () {
                 // Align windows on screen
                 var x = 0;
-                Object.keys(self.deviceOptions).forEach(function(deviceName) {
+                Object.keys(self.deviceOptions).forEach(function (deviceName) {
                     self.devices.select(deviceName).windowHandlePosition({x: x, y: 0});
                     x += tileWidth;
                 });
@@ -173,32 +139,28 @@ buster.testCase("XD-MVC Example Gallery", {
                 self.deviceA = self.devices.select('A');
                 self.deviceB = self.devices.select('B');
             });
-    },
+    });
 
-    //after(function () {
-    tearDown: function () {
+    afterEach(function() {
         // Close browser before completing a test
         return this.devices.end();
-        //this.deviceB.end();
-    },
+    });
 
-    // it('eventLogger', function() {
-    'eventLogger': {
-        'should count XDconnection events': function() {
+    describe('eventLogger', function() {
+        it ('should count XDconnection events', function() {
             var self = this;
 
             return self.setupConnectedBrowsers().then(function() {
                 return self.deviceA.execute(getEventCounter).then(function(ret) {
                     console.log('A: got eventCounter: ');
                     console.log(ret.value);
-                    expect(ret.value.XDconnection).toBe(self.devicesCount() - 1);
+                    assert.equal(ret.value.XDconnection, self.devicesCount() - 1);
                 });
             });
-        }
-    },
+        });
+    });
 
-    //it('should not share cookies across browser sessions', function (done) {
-    'should not share cookies across browser sessions': function () {
+    it('should not share cookies across browser sessions', function () {
         var self = this;
 
         return self.deviceA.url(this.baseUrl).then(function () {
@@ -206,30 +168,27 @@ buster.testCase("XD-MVC Example Gallery", {
         }).setCookie({name: 'test_cookieA', value: 'A'})
         .getCookie('test_cookieA').then(function (cookie) {
 
-            refute.isNull(cookie);
-            assert.equals(cookie.name, 'test_cookieA');
-            assert.equals(cookie.value, 'A');
+            assert.notEqual(cookie, null);
+            assert.equal(cookie.name, 'test_cookieA');
+            assert.equal(cookie.value, 'A');
 
             return self.deviceB.setCookie({name: 'test_cookieB', value: 'B'})
             .getCookie('test_cookieB').then(function (cookie) {
 
-                refute.isNull(cookie);
-                assert.equals(cookie.name, 'test_cookieB');
-                assert.equals(cookie.value, 'B');
+                assert.notEqual(cookie, null);
+                assert.equal(cookie.name, 'test_cookieB');
+                assert.equal(cookie.value, 'B');
 
             }).getCookie('test_cookieA').then(function (cookie) {
-                assert.isNull(cookie);
+                assert.equal(cookie, null);
             });
         });
-    },
-//});
+    });
 
-//it('should not share local storage across browser sessions', function (done) {
-    'should not share local storage across browser sessions': function () {
+    it('should not share local storage across browser sessions', function () {
         var self = this;
 
         var getItem = function(key) {
-            console.log('localStorage.getItem ' + key);
             return localStorage.getItem(key);
         };
 
@@ -241,17 +200,15 @@ buster.testCase("XD-MVC Example Gallery", {
             return self.deviceB.url(self.baseUrl);
         }).execute(setItem, 'test_storageA', 'A')
         .execute(getItem, 'test_storageA').then(function (ret) {
-            assert.equals(ret.value, 'A');
+            assert.equal(ret.value, 'A');
 
             return self.deviceB.execute(getItem, 'test_storageA').then(function (ret) {
-                assert.isNull(ret.value);
+                return assert.equal(ret.value, null);
             });
         });
-    //});
-    },
+    });
 
-    'should show the selected image on the other devices': function () {
-    //it('should show the selected image on the second device', function () {
+    it('should show the selected image on the other devices', function () {
 
         var self = this;
 
@@ -292,7 +249,7 @@ buster.testCase("XD-MVC Example Gallery", {
                     var src = srcs[key];
                     console.log('A: imageUrlA ' + imageUrlA);
                     console.log('B: image src ' + src);
-                    assert.equals(src, imageUrlA);
+                    assert.equal(src, imageUrlA);
                 });
 
                 return multiAction(self.devices, allButA, function(device) {
@@ -307,6 +264,5 @@ buster.testCase("XD-MVC Example Gallery", {
             console.log('A: save screenshot');
             console.log('err: ' + err);
         }).endAll();
-    //});
-    }
+    });
 });
