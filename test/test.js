@@ -40,7 +40,44 @@ var getEventCounter = function() {
 };
 
 var utility = {
-    setupConnectedBrowsers: function() {
+
+    initWithDevices: function(devices) {
+
+        // Store id into device
+        Object.keys(devices).forEach(function(id) {
+            var dev = devices[id];
+            debug(id, dev);
+            dev["id"] = id;
+            debug(id, dev);
+        });
+
+        debug(devices);
+
+        self.deviceOptions = devices;
+
+        // New browser instance with WebdriverIO
+        self.devices = webdriverio.multiremote(self.deviceOptions);
+
+        var tileWidth = Math.floor(1600 / self.devicesCount());
+
+        return self.devices.init()
+            .timeoutsAsyncScript(5 * 1000)
+            .windowHandleSize({width: tileWidth, height: 600})
+            .then(function () {
+                // Align windows on screen
+                var x = 0;
+                Object.keys(self.deviceOptions).forEach(function (deviceName) {
+                    self.devices.select(deviceName).windowHandlePosition({x: x, y: 0});
+                    x += tileWidth;
+                });
+
+                // legacy variables
+                self.deviceA = self.devices.select('A');
+                self.deviceB = self.devices.select('B');
+            });
+    },
+
+    pairBrowsersViaURL: function() {
         var self = this;
 
         var deviceA = self.devices.select('A');
@@ -75,6 +112,10 @@ var utility = {
         })
     },
 
+    pairBrowsersViaXDMVC: function() {
+
+    },
+
     devicesCount : function() {
         var self = this;
         return Object.keys(self.deviceOptions).length;
@@ -102,7 +143,7 @@ function multiAction (devices, deviceIds, callback) {
     return q.all(promises);
 }
 
-describe('XD-MVC Example Gallery', function() {
+describe('XD-MVC Maps', function() {
     var self = this;
 
     // Set test timeout
@@ -113,45 +154,25 @@ describe('XD-MVC Example Gallery', function() {
     self.baseUrl = "http://me.local:8082/gallery.html";
 
     // Bind function to this reference
-    self.setupConnectedBrowsers = utility.setupConnectedBrowsers.bind(self);
+    self.pairBrowsersViaURL = utility.pairBrowsersViaURL.bind(self);
     self.devicesCount = utility.devicesCount.bind(self);
 
-    var initWithDevices = function(devices) {
+});
 
-        // Store id into device
-        Object.keys(devices).forEach(function(id) {
-            var dev = devices[id];
-            debug(id, dev);
-            dev["id"] = id;
-            debug(id, dev);
-        });
+describe('XD-MVC Gallery', function() {
+    var self = this;
 
-        debug(devices);
+    // Set test timeout
+    this.timeout(15 * 1000);
 
-        self.deviceOptions = devices;
+    self.deviceOptions = {};
+    self.devices = {};
+    self.baseUrl = "http://me.local:8082/gallery.html";
 
-        // New browser instance with WebdriverIO
-        self.devices = webdriverio.multiremote(self.deviceOptions);
-        //attachCustomFunctions(this.devices);
-
-        var tileWidth = Math.floor(1600 / self.devicesCount());
-
-        return self.devices.init()
-            .timeoutsAsyncScript(5 * 1000)
-            .windowHandleSize({width: tileWidth, height: 600})
-            .then(function () {
-                // Align windows on screen
-                var x = 0;
-                Object.keys(self.deviceOptions).forEach(function (deviceName) {
-                    self.devices.select(deviceName).windowHandlePosition({x: x, y: 0});
-                    x += tileWidth;
-                });
-
-                // legacy variables
-                self.deviceA = self.devices.select('A');
-                self.deviceB = self.devices.select('B');
-            });
-    }.bind(this);
+    // Bind function to this reference
+    self.pairBrowsersViaURL = utility.pairBrowsersViaURL.bind(self);
+    self.devicesCount = utility.devicesCount.bind(self);
+    var initWithDevices = utility.initWithDevices.bind(this);
 
 
     beforeEach(function () {
@@ -166,7 +187,7 @@ describe('XD-MVC Example Gallery', function() {
         it ('should count XDconnection events', function() {
 
             return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
-                return self.setupConnectedBrowsers();
+                return self.pairBrowsersViaURL();
             }).then(function() {
                 return self.deviceA.execute(getEventCounter).then(function(ret) {
                     debug('A: got eventCounter: ');
@@ -180,7 +201,7 @@ describe('XD-MVC Example Gallery', function() {
     it('should not share cookies across browser sessions', function () {
 
         return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
-            return self.setupConnectedBrowsers();
+            return self.pairBrowsersViaURL();
         }).then(function() {
             return self.deviceA.url(this.baseUrl).then(function () {
                 return self.deviceB.url(self.baseUrl);
@@ -215,7 +236,7 @@ describe('XD-MVC Example Gallery', function() {
         };
 
         return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
-            return self.setupConnectedBrowsers();
+            return self.pairBrowsersViaURL();
         }).then(function() {
             return self.deviceA.url(self.baseUrl).then(function () {
                 return self.deviceB.url(self.baseUrl);
@@ -274,7 +295,7 @@ describe('XD-MVC Example Gallery', function() {
                 var imageUrlA;
 
                 return initWithDevices(setup.devices).then(function() {
-                    return self.setupConnectedBrowsers();
+                    return self.pairBrowsersViaURL();
                 }).then(function() {
                     return self.deviceA.waitForVisible('h2.gallery-overview', 5000).then(function () {
                         //debug('A: h2.gallery-overview is visible');
