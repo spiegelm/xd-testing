@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "description": "",
   "dependencies": {
-    "buster": "^0.7.18",
-    "buster-selenium": "0.0.6",
     "chromedriver": "^2.20.0",
+    "mocha": "^2.4.5",
     "q": "^1.4.1",
     "selenium-standalone": "^4.8.0",
     "selenium-webdriver": "^2.48.2",
@@ -13,7 +12,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "./node_modules/.bin/buster-test -r specification"
+    "test": "./node_modules/.bin/mocha"
   },
   "author": "Michael Spiegel"
 }
