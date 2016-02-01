@@ -12,7 +12,9 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "./node_modules/.bin/mocha"
+    "pretest": "npm run cleanup",
+    "test": "./node_modules/.bin/mocha",
+    "cleanup": "rm -rf screenshots/*"
   },
   "author": "Michael Spiegel"
 }
