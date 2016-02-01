@@ -224,7 +224,7 @@ describe('XD-MVC Example Gallery', function() {
         }
     };
 
-    describe.only('should show the selected image on the other devices', function () {
+    describe('should show the selected image on the other devices', function () {
 
         var setups = [
             {devices: {A: templates.windows_chrome, B: templates.nexus4}},
@@ -246,7 +246,7 @@ describe('XD-MVC Example Gallery', function() {
                 return initWithDevices(setup.devices).then(function() {
                     return self.setupConnectedBrowsers();
                 }).then(function() {
-                    self.deviceA.waitForVisible('h2.gallery-overview', 5000).then(function () {
+                    return self.deviceA.waitForVisible('h2.gallery-overview', 5000).then(function () {
                         console.log('A: h2.gallery-overview is visible');
                     }).click('//*[text()="Bike Tours"]').then(function () {
                         console.log('A: clicked Bike Tours');
