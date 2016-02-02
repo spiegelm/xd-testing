@@ -243,6 +243,55 @@ describe('XD-MVC Maps', function() {
         });
     });
 
+    var pairDevicesViaMapsGui = () => {
+        var deviceA = self.devices.select('A');
+        var deviceB = self.devices.select('B');
+
+        var deviceIdA = deviceA.url(self.baseUrl).then(function () {
+            debug('A: init');
+        }).execute(injectEventLogger).then(function () {
+            debug('A: injected event logger');
+        }).execute(function () {
+            return XDmvc.deviceId;
+        }).then(function (ret) {
+            return ret.value;
+        });
+
+        var deviceIdB = deviceB.url(self.baseUrl).then(function () {
+            debug('B: init');
+        }).execute(injectEventLogger).then(function () {
+            debug('B: injected event logger');
+        }).execute(function () {
+            return XDmvc.deviceId;
+        }).then(function (ret) {
+            return ret.value;
+        });
+
+        return q.all([deviceIdA, deviceIdB]).then(function (vals) {
+            // Both devices are ready
+            var idA = vals[0];
+            var idB = vals[1];
+
+            return deviceA.click('#menu-button')
+                .waitForVisible('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]', 3000)
+                .click('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]')
+                .waitUntil(function () {
+                    return deviceA.execute(getEventCounter).then(function (ret) {
+                        debug('A: got eventCounter: ');
+                        debug(ret.value);
+                        return ret.value.XDconnection == 1;
+                    });
+                });
+        });
+    };
+
+    it('should pair via GUI', function() {
+        var devices = {A: templates.windows_chrome(), B: templates.windows_chrome()};
+
+        return initWithDevices(devices).then(() => {
+            return pairDevicesViaMapsGui();
+        });
+    });
     it('should sync the map center on mirrored devices', function() {
         var devices = {A: templates.windows_chrome(), B: templates.windows_chrome()};
 
