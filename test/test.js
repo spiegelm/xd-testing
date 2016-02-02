@@ -79,7 +79,7 @@ var utility = {
             });
     },
 
-    pairBrowsersViaURL: function() {
+    pairDevicesViaURL: function() {
         var self = this;
 
         var deviceA = self.devices.select('A');
@@ -114,7 +114,7 @@ var utility = {
         })
     },
 
-    pairBrowsersViaXDMVC: function() {
+    pairDevicesViaXDMVC: function() {
         var self = this;
 
         var deviceA = self.devices.select('A');
@@ -220,8 +220,8 @@ describe('XD-MVC Maps', function() {
     self.baseUrl = "http://me.local:8000/maps.html";
 
     // Bind function to this reference
-    self.pairBrowsersViaURL = utility.pairBrowsersViaURL.bind(self);
-    self.pairBrowsersViaXDMVC = utility.pairBrowsersViaXDMVC.bind(self);
+    self.pairDevicesViaURL = utility.pairDevicesViaURL.bind(self);
+    self.pairDevicesViaXDMVC = utility.pairDevicesViaXDMVC.bind(self);
     self.devicesCount = utility.devicesCount.bind(self);
     var initWithDevices = utility.initWithDevices.bind(self);
 
@@ -234,7 +234,7 @@ describe('XD-MVC Maps', function() {
 
     it('should pair via XDmvc.connectTo', function () {
         var devices = {A: templates.windows_chrome(), B: templates.windows_chrome()};
-        return initWithDevices(devices).then(() => self.pairBrowsersViaXDMVC()).then(() => {
+        return initWithDevices(devices).then(() => self.pairDevicesViaXDMVC()).then(() => {
             return self.devices.select('A').execute(function () {
                 return XDmvc.getConnectedDevices().length;
             }).then(function (ret) {
@@ -292,10 +292,12 @@ describe('XD-MVC Maps', function() {
             return pairDevicesViaMapsGui();
         });
     });
+
+    // TODO add more setups
     it('should sync the map center on mirrored devices', function() {
         var devices = {A: templates.windows_chrome(), B: templates.windows_chrome()};
 
-        return initWithDevices(devices).then(() => self.pairBrowsersViaXDMVC()).then(() => {
+        return initWithDevices(devices).then(() => self.pairDevicesViaXDMVC()).then(() => {
             var deviceA = self.devices.select('A');
             var deviceB = self.devices.select('B');
 
@@ -337,7 +339,7 @@ describe('XD-MVC Gallery', function() {
     self.baseUrl = "http://me.local:8082/gallery.html";
 
     // Bind function to this reference
-    self.pairBrowsersViaURL = utility.pairBrowsersViaURL.bind(self);
+    self.pairDevicesViaURL = utility.pairDevicesViaURL.bind(self);
     self.devicesCount = utility.devicesCount.bind(self);
     var initWithDevices = utility.initWithDevices.bind(this);
 
@@ -354,7 +356,7 @@ describe('XD-MVC Gallery', function() {
         it ('should count XDconnection events', function() {
 
             return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
-                return self.pairBrowsersViaURL();
+                return self.pairDevicesViaURL();
             }).then(function() {
                 return self.deviceA.execute(getEventCounter).then(function(ret) {
                     debug('A: got eventCounter: ');
@@ -368,7 +370,7 @@ describe('XD-MVC Gallery', function() {
     it('should not share cookies across browser sessions', function () {
 
         return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
-            return self.pairBrowsersViaURL();
+            return self.pairDevicesViaURL();
         }).then(function() {
             return self.deviceA.url(this.baseUrl).then(function () {
                 return self.deviceB.url(self.baseUrl);
@@ -403,7 +405,7 @@ describe('XD-MVC Gallery', function() {
         };
 
         return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
-            return self.pairBrowsersViaURL();
+            return self.pairDevicesViaURL();
         }).then(function() {
             return self.deviceA.url(self.baseUrl).then(function () {
                 return self.deviceB.url(self.baseUrl);
@@ -441,7 +443,7 @@ describe('XD-MVC Gallery', function() {
                 var imageUrlA;
 
                 return initWithDevices(setup.devices).then(function() {
-                    return self.pairBrowsersViaURL();
+                    return self.pairDevicesViaURL();
                 }).then(function() {
                     return self.deviceA.waitForVisible('h2.gallery-overview', 5000).then(function () {
                         //debug('A: h2.gallery-overview is visible');
