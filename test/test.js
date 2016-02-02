@@ -43,6 +43,8 @@ var utility = {
 
     initWithDevices: function(devices) {
 
+        var self = this;
+
         // Store id into device
         Object.keys(devices).forEach(function(id) {
             var dev = devices[id];
@@ -113,12 +115,72 @@ var utility = {
     },
 
     pairBrowsersViaXDMVC: function() {
+        var self = this;
 
+        var deviceA = self.devices.select('A');
+        var deviceB = self.devices.select('B');
+
+        // TODO wait for XD "initialized" event
+
+        var deviceIdA = deviceA.url(self.baseUrl).then(function () {
+            debug('A: init');
+        }).execute(injectEventLogger).then(function () {
+            debug('A: injected event logger');
+        }).execute(function() {
+            return XDmvc.deviceId;
+        }).then(function(ret) {
+            return ret.value;
+        });
+
+        var deviceIdB = deviceB.url(self.baseUrl).then(function () {
+            debug('B: init');
+        }).execute(injectEventLogger).then(function () {
+            debug('B: injected event logger');
+        }).execute(function() {
+            return XDmvc.deviceId;
+        }).then(function(ret) {
+            return ret.value;
+        });
+
+        return q.all([deviceIdA, deviceIdB]).then(function(vals) {
+            var idA = vals[0];
+            var idB = vals[1];
+            return deviceA.execute(function(id) {
+                XDmvc.connectTo(id);
+            }, idB).then(function() {
+                return deviceA.waitUntil(function () {
+                    return deviceA.execute(getEventCounter).then(function (ret) {
+                        debug('A: got eventCounter: ');
+                        debug(ret.value);
+                        debug('devices.length:', self.devicesCount());
+                        return ret.value.XDconnection == self.devicesCount() - 1;
+                    });
+                });
+            });
+
+        });
     },
 
     devicesCount : function() {
         var self = this;
         return Object.keys(self.deviceOptions).length;
+    }
+};
+
+var templates = {
+    windows_chrome: function() {
+        // Generate a new object
+        return {
+            name: 'Chrome (Win)',
+            desiredCapabilities: {browserName: 'chrome'}
+        };
+    },
+    nexus4: function() {
+        // Generate a new object
+        return {
+            name: 'Nexus 4',
+            desiredCapabilities: {browserName: 'chrome'}
+        }
     }
 };
 
@@ -143,6 +205,10 @@ function multiAction (devices, deviceIds, callback) {
     return q.all(promises);
 }
 
+var screenshotPath = function(test, device) {
+    return './screenshots/' + test.fullTitle() + ' - ' + device.options.id + ' ' + device.options.name + '.png';
+};
+
 describe('XD-MVC Maps', function() {
     var self = this;
 
@@ -151,11 +217,57 @@ describe('XD-MVC Maps', function() {
 
     self.deviceOptions = {};
     self.devices = {};
-    self.baseUrl = "http://me.local:8082/gallery.html";
+    self.baseUrl = "http://me.local:8000/maps.html";
 
     // Bind function to this reference
     self.pairBrowsersViaURL = utility.pairBrowsersViaURL.bind(self);
+    self.pairBrowsersViaXDMVC = utility.pairBrowsersViaXDMVC.bind(self);
     self.devicesCount = utility.devicesCount.bind(self);
+    var initWithDevices = utility.initWithDevices.bind(self);
+
+
+    afterEach(function() {
+        // Close browsers before completing a test
+        return self.devices.end();
+    });
+
+
+    it('should pair via XDmvc.connectTo', function () {
+        var devices = {A: templates.windows_chrome(), B: templates.windows_chrome()};
+        return initWithDevices(devices).then(() => self.pairBrowsersViaXDMVC()).then(() => {
+            return self.devices.select('A').execute(function () {
+                return XDmvc.getConnectedDevices().length;
+            }).then(function (ret) {
+                assert.equal(ret.value, 1);
+            });
+        });
+    });
+
+    it('should sync the map center on mirrored devices', function() {
+        var devices = {A: templates.windows_chrome(), B: templates.windows_chrome()};
+
+        return initWithDevices(devices).then(() => self.pairBrowsersViaXDMVC()).then(() => {
+            var deviceA = self.devices.select('A');
+            var deviceB = self.devices.select('B');
+
+            var lastXDSyncCount;
+
+            return deviceA.execute(function() {
+                return eventLogger.eventCounter.XDsync;
+            }).then((ret) => {
+                lastXDSyncCount = ret.value;
+                return deviceB.execute(function() {
+                    map.setCenter({lat: 47.378356928925186, lng: 8.54871779680252})
+                });
+            }).waitUntil(() => deviceA.execute(function(lastSyncCounter) {
+                return eventLogger.eventCounter.XDsync > lastSyncCounter;
+            }), lastXDSyncCount).execute(function() {
+                return eventLogger.eventCounter.XDsync
+            }).then((ret) => {
+                assert.ok(lastXDSyncCount < ret.value, 'Number of syncs has not increased.');
+            }).pause(1000).saveScreenshot(screenshotPath(self, deviceA)).then(() => deviceB.saveScreenshot(screenshotPath(self, deviceB)));
+        });
+    });
 
 });
 
@@ -179,7 +291,7 @@ describe('XD-MVC Gallery', function() {
     });
 
     afterEach(function() {
-        // Close browser before completing a test
+        // Close browsers before completing a test
         return self.devices.end();
     });
 
@@ -251,23 +363,6 @@ describe('XD-MVC Gallery', function() {
         });
     });
 
-    var templates = {
-        windows_chrome: function() {
-            // Generate a new object
-            return {
-                name: 'Chrome (Win)',
-                desiredCapabilities: {browserName: 'chrome'}
-            };
-        },
-        nexus4: function() {
-            // Generate a new object
-            return {
-                name: 'Nexus 4',
-                desiredCapabilities: {browserName: 'chrome'}
-            }
-        }
-    };
-
     describe('should show the selected image on the other devices', function () {
 
         var setups = [
@@ -288,10 +383,6 @@ describe('XD-MVC Gallery', function() {
                 var test = this.test;
 
                 var i = 0;
-                var screenshotPath = function(device) {
-                    return './screenshots/' + test.fullTitle() + ' - ' + device.options.id + ' ' + device.options.name + '.png';
-                };
-
                 var imageUrlA;
 
                 return initWithDevices(setup.devices).then(function() {
@@ -334,13 +425,13 @@ describe('XD-MVC Gallery', function() {
                             });
 
                             return multiAction(self.devices, allButA, function (device) {
-                                return device.saveScreenshot(screenshotPath(device)).then(function() {
+                                return device.saveScreenshot(screenshotPath(self, device)).then(function() {
                                     assert.equal(typeof err, "undefined");
                                     debug(device.options.id + ': save screenshot');
                                 });
                             });
                         });
-                    }).saveScreenshot(screenshotPath(self.deviceA)).then(function() {
+                    }).saveScreenshot(screenshotPath(self, self.deviceA)).then(function() {
                         assert.equal(typeof err, "undefined");
                         debug(self.deviceA.options.id + ': save screenshot');
                     });
