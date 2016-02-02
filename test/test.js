@@ -257,14 +257,20 @@ describe('XD-MVC Maps', function() {
             }).then((ret) => {
                 lastXDSyncCount = ret.value;
                 return deviceB.execute(function() {
-                    map.setCenter({lat: 47.378356928925186, lng: 8.54871779680252})
+                    map.setCenter({lat: 47.3783569289, lng: 8.5487177968});
                 });
             }).waitUntil(() => deviceA.execute(function(lastSyncCounter) {
                 return eventLogger.eventCounter.XDsync > lastSyncCounter;
             }), lastXDSyncCount).execute(function() {
-                return eventLogger.eventCounter.XDsync
+                return {
+                    XDsync: eventLogger.eventCounter.XDsync,
+                    map_lat: map.getCenter().lat(),
+                    map_lng: map.getCenter().lng()
+                };
             }).then((ret) => {
-                assert.ok(lastXDSyncCount < ret.value, 'Number of syncs has not increased.');
+                assert.ok(lastXDSyncCount < ret.value.XDsync, 'Number of syncs has not increased.');
+                assert.equal(ret.value.map_lat.toFixed(10), 47.3783569289);
+                assert.equal(ret.value.map_lng.toFixed(10),  8.5487177968);
             }).pause(1000).saveScreenshot(screenshotPath(self, deviceA)).then(() => deviceB.saveScreenshot(screenshotPath(self, deviceB)));
         });
     });
