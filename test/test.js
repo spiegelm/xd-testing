@@ -424,7 +424,8 @@ describe('XD-MVC Gallery', function() {
 
         var setups = [
             {devices: {A: templates.windows_chrome(), B: templates.nexus4()}},
-            {devices: {A: templates.windows_chrome(), B: templates.nexus4(), C: templates.nexus4()}}
+            {devices: {A: templates.windows_chrome(), B: templates.nexus4(), C: templates.nexus4()}},
+            {devices: {A: templates.windows_chrome(), B: templates.nexus4(), C: templates.nexus4(), D: templates.nexus4(), E: templates.nexus4()}}
         ];
 
         setups.forEach(function(setup) {
@@ -482,13 +483,13 @@ describe('XD-MVC Gallery', function() {
                             });
 
                             return multiAction(self.devices, allButA, function (device) {
-                                return device.saveScreenshot(screenshotPath(self, device)).then(function() {
+                                return device.saveScreenshot(screenshotPath(test, device)).then(function() {
                                     assert.equal(typeof err, "undefined");
                                     debug(device.options.id + ': save screenshot');
                                 });
                             });
                         });
-                    }).saveScreenshot(screenshotPath(self, self.deviceA)).then(function() {
+                    }).saveScreenshot(screenshotPath(test, self.deviceA)).then(function() {
                         assert.equal(typeof err, "undefined");
                         debug(self.deviceA.options.id + ': save screenshot');
                     });
