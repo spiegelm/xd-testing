@@ -2,6 +2,10 @@
 
 var assert = require('chai').assert;
 var webdriverio = require('webdriverio');
+
+/**
+ * @type {Q}
+ */
 var q = require('q');
 
 var debug = function() {
@@ -179,14 +183,18 @@ var templates = {
     }
 };
 
+/**
+ * @callback multiActionCallback
+ * @param {WebdriverIO.Client} device
+ */
 
 /**
  * Executes callback on devices matching deviceNames.
- * Returns an promise.
+ * Returns a promise.
  * @param devices
  * @param deviceIds
- * @param callback
- * @returns
+ * @param {multiActionCallback} callback
+ * @returns Q.Promise<T[]>
  */
 function multiAction (devices, deviceIds, callback) {
     var promises = [];
