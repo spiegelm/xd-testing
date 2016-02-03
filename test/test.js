@@ -437,7 +437,6 @@ describe('XD-MVC Gallery', function() {
 
                 var test = this.test;
 
-                var i = 0;
                 var imageUrlA;
 
                 return initWithDevices(setup.devices).then(function() {
