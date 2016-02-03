@@ -431,10 +431,7 @@ describe('XD-MVC Gallery', function() {
         setups.forEach(function(setup) {
 
             // Assemble setup name
-            var setupName = Object.keys(setup.devices).map(function(key) {
-                var dev = setup.devices[key];
-                return dev.name;
-            }).join(', ');
+            var setupName = Object.keys(setup.devices).map(key => setup.devices[key].name).join(', ');
 
             it('on ' + setupName, function() {
 
