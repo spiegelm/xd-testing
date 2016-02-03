@@ -1,7 +1,11 @@
 "use strict";
 
-var assert = require('assert');
+var assert = require('chai').assert;
 var webdriverio = require('webdriverio');
+
+/**
+ * @type {Q}
+ */
 var q = require('q');
 
 var debug = function() {
@@ -40,7 +44,46 @@ var getEventCounter = function() {
 };
 
 var utility = {
-    setupConnectedBrowsers: function() {
+
+    initWithDevices: function(devices) {
+
+        var self = this;
+
+        // Store id into device
+        Object.keys(devices).forEach(function(id) {
+            var dev = devices[id];
+            debug(id, dev);
+            dev["id"] = id;
+            debug(id, dev);
+        });
+
+        debug(devices);
+
+        self.deviceOptions = devices;
+
+        // New browser instance with WebdriverIO
+        self.devices = webdriverio.multiremote(self.deviceOptions);
+
+        var tileWidth = Math.floor(1600 / self.devicesCount());
+
+        return self.devices.init()
+            .timeoutsAsyncScript(5 * 1000)
+            .windowHandleSize({width: tileWidth, height: 600})
+            .then(function () {
+                // Align windows on screen
+                var x = 0;
+                Object.keys(self.deviceOptions).forEach(function (deviceName) {
+                    self.devices.select(deviceName).windowHandlePosition({x: x, y: 0});
+                    x += tileWidth;
+                });
+
+                // legacy variables
+                self.deviceA = self.devices.select('A');
+                self.deviceB = self.devices.select('B');
+            });
+    },
+
+    pairDevicesViaURL: function() {
         var self = this;
 
         var deviceA = self.devices.select('A');
@@ -75,20 +118,83 @@ var utility = {
         })
     },
 
+    pairDevicesViaXDMVC: function() {
+        var self = this;
+
+        var deviceA = self.devices.select('A');
+        var deviceB = self.devices.select('B');
+
+        // TODO wait for XD "initialized" event
+
+        var allDevices = Object.keys(self.deviceOptions);
+
+        return multiAction(self.devices, allDevices, (device) => {
+            return device.url(self.baseUrl).then(function () {
+                debug('init');
+            }).execute(injectEventLogger).then(function () {
+                debug('injected event logger');
+            }).execute(function() {
+                return XDmvc.deviceId;
+            }).then(ret => ret.value);
+        }).then(function(vals) {
+
+            // Connect first device with all the others
+            var connect = vals.slice(1).map(idOther => {
+                
+                // Omit first id, loop over the others
+                return deviceA.execute(function (id) {
+                    XDmvc.connectTo(id);
+                }, idOther);
+            });
+
+            return q.all(connect).then(() => {
+                return deviceA.waitUntil(function () {
+                    return deviceA.execute(getEventCounter).then(function (ret) {
+                        debug('A: got eventCounter: ');
+                        debug(ret.value);
+                        debug('devices.length:', self.devicesCount());
+                        return ret.value.XDconnection == self.devicesCount() - 1;
+                    });
+                });
+            });
+        });
+    },
+
     devicesCount : function() {
         var self = this;
         return Object.keys(self.deviceOptions).length;
     }
 };
 
+var templates = {
+    windows_chrome: function() {
+        // Generate a new object
+        return {
+            name: 'Chrome (Win)',
+            desiredCapabilities: {browserName: 'chrome'}
+        };
+    },
+    nexus4: function() {
+        // Generate a new object
+        return {
+            name: 'Nexus 4',
+            desiredCapabilities: {browserName: 'chrome'}
+        }
+    }
+};
+
+/**
+ * @callback multiActionCallback
+ * @param {WebdriverIO.Client} device
+ */
 
 /**
  * Executes callback on devices matching deviceNames.
- * Returns an promise.
+ * Returns a promise.
  * @param devices
  * @param deviceIds
- * @param callback
- * @returns
+ * @param {multiActionCallback} callback
+ * @returns Q.Promise<T[]>
  */
 function multiAction (devices, deviceIds, callback) {
     var promises = [];
@@ -102,7 +208,173 @@ function multiAction (devices, deviceIds, callback) {
     return q.all(promises);
 }
 
-describe('XD-MVC Example Gallery', function() {
+var screenshotPath = function(test, device) {
+    return './screenshots/' + test.fullTitle() + ' - ' + device.options.id + ' ' + device.options.name + '.png';
+};
+
+describe('XD-MVC Maps', function() {
+    var self = this;
+
+    // Set test timeout
+    this.timeout(30 * 1000);
+
+    self.deviceOptions = {};
+    self.devices = {};
+    self.baseUrl = "http://me.local:8000/maps.html";
+
+    // Bind function to this reference
+    self.pairDevicesViaURL = utility.pairDevicesViaURL.bind(self);
+    self.pairDevicesViaXDMVC = utility.pairDevicesViaXDMVC.bind(self);
+    self.devicesCount = utility.devicesCount.bind(self);
+    var initWithDevices = utility.initWithDevices.bind(self);
+
+
+    afterEach(function() {
+        // Close browsers before completing a test
+        return self.devices.end();
+    });
+
+
+    it('should pair via XDmvc.connectTo', function () {
+        var devices = {A: templates.windows_chrome(), B: templates.windows_chrome()};
+        return initWithDevices(devices).then(() => self.pairDevicesViaXDMVC()).then(() => {
+            return self.devices.select('A').execute(function () {
+                return XDmvc.getConnectedDevices().length;
+            }).then(function (ret) {
+                assert.equal(ret.value, 1);
+            });
+        });
+    });
+
+    var pairDevicesViaMapsGui = () => {
+        var deviceA = self.devices.select('A');
+        var deviceB = self.devices.select('B');
+
+        var deviceIdA = deviceA.url(self.baseUrl).then(function () {
+            debug('A: init');
+        }).execute(injectEventLogger).then(function () {
+            debug('A: injected event logger');
+        }).execute(function () {
+            return XDmvc.deviceId;
+        }).then(function (ret) {
+            return ret.value;
+        });
+
+        var deviceIdB = deviceB.url(self.baseUrl).then(function () {
+            debug('B: init');
+        }).execute(injectEventLogger).then(function () {
+            debug('B: injected event logger');
+        }).execute(function () {
+            return XDmvc.deviceId;
+        }).then(function (ret) {
+            return ret.value;
+        });
+
+        return q.all([deviceIdA, deviceIdB]).then(function (vals) {
+            // Both devices are ready
+            var idA = vals[0];
+            var idB = vals[1];
+
+            return deviceA.click('#menu-button')
+                .waitForVisible('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]', 3000)
+                .click('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]')
+                .waitUntil(function () {
+                    return deviceA.execute(getEventCounter).then(function (ret) {
+                        debug('A: got eventCounter: ');
+                        debug(ret.value);
+                        return ret.value.XDconnection == 1;
+                    });
+                });
+        });
+    };
+
+    it('should pair via GUI', function() {
+        var devices = {A: templates.windows_chrome(), B: templates.windows_chrome()};
+
+        return initWithDevices(devices).then(() => {
+            return pairDevicesViaMapsGui();
+        });
+    });
+
+
+    describe('should sync the map center on mirrored devices', function() {
+
+        var setups = [
+            {devices: {A: templates.windows_chrome(), B: templates.nexus4()}},
+            {devices: {A: templates.windows_chrome(), B: templates.nexus4(), C: templates.nexus4()}}
+        ];
+
+        setups.forEach(function(setup) {
+
+            // Assemble setup name
+            var setupName = Object.keys(setup.devices).map(function (key) {
+                var dev = setup.devices[key];
+                return dev.name;
+            }).join(', ');
+
+            it('on ' + setupName, function () {
+                var test = this.test;
+
+                var devices = setup.devices;
+
+                return initWithDevices(devices).then(() => self.pairDevicesViaXDMVC()).then(() => {
+                    var deviceA = self.devices.select('A');
+
+                    var lastXDSyncCounts;
+
+                    var allDevices = Object.keys(self.deviceOptions);
+                    var passiveDevices = allDevices.filter((id) => id != 'A');
+
+                    return multiAction(self.devices, passiveDevices, function(device) {
+                        return device.execute(function() {
+                            return eventLogger.eventCounter.XDsync;
+                        }).then(ret => {
+                            return {id: device.options.id, XDsync: ret.value};
+                        });
+                    }).then(function(values) {
+                        // Store last sync counter
+                        lastXDSyncCounts = {};
+                        values.forEach(val => { lastXDSyncCounts[val.id] = val.XDsync });
+
+                        // Adjust map location
+                        return deviceA.execute(function () {
+                            map.setCenter({lat: 47.3783569289, lng: 8.5487177968});
+                        });
+                    }).then(() => multiAction(self.devices, passiveDevices, device => {
+                        return device.waitUntil(() => device.execute(function (lastSyncCounter) {
+                            return eventLogger.eventCounter.XDsync > lastSyncCounter;
+                        }, lastXDSyncCounts[device.options.id]))
+                    })).then(() => multiAction(self.devices, passiveDevices, device =>
+                        device.execute(function(id) {
+                            return {
+                                id: id,
+                                XDsync: eventLogger.eventCounter.XDsync,
+                                map_lat: map.getCenter().lat(),
+                                map_lng: map.getCenter().lng()
+                            };
+                        }, device.options.id)
+                    )).then(returns => {
+                        return returns.map(ret => ret.value);
+                    }).then(values => {
+
+                        values.forEach(value => {
+                            assert.isAbove(value.XDsync, lastXDSyncCounts[value.id], 'Number of syncs has not increased.');
+                            assert.equal(value.map_lat.toFixed(10), 47.3783569289);
+                            assert.equal(value.map_lng.toFixed(10), 8.5487177968);
+                        });
+
+                        return multiAction(self.devices, allDevices, device => {
+                            return device.pause(1000).saveScreenshot(screenshotPath(test, device));
+                        });
+                    });
+                });
+            });
+        });
+    });
+
+});
+
+describe('XD-MVC Gallery', function() {
     var self = this;
 
     // Set test timeout
@@ -113,52 +385,16 @@ describe('XD-MVC Example Gallery', function() {
     self.baseUrl = "http://me.local:8082/gallery.html";
 
     // Bind function to this reference
-    self.setupConnectedBrowsers = utility.setupConnectedBrowsers.bind(self);
+    self.pairDevicesViaURL = utility.pairDevicesViaURL.bind(self);
     self.devicesCount = utility.devicesCount.bind(self);
-
-    var initWithDevices = function(devices) {
-
-        // Store id into device
-        Object.keys(devices).forEach(function(id) {
-            var dev = devices[id];
-            debug(id, dev);
-            dev["id"] = id;
-            debug(id, dev);
-        });
-
-        debug(devices);
-
-        self.deviceOptions = devices;
-
-        // New browser instance with WebdriverIO
-        self.devices = webdriverio.multiremote(self.deviceOptions);
-        //attachCustomFunctions(this.devices);
-
-        var tileWidth = Math.floor(1600 / self.devicesCount());
-
-        return self.devices.init()
-            .timeoutsAsyncScript(5 * 1000)
-            .windowHandleSize({width: tileWidth, height: 600})
-            .then(function () {
-                // Align windows on screen
-                var x = 0;
-                Object.keys(self.deviceOptions).forEach(function (deviceName) {
-                    self.devices.select(deviceName).windowHandlePosition({x: x, y: 0});
-                    x += tileWidth;
-                });
-
-                // legacy variables
-                self.deviceA = self.devices.select('A');
-                self.deviceB = self.devices.select('B');
-            });
-    }.bind(this);
+    var initWithDevices = utility.initWithDevices.bind(this);
 
 
     beforeEach(function () {
     });
 
     afterEach(function() {
-        // Close browser before completing a test
+        // Close browsers before completing a test
         return self.devices.end();
     });
 
@@ -166,7 +402,7 @@ describe('XD-MVC Example Gallery', function() {
         it ('should count XDconnection events', function() {
 
             return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
-                return self.setupConnectedBrowsers();
+                return self.pairDevicesViaURL();
             }).then(function() {
                 return self.deviceA.execute(getEventCounter).then(function(ret) {
                     debug('A: got eventCounter: ');
@@ -180,7 +416,7 @@ describe('XD-MVC Example Gallery', function() {
     it('should not share cookies across browser sessions', function () {
 
         return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
-            return self.setupConnectedBrowsers();
+            return self.pairDevicesViaURL();
         }).then(function() {
             return self.deviceA.url(this.baseUrl).then(function () {
                 return self.deviceB.url(self.baseUrl);
@@ -215,7 +451,7 @@ describe('XD-MVC Example Gallery', function() {
         };
 
         return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
-            return self.setupConnectedBrowsers();
+            return self.pairDevicesViaURL();
         }).then(function() {
             return self.deviceA.url(self.baseUrl).then(function () {
                 return self.deviceB.url(self.baseUrl);
@@ -230,51 +466,27 @@ describe('XD-MVC Example Gallery', function() {
         });
     });
 
-    var templates = {
-        windows_chrome: function() {
-            // Generate a new object
-            return {
-                name: 'Chrome (Win)',
-                desiredCapabilities: {browserName: 'chrome'}
-            };
-        },
-        nexus4: function() {
-            // Generate a new object
-            return {
-                name: 'Nexus 4',
-                desiredCapabilities: {browserName: 'chrome'}
-            }
-        }
-    };
-
     describe('should show the selected image on the other devices', function () {
 
         var setups = [
             {devices: {A: templates.windows_chrome(), B: templates.nexus4()}},
-            {devices: {A: templates.windows_chrome(), B: templates.nexus4(), C: templates.nexus4()}}
+            {devices: {A: templates.windows_chrome(), B: templates.nexus4(), C: templates.nexus4()}},
+            {devices: {A: templates.windows_chrome(), B: templates.nexus4(), C: templates.nexus4(), D: templates.nexus4(), E: templates.nexus4()}}
         ];
 
         setups.forEach(function(setup) {
 
             // Assemble setup name
-            var setupName = Object.keys(setup.devices).map(function(key) {
-                var dev = setup.devices[key];
-                return dev.name;
-            }).join(', ');
+            var setupName = Object.keys(setup.devices).map(key => setup.devices[key].name).join(', ');
 
             it('on ' + setupName, function() {
 
                 var test = this.test;
 
-                var i = 0;
-                var screenshotPath = function(device) {
-                    return './screenshots/' + test.fullTitle() + ' - ' + device.options.id + ' ' + device.options.name + '.png';
-                };
-
                 var imageUrlA;
 
                 return initWithDevices(setup.devices).then(function() {
-                    return self.setupConnectedBrowsers();
+                    return self.pairDevicesViaURL();
                 }).then(function() {
                     return self.deviceA.waitForVisible('h2.gallery-overview', 5000).then(function () {
                         //debug('A: h2.gallery-overview is visible');
@@ -313,16 +525,10 @@ describe('XD-MVC Example Gallery', function() {
                             });
 
                             return multiAction(self.devices, allButA, function (device) {
-                                return device.saveScreenshot(screenshotPath(device)).then(function() {
-                                    assert.equal(typeof err, "undefined");
-                                    debug(device.options.id + ': save screenshot');
-                                });
+                                return device.saveScreenshot(screenshotPath(test, device));
                             });
                         });
-                    }).saveScreenshot(screenshotPath(self.deviceA)).then(function() {
-                        assert.equal(typeof err, "undefined");
-                        debug(self.deviceA.options.id + ': save screenshot');
-                    });
+                    }).saveScreenshot(screenshotPath(test, self.deviceA));
                 });
             });
         });
