@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "",
   "dependencies": {
+    "chai": "^3.5.0",
     "chromedriver": "^2.20.0",
     "mocha": "^2.4.5",
     "q": "^1.4.1",
