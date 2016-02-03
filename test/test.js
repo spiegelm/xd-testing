@@ -122,32 +122,28 @@ var utility = {
 
         // TODO wait for XD "initialized" event
 
-        var deviceIdA = deviceA.url(self.baseUrl).then(function () {
-            debug('A: init');
-        }).execute(injectEventLogger).then(function () {
-            debug('A: injected event logger');
-        }).execute(function() {
-            return XDmvc.deviceId;
-        }).then(function(ret) {
-            return ret.value;
-        });
+        var allDevices = Object.keys(self.deviceOptions);
 
-        var deviceIdB = deviceB.url(self.baseUrl).then(function () {
-            debug('B: init');
-        }).execute(injectEventLogger).then(function () {
-            debug('B: injected event logger');
-        }).execute(function() {
-            return XDmvc.deviceId;
-        }).then(function(ret) {
-            return ret.value;
-        });
+        return multiAction(self.devices, allDevices, (device) => {
+            return device.url(self.baseUrl).then(function () {
+                debug('init');
+            }).execute(injectEventLogger).then(function () {
+                debug('injected event logger');
+            }).execute(function() {
+                return XDmvc.deviceId;
+            }).then(ret => ret.value);
+        }).then(function(vals) {
 
-        return q.all([deviceIdA, deviceIdB]).then(function(vals) {
-            var idA = vals[0];
-            var idB = vals[1];
-            return deviceA.execute(function(id) {
-                XDmvc.connectTo(id);
-            }, idB).then(function() {
+            // Connect first device with all the others
+            var connect = vals.slice(1).map(idOther => {
+                
+                // Omit first id, loop over the others
+                return deviceA.execute(function (id) {
+                    XDmvc.connectTo(id);
+                }, idOther);
+            });
+
+            return q.all(connect).then(() => {
                 return deviceA.waitUntil(function () {
                     return deviceA.execute(getEventCounter).then(function (ret) {
                         debug('A: got eventCounter: ');
@@ -157,7 +153,6 @@ var utility = {
                     });
                 });
             });
-
         });
     },
 
@@ -213,7 +208,7 @@ describe('XD-MVC Maps', function() {
     var self = this;
 
     // Set test timeout
-    this.timeout(15 * 1000);
+    this.timeout(30 * 1000);
 
     self.deviceOptions = {};
     self.devices = {};
@@ -293,36 +288,79 @@ describe('XD-MVC Maps', function() {
         });
     });
 
-    // TODO add more setups
-    it('should sync the map center on mirrored devices', function() {
-        var devices = {A: templates.windows_chrome(), B: templates.windows_chrome()};
 
-        return initWithDevices(devices).then(() => self.pairDevicesViaXDMVC()).then(() => {
-            var deviceA = self.devices.select('A');
-            var deviceB = self.devices.select('B');
+    describe('should sync the map center on mirrored devices', function() {
 
-            var lastXDSyncCount;
+        var setups = [
+            {devices: {A: templates.windows_chrome(), B: templates.nexus4()}},
+            {devices: {A: templates.windows_chrome(), B: templates.nexus4(), C: templates.nexus4()}}
+        ];
 
-            return deviceA.execute(function() {
-                return eventLogger.eventCounter.XDsync;
-            }).then((ret) => {
-                lastXDSyncCount = ret.value;
-                return deviceB.execute(function() {
-                    map.setCenter({lat: 47.3783569289, lng: 8.5487177968});
+        setups.forEach(function(setup) {
+
+            // Assemble setup name
+            var setupName = Object.keys(setup.devices).map(function (key) {
+                var dev = setup.devices[key];
+                return dev.name;
+            }).join(', ');
+
+            it('on ' + setupName, function () {
+                var test = this.test;
+
+                var devices = setup.devices;
+
+                return initWithDevices(devices).then(() => self.pairDevicesViaXDMVC()).then(() => {
+                    var deviceA = self.devices.select('A');
+
+                    var lastXDSyncCounts;
+
+                    var allDevices = Object.keys(self.deviceOptions);
+                    var passiveDevices = allDevices.filter((id) => id != 'A');
+
+                    return multiAction(self.devices, passiveDevices, function(device) {
+                        return device.execute(function() {
+                            return eventLogger.eventCounter.XDsync;
+                        }).then(ret => {
+                            return {id: device.options.id, XDsync: ret.value};
+                        });
+                    }).then(function(values) {
+                        // Store last sync counter
+                        lastXDSyncCounts = {};
+                        values.forEach(val => { lastXDSyncCounts[val.id] = val.XDsync });
+
+                        // Adjust map location
+                        return deviceA.execute(function () {
+                            map.setCenter({lat: 47.3783569289, lng: 8.5487177968});
+                        });
+                    }).then(() => multiAction(self.devices, passiveDevices, device => {
+                        return device.waitUntil(() => device.execute(function (lastSyncCounter) {
+                            return eventLogger.eventCounter.XDsync > lastSyncCounter;
+                        }, lastXDSyncCounts[device.options.id]))
+                    })).then(() => multiAction(self.devices, passiveDevices, device =>
+                        device.execute(function(id) {
+                            return {
+                                id: id,
+                                XDsync: eventLogger.eventCounter.XDsync,
+                                map_lat: map.getCenter().lat(),
+                                map_lng: map.getCenter().lng()
+                            };
+                        }, device.options.id)
+                    )).then(returns => {
+                        return returns.map(ret => ret.value);
+                    }).then(values => {
+
+                        values.forEach(value => {
+                            assert.isAbove(value.XDsync, lastXDSyncCounts[value.id], 'Number of syncs has not increased.');
+                            assert.equal(value.map_lat.toFixed(10), 47.3783569289);
+                            assert.equal(value.map_lng.toFixed(10), 8.5487177968);
+                        });
+
+                        return multiAction(self.devices, allDevices, device => {
+                            return device.pause(1000).saveScreenshot(screenshotPath(test, device));
+                        });
+                    });
                 });
-            }).waitUntil(() => deviceA.execute(function(lastSyncCounter) {
-                return eventLogger.eventCounter.XDsync > lastSyncCounter;
-            }), lastXDSyncCount).execute(function() {
-                return {
-                    XDsync: eventLogger.eventCounter.XDsync,
-                    map_lat: map.getCenter().lat(),
-                    map_lng: map.getCenter().lng()
-                };
-            }).then((ret) => {
-                assert.ok(lastXDSyncCount < ret.value.XDsync, 'Number of syncs has not increased.');
-                assert.equal(ret.value.map_lat.toFixed(10), 47.3783569289);
-                assert.equal(ret.value.map_lng.toFixed(10),  8.5487177968);
-            }).pause(1000).saveScreenshot(screenshotPath(self, deviceA)).then(() => deviceB.saveScreenshot(screenshotPath(self, deviceB)));
+            });
         });
     });
 
