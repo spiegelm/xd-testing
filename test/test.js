@@ -479,16 +479,10 @@ describe('XD-MVC Gallery', function() {
                             });
 
                             return multiAction(self.devices, allButA, function (device) {
-                                return device.saveScreenshot(screenshotPath(test, device)).then(function() {
-                                    assert.equal(typeof err, "undefined");
-                                    debug(device.options.id + ': save screenshot');
-                                });
+                                return device.saveScreenshot(screenshotPath(test, device));
                             });
                         });
-                    }).saveScreenshot(screenshotPath(test, self.deviceA)).then(function() {
-                        assert.equal(typeof err, "undefined");
-                        debug(self.deviceA.options.id + ': save screenshot');
-                    });
+                    }).saveScreenshot(screenshotPath(test, self.deviceA));
                 });
             });
         });
