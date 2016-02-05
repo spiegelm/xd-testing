@@ -76,10 +76,6 @@ var utility = {
                     self.devices.select(deviceName).windowHandlePosition({x: x, y: 0});
                     x += tileWidth;
                 });
-
-                // legacy variables
-                self.deviceA = self.devices.select('A');
-                self.deviceB = self.devices.select('B');
             });
     },
 
@@ -122,7 +118,6 @@ var utility = {
         var self = this;
 
         var deviceA = self.devices.select('A');
-        var deviceB = self.devices.select('B');
 
         // TODO wait for XD "initialized" event
 
@@ -378,7 +373,7 @@ describe('XD-MVC Gallery', function() {
     var self = this;
 
     // Set test timeout
-    this.timeout(15 * 1000);
+    this.timeout(30 * 1000);
 
     self.deviceOptions = {};
     self.devices = {};
@@ -401,10 +396,12 @@ describe('XD-MVC Gallery', function() {
     describe('eventLogger', function() {
         it ('should count XDconnection events', function() {
 
+
             return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
                 return self.pairDevicesViaURL();
             }).then(function() {
-                return self.deviceA.execute(getEventCounter).then(function(ret) {
+                var deviceA = self.devices.select('A');
+                return deviceA.execute(getEventCounter).then(function(ret) {
                     debug('A: got eventCounter: ');
                     debug(ret.value);
                     assert.equal(ret.value.XDconnection, self.devicesCount() - 1);
@@ -418,8 +415,11 @@ describe('XD-MVC Gallery', function() {
         return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
             return self.pairDevicesViaURL();
         }).then(function() {
-            return self.deviceA.url(this.baseUrl).then(function () {
-                return self.deviceB.url(self.baseUrl);
+            var deviceA = self.devices.select('A');
+            var deviceB = self.devices.select('B');
+
+            return deviceA.url(this.baseUrl).then(function () {
+                return deviceB.url(self.baseUrl);
             }).setCookie({name: 'test_cookieA', value: 'A'})
             .getCookie('test_cookieA').then(function (cookie) {
 
@@ -427,7 +427,7 @@ describe('XD-MVC Gallery', function() {
                 assert.equal(cookie.name, 'test_cookieA');
                 assert.equal(cookie.value, 'A');
 
-                return self.deviceB.setCookie({name: 'test_cookieB', value: 'B'})
+                return deviceB.setCookie({name: 'test_cookieB', value: 'B'})
                 .getCookie('test_cookieB').then(function (cookie) {
 
                     assert.notEqual(cookie, null);
@@ -453,13 +453,16 @@ describe('XD-MVC Gallery', function() {
         return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
             return self.pairDevicesViaURL();
         }).then(function() {
-            return self.deviceA.url(self.baseUrl).then(function () {
-                return self.deviceB.url(self.baseUrl);
+            var deviceA = self.devices.select('A');
+            var deviceB = self.devices.select('B');
+
+            return deviceA.url(self.baseUrl).then(function () {
+                return deviceB.url(self.baseUrl);
             }).execute(setItem, 'test_storageA', 'A')
             .execute(getItem, 'test_storageA').then(function (ret) {
                 assert.equal(ret.value, 'A');
 
-                return self.deviceB.execute(getItem, 'test_storageA').then(function (ret) {
+                return deviceB.execute(getItem, 'test_storageA').then(function (ret) {
                     return assert.equal(ret.value, null);
                 });
             });
@@ -488,7 +491,9 @@ describe('XD-MVC Gallery', function() {
                 return initWithDevices(setup.devices).then(function() {
                     return self.pairDevicesViaURL();
                 }).then(function() {
-                    return self.deviceA.waitForVisible('h2.gallery-overview', 5000).then(function () {
+                    var deviceA = self.devices.select('A');
+
+                    return deviceA.waitForVisible('h2.gallery-overview', 5000).then(function () {
                         //debug('A: h2.gallery-overview is visible');
                     }).click('//*[text()="Bike Tours"]').then(function () {
                         //debug('A: clicked Bike Tours');
@@ -528,7 +533,7 @@ describe('XD-MVC Gallery', function() {
                                 return device.saveScreenshot(screenshotPath(test, device));
                             });
                         });
-                    }).saveScreenshot(screenshotPath(test, self.deviceA));
+                    }).saveScreenshot(screenshotPath(test, deviceA));
                 });
             });
         });
