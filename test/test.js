@@ -162,10 +162,10 @@ var utility = {
 };
 
 var templates = {
-    windows_chrome: function() {
+    chrome: function() {
         // Generate a new object
         return {
-            name: 'Chrome (Win)',
+            name: 'Chrome',
             desiredCapabilities: {browserName: 'chrome'}
         };
     },
@@ -177,6 +177,22 @@ var templates = {
         }
     }
 };
+
+/**
+ * Resolve templates
+ * @param config
+ */
+function normalizeConfig(config) {
+    config['setups'].forEach(setup => {
+        Object.keys(setup.devices).forEach(id => {
+            var deviceConfig = setup.devices[id];
+            if (typeof deviceConfig == "string" && templates[deviceConfig]) {
+                // Replace template reference
+                setup.devices[id] = templates[deviceConfig]();
+            }
+        })
+    });
+}
 
 /**
  * @callback multiActionCallback
@@ -207,6 +223,11 @@ var screenshotPath = function(test, device) {
     return './screenshots/' + test.fullTitle() + ' - ' + device.options.id + ' ' + device.options.name + '.png';
 };
 
+var config = require(process.cwd() + '/xd-testing.json');
+normalizeConfig(config);
+var setups = config['setups'];
+
+
 describe('XD-MVC Maps', function() {
     var self = this;
 
@@ -231,7 +252,7 @@ describe('XD-MVC Maps', function() {
 
 
     it('should pair via XDmvc.connectTo', function () {
-        var devices = {A: templates.windows_chrome(), B: templates.windows_chrome()};
+        var devices = {A: templates.chrome(), B: templates.chrome()};
         return initWithDevices(devices).then(() => self.pairDevicesViaXDMVC()).then(() => {
             return self.devices.select('A').execute(function () {
                 return XDmvc.getConnectedDevices().length;
@@ -284,7 +305,7 @@ describe('XD-MVC Maps', function() {
     };
 
     it('should pair via GUI', function() {
-        var devices = {A: templates.windows_chrome(), B: templates.windows_chrome()};
+        var devices = {A: templates.chrome(), B: templates.chrome()};
 
         return initWithDevices(devices).then(() => {
             return pairDevicesViaMapsGui();
@@ -293,11 +314,6 @@ describe('XD-MVC Maps', function() {
 
 
     describe('should sync the map center on mirrored devices', function() {
-
-        var setups = [
-            {devices: {A: templates.windows_chrome(), B: templates.nexus4()}},
-            {devices: {A: templates.windows_chrome(), B: templates.nexus4(), C: templates.nexus4()}}
-        ];
 
         setups.forEach(function(setup) {
 
@@ -385,9 +401,6 @@ describe('XD-MVC Gallery', function() {
     var initWithDevices = utility.initWithDevices.bind(this);
 
 
-    beforeEach(function () {
-    });
-
     afterEach(function() {
         // Close browsers before completing a test
         return self.devices.end();
@@ -397,7 +410,7 @@ describe('XD-MVC Gallery', function() {
         it ('should count XDconnection events', function() {
 
 
-            return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
+            return initWithDevices({A: templates.chrome(), B: templates.chrome()}).then(function() {
                 return self.pairDevicesViaURL();
             }).then(function() {
                 var deviceA = self.devices.select('A');
@@ -412,7 +425,7 @@ describe('XD-MVC Gallery', function() {
 
     it('should not share cookies across browser sessions', function () {
 
-        return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
+        return initWithDevices({A: templates.chrome(), B: templates.chrome()}).then(function() {
             return self.pairDevicesViaURL();
         }).then(function() {
             var deviceA = self.devices.select('A');
@@ -450,7 +463,7 @@ describe('XD-MVC Gallery', function() {
             localStorage.setItem(key, value);
         };
 
-        return initWithDevices({A: templates.windows_chrome(), B: templates.windows_chrome()}).then(function() {
+        return initWithDevices({A: templates.chrome(), B: templates.chrome()}).then(function() {
             return self.pairDevicesViaURL();
         }).then(function() {
             var deviceA = self.devices.select('A');
@@ -470,12 +483,6 @@ describe('XD-MVC Gallery', function() {
     });
 
     describe('should show the selected image on the other devices', function () {
-
-        var setups = [
-            {devices: {A: templates.windows_chrome(), B: templates.nexus4()}},
-            {devices: {A: templates.windows_chrome(), B: templates.nexus4(), C: templates.nexus4()}},
-            {devices: {A: templates.windows_chrome(), B: templates.nexus4(), C: templates.nexus4(), D: templates.nexus4(), E: templates.nexus4()}}
-        ];
 
         setups.forEach(function(setup) {
 
