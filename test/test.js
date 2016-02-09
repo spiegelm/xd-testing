@@ -2,7 +2,8 @@
 
 var assert = require('chai').assert;
 var webdriverio = require('webdriverio');
-var xdmvc = require('../lib/adapter/xdmvc.js');
+var xdmvc = require('../lib/adapter/xdmvc');
+var utility = require('../lib/utility')
 
 /**
  * @type {Q}
@@ -15,124 +16,6 @@ var debug = function() {
     }
 };
 
-
-var utility = {
-
-    initWithDevices: function(devices) {
-
-        var self = this;
-
-        // Store id into device
-        Object.keys(devices).forEach(function(id) {
-            var dev = devices[id];
-            debug(id, dev);
-            dev["id"] = id;
-            debug(id, dev);
-        });
-
-        debug(devices);
-
-        self.deviceOptions = devices;
-
-        // New browser instance with WebdriverIO
-        self.devices = webdriverio.multiremote(self.deviceOptions);
-
-        var tileWidth = Math.floor(1600 / self.devicesCount());
-
-        return self.devices.init()
-            .timeoutsAsyncScript(5 * 1000)
-            .windowHandleSize({width: tileWidth, height: 600})
-            .then(function () {
-                // Align windows on screen
-                var x = 0;
-                Object.keys(self.deviceOptions).forEach(function (deviceName) {
-                    self.devices.select(deviceName).windowHandlePosition({x: x, y: 0});
-                    x += tileWidth;
-                });
-            });
-    },
-
-    pairDevicesViaURL: function() {
-        var self = this;
-
-        var deviceA = self.devices.select('A');
-
-        return deviceA.url(self.baseUrl).then(function () {
-            debug('A: init');
-        }).execute(function () {
-            return 1 + 2;
-        }).then(function (ret) {
-            assert.equal(ret.value, 3);
-        }).execute(xdmvc.injectEventLogger).then(function () {
-            debug('A: injected event logger');
-        }).getUrl().then(function (url) {
-
-            var allButA = Object.keys(self.deviceOptions).filter(function (deviceName) {
-                return deviceName != 'A';
-            });
-            return multiAction(self.devices, allButA, function (device) {
-                return device.url(url);
-            }).then(function () {
-                debug('init urls');
-
-                return deviceA.waitUntil(function () {
-                    return deviceA.execute(xdmvc.getEventCounter).then(function (ret) {
-                        debug('A: got eventCounter: ');
-                        debug(ret.value);
-                        debug('devices.length:', self.devicesCount());
-                        return ret.value.XDconnection == self.devicesCount() - 1;
-                    });
-                });
-            });
-        })
-    },
-
-    pairDevicesViaXDMVC: function() {
-        var self = this;
-
-        var deviceA = self.devices.select('A');
-
-        // TODO wait for XD "initialized" event
-
-        var allDevices = Object.keys(self.deviceOptions);
-
-        return multiAction(self.devices, allDevices, (device) => {
-            return device.url(self.baseUrl).then(function () {
-                debug('init');
-            }).execute(xdmvc.injectEventLogger).then(function () {
-                debug('injected event logger');
-            }).execute(function() {
-                return XDmvc.deviceId;
-            }).then(ret => ret.value);
-        }).then(function(vals) {
-
-            // Connect first device with all the others
-            var connect = vals.slice(1).map(idOther => {
-                
-                // Omit first id, loop over the others
-                return deviceA.execute(function (id) {
-                    XDmvc.connectTo(id);
-                }, idOther);
-            });
-
-            return q.all(connect).then(() => {
-                return deviceA.waitUntil(function () {
-                    return deviceA.execute(xdmvc.getEventCounter).then(function (ret) {
-                        debug('A: got eventCounter: ');
-                        debug(ret.value);
-                        debug('devices.length:', self.devicesCount());
-                        return ret.value.XDconnection == self.devicesCount() - 1;
-                    });
-                });
-            });
-        });
-    },
-
-    devicesCount : function() {
-        var self = this;
-        return Object.keys(self.deviceOptions).length;
-    }
-};
 
 var templates = {
     chrome: function() {
@@ -167,30 +50,6 @@ function normalizeConfig(config) {
     });
 }
 
-/**
- * @callback multiActionCallback
- * @param {WebdriverIO.Client} device
- */
-
-/**
- * Executes callback on devices matching deviceNames.
- * Returns a promise.
- * @param devices
- * @param deviceIds
- * @param {multiActionCallback} callback
- * @returns Q.Promise<T[]>
- */
-function multiAction (devices, deviceIds, callback) {
-    var promises = [];
-    debug(deviceIds);
-    deviceIds.forEach(function(id) {
-        var device = devices.select(id);
-        debug('multiAction ' + id + ' ' + device.options.id, device.options);
-
-        promises.push(callback(device));
-    });
-    return q.all(promises);
-}
 
 var screenshotPath = function(test, device) {
     return './screenshots/' + test.fullTitle() + ' - ' + device.options.id + ' ' + device.options.name + '.png';
@@ -212,9 +71,9 @@ describe('XD-MVC Maps', function() {
     self.baseUrl = "http://me.local:8000/maps.html";
 
     // Bind function to this reference
-    self.pairDevicesViaURL = utility.pairDevicesViaURL.bind(self);
-    self.pairDevicesViaXDMVC = utility.pairDevicesViaXDMVC.bind(self);
-    self.devicesCount = utility.devicesCount.bind(self);
+    self.pairDevicesViaURL = xdmvc.pairDevicesViaURL.bind(self);
+    self.pairDevicesViaXDMVC = xdmvc.pairDevicesViaXDMVC.bind(self);
+    self.devicesCount = xdmvc.devicesCount.bind(self);
     var initWithDevices = utility.initWithDevices.bind(self);
 
 
@@ -265,7 +124,7 @@ describe('XD-MVC Maps', function() {
             var idB = vals[1];
 
             return deviceA.click('#menu-button')
-                .waitForVisible('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]', 3000)
+                .waitForVisible('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]', 5000)
                 .click('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]')
                 .waitUntil(function () {
                     return deviceA.execute(xdmvc.getEventCounter).then(function (ret) {
@@ -309,7 +168,7 @@ describe('XD-MVC Maps', function() {
                     var allDevices = Object.keys(self.deviceOptions);
                     var passiveDevices = allDevices.filter((id) => id != 'A');
 
-                    return multiAction(self.devices, passiveDevices, function(device) {
+                    return utility.multiAction(self.devices, passiveDevices, function(device) {
                         return device.execute(function() {
                             return eventLogger.eventCounter.XDsync;
                         }).then(ret => {
@@ -324,11 +183,11 @@ describe('XD-MVC Maps', function() {
                         return deviceA.execute(function () {
                             map.setCenter({lat: 47.3783569289, lng: 8.5487177968});
                         });
-                    }).then(() => multiAction(self.devices, passiveDevices, device => {
+                    }).then(() => utility.multiAction(self.devices, passiveDevices, device => {
                         return device.waitUntil(() => device.execute(function (lastSyncCounter) {
                             return eventLogger.eventCounter.XDsync > lastSyncCounter;
                         }, lastXDSyncCounts[device.options.id]))
-                    })).then(() => multiAction(self.devices, passiveDevices, device =>
+                    })).then(() => utility.multiAction(self.devices, passiveDevices, device =>
                         device.execute(function(id) {
                             return {
                                 id: id,
@@ -347,7 +206,7 @@ describe('XD-MVC Maps', function() {
                             assert.equal(value.map_lng.toFixed(10), 8.5487177968);
                         });
 
-                        return multiAction(self.devices, allDevices, device => {
+                        return utility.multiAction(self.devices, allDevices, device => {
                             return device.pause(1000).saveScreenshot(screenshotPath(test, device));
                         });
                     });
@@ -369,10 +228,9 @@ describe('XD-MVC Gallery', function() {
     self.baseUrl = "http://me.local:8082/gallery.html";
 
     // Bind function to this reference
-    self.pairDevicesViaURL = utility.pairDevicesViaURL.bind(self);
-    self.devicesCount = utility.devicesCount.bind(self);
+    self.pairDevicesViaURL = xdmvc.pairDevicesViaURL.bind(self);
+    self.devicesCount = xdmvc.devicesCount.bind(self);
     var initWithDevices = utility.initWithDevices.bind(this);
-
 
     afterEach(function() {
         // Close browsers before completing a test
@@ -497,10 +355,10 @@ describe('XD-MVC Gallery', function() {
 
                         debug(allButA);
 
-                        return multiAction(self.devices, allButA, function (device) {
+                        return utility.multiAction(self.devices, allButA, function (device) {
                             return device.waitForVisible('#image img', 3000);
                         }).then(function () {
-                            return multiAction(self.devices, allButA, function (device) {
+                            return utility.multiAction(self.devices, allButA, function (device) {
                                 return device.getAttribute('#image img', 'src');
                             });
                         }).then(function (srcs) {
@@ -509,7 +367,7 @@ describe('XD-MVC Gallery', function() {
                                 assert.equal(src, imageUrlA);
                             });
 
-                            return multiAction(self.devices, allButA, function (device) {
+                            return utility.multiAction(self.devices, allButA, function (device) {
                                 return device.saveScreenshot(screenshotPath(test, device));
                             });
                         });
