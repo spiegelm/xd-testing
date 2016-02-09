@@ -2,7 +2,6 @@
 
 var assert = require('chai').assert;
 var webdriverio = require('webdriverio');
-var xdmvc = require('../lib/adapter/xdmvc');
 var utility = require('../lib/utility')
 
 /**
@@ -71,9 +70,10 @@ describe('XD-MVC Maps', function() {
     self.baseUrl = "http://me.local:8000/maps.html";
 
     // Bind function to this reference
-    self.pairDevicesViaURL = xdmvc.pairDevicesViaURL.bind(self);
-    self.pairDevicesViaXDMVC = xdmvc.pairDevicesViaXDMVC.bind(self);
-    self.devicesCount = xdmvc.devicesCount.bind(self);
+    self.adapter = require('../lib/adapter/xdmvc');
+    self.pairDevicesViaURL = self.adapter.pairDevicesViaURL.bind(self);
+    self.pairDevicesViaXDMVC = self.adapter.pairDevicesViaXDMVC.bind(self);
+    self.devicesCount = self.adapter.devicesCount.bind(self);
     var initWithDevices = utility.initWithDevices.bind(self);
 
 
@@ -100,7 +100,7 @@ describe('XD-MVC Maps', function() {
 
         var deviceIdA = deviceA.url(self.baseUrl).then(function () {
             debug('A: init');
-        }).execute(xdmvc.injectEventLogger).then(function () {
+        }).execute(self.adapter.injectEventLogger).then(function () {
             debug('A: injected event logger');
         }).execute(function () {
             return XDmvc.deviceId;
@@ -110,7 +110,7 @@ describe('XD-MVC Maps', function() {
 
         var deviceIdB = deviceB.url(self.baseUrl).then(function () {
             debug('B: init');
-        }).execute(xdmvc.injectEventLogger).then(function () {
+        }).execute(self.adapter.injectEventLogger).then(function () {
             debug('B: injected event logger');
         }).execute(function () {
             return XDmvc.deviceId;
@@ -127,7 +127,7 @@ describe('XD-MVC Maps', function() {
                 .waitForVisible('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]', 5000)
                 .click('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]')
                 .waitUntil(function () {
-                    return deviceA.execute(xdmvc.getEventCounter).then(function (ret) {
+                    return deviceA.execute(self.adapter.getEventCounter).then(function (ret) {
                         debug('A: got eventCounter: ');
                         debug(ret.value);
                         return ret.value.XDconnection == 1;
@@ -228,8 +228,10 @@ describe('XD-MVC Gallery', function() {
     self.baseUrl = "http://me.local:8082/gallery.html";
 
     // Bind function to this reference
-    self.pairDevicesViaURL = xdmvc.pairDevicesViaURL.bind(self);
-    self.devicesCount = xdmvc.devicesCount.bind(self);
+    self.adapter = require('../lib/adapter/xdmvc');
+    self.pairDevicesViaURL = self.adapter.pairDevicesViaURL.bind(self);
+    self.pairDevicesViaXDMVC = self.adapter.pairDevicesViaXDMVC.bind(self);
+    self.devicesCount = self.adapter.devicesCount.bind(self);
     var initWithDevices = utility.initWithDevices.bind(this);
 
     afterEach(function() {
@@ -245,7 +247,7 @@ describe('XD-MVC Gallery', function() {
                 return self.pairDevicesViaURL();
             }).then(function() {
                 var deviceA = self.devices.select('A');
-                return deviceA.execute(xdmvc.getEventCounter).then(function(ret) {
+                return deviceA.execute(self.adapter.getEventCounter).then(function(ret) {
                     debug('A: got eventCounter: ');
                     debug(ret.value);
                     assert.equal(ret.value.XDconnection, self.devicesCount() - 1);
