@@ -2,6 +2,7 @@
 
 var assert = require('chai').assert;
 var webdriverio = require('webdriverio');
+var xdmvc = require('../lib/adapter/xdmvc.js');
 
 /**
  * @type {Q}
@@ -14,34 +15,6 @@ var debug = function() {
     }
 };
 
-var injectEventLogger = function() {
-
-    var DEBUG = false;
-
-    function EventLogger() {
-        this.eventNames = ["XDdisconnection", "XDconnection", "XDdevice", "XDroles", "XDsync", "XDserverReady", "XDothersRolesChanged"];
-        this.eventCounter = {};
-
-        this.eventNames.forEach((function (event) {
-            this.eventCounter[event] = 0;
-            XDmvc.on(event, (function (sender) {
-                this.eventCounter[event]++;
-                if (DEBUG) {
-                    console.log(event);
-                    console.log(sender);
-                    console.log(this.eventCounter);
-                }
-            }).bind(this))
-        }).bind(this));
-    }
-
-    window.eventLogger = new EventLogger();
-    return 0;
-};
-
-var getEventCounter = function() {
-    return window.eventLogger.eventCounter;
-};
 
 var utility = {
 
@@ -90,7 +63,7 @@ var utility = {
             return 1 + 2;
         }).then(function (ret) {
             assert.equal(ret.value, 3);
-        }).execute(injectEventLogger).then(function () {
+        }).execute(xdmvc.injectEventLogger).then(function () {
             debug('A: injected event logger');
         }).getUrl().then(function (url) {
 
@@ -103,7 +76,7 @@ var utility = {
                 debug('init urls');
 
                 return deviceA.waitUntil(function () {
-                    return deviceA.execute(getEventCounter).then(function (ret) {
+                    return deviceA.execute(xdmvc.getEventCounter).then(function (ret) {
                         debug('A: got eventCounter: ');
                         debug(ret.value);
                         debug('devices.length:', self.devicesCount());
@@ -126,7 +99,7 @@ var utility = {
         return multiAction(self.devices, allDevices, (device) => {
             return device.url(self.baseUrl).then(function () {
                 debug('init');
-            }).execute(injectEventLogger).then(function () {
+            }).execute(xdmvc.injectEventLogger).then(function () {
                 debug('injected event logger');
             }).execute(function() {
                 return XDmvc.deviceId;
@@ -144,7 +117,7 @@ var utility = {
 
             return q.all(connect).then(() => {
                 return deviceA.waitUntil(function () {
-                    return deviceA.execute(getEventCounter).then(function (ret) {
+                    return deviceA.execute(xdmvc.getEventCounter).then(function (ret) {
                         debug('A: got eventCounter: ');
                         debug(ret.value);
                         debug('devices.length:', self.devicesCount());
@@ -268,7 +241,7 @@ describe('XD-MVC Maps', function() {
 
         var deviceIdA = deviceA.url(self.baseUrl).then(function () {
             debug('A: init');
-        }).execute(injectEventLogger).then(function () {
+        }).execute(xdmvc.injectEventLogger).then(function () {
             debug('A: injected event logger');
         }).execute(function () {
             return XDmvc.deviceId;
@@ -278,7 +251,7 @@ describe('XD-MVC Maps', function() {
 
         var deviceIdB = deviceB.url(self.baseUrl).then(function () {
             debug('B: init');
-        }).execute(injectEventLogger).then(function () {
+        }).execute(xdmvc.injectEventLogger).then(function () {
             debug('B: injected event logger');
         }).execute(function () {
             return XDmvc.deviceId;
@@ -295,7 +268,7 @@ describe('XD-MVC Maps', function() {
                 .waitForVisible('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]', 3000)
                 .click('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]')
                 .waitUntil(function () {
-                    return deviceA.execute(getEventCounter).then(function (ret) {
+                    return deviceA.execute(xdmvc.getEventCounter).then(function (ret) {
                         debug('A: got eventCounter: ');
                         debug(ret.value);
                         return ret.value.XDconnection == 1;
@@ -414,7 +387,7 @@ describe('XD-MVC Gallery', function() {
                 return self.pairDevicesViaURL();
             }).then(function() {
                 var deviceA = self.devices.select('A');
-                return deviceA.execute(getEventCounter).then(function(ret) {
+                return deviceA.execute(xdmvc.getEventCounter).then(function(ret) {
                     debug('A: got eventCounter: ');
                     debug(ret.value);
                     assert.equal(ret.value.XDconnection, self.devicesCount() - 1);
