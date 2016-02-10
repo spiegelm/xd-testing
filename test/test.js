@@ -118,6 +118,9 @@ describe('XD-MVC Maps', function() {
             return ret.value;
         });
 
+        // TODO wait until deviceB is registered, before loading deviceA
+        // TODO or just repeat clicking the repeat button on the UI until the device appears
+
         return q.all([deviceIdA, deviceIdB]).then(function (vals) {
             // Both devices are ready
             var idA = vals[0];
@@ -337,7 +340,7 @@ describe('XD-MVC Gallery', function() {
                         //debug('A: h2.gallery-overview is visible');
                     }).click('//*[text()="Bike Tours"]').then(function () {
                         //debug('A: clicked Bike Tours');
-                    }).waitForVisible('#gallery img:nth-of-type(1)').then(function () {
+                    }).waitForVisible('#gallery img:nth-of-type(1)', 5000).then(function () {
                         //debug('A: first image is visible');
                     }).click('#gallery img:nth-of-type(1)').then(function () {
                         //debug('A: clicked first image in galery');
