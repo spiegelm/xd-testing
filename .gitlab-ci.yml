@@ -2,6 +2,7 @@ before_script:
   - apt-get update && apt-get install -y nodejs
   - node --version
   - npm --version
+  - java -version # Required for selenium server
   - npm install
   - bash ./scripts/setup_ci.sh
 
