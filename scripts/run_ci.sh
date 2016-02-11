@@ -26,6 +26,9 @@ echo "Start selenium sever"
 SELENIUM_PID=$!
 echo $SELENIUM_PID
 
+echo "Generate config file"
+./lib/generate-config.js
+
 # Run the tests
 echo "Run tests"
 npm test
