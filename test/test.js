@@ -67,7 +67,7 @@ describe('XD-MVC Maps', function() {
 
     self.deviceOptions = {};
     self.devices = {};
-    self.baseUrl = "http://me.local:8080/maps.html";
+    self.baseUrl = "http://localhost:8080/maps.html";
 
     // Bind function to this reference
     self.adapter = require('../lib/adapter/xdmvc');
@@ -228,7 +228,7 @@ describe('XD-MVC Gallery', function() {
 
     self.deviceOptions = {};
     self.devices = {};
-    self.baseUrl = "http://me.local:8082/gallery.html";
+    self.baseUrl = "http://localhost:8082/gallery.html";
 
     // Bind function to this reference
     self.adapter = require('../lib/adapter/xdmvc');
