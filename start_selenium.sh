@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Determine versions
 SELENIUM_SERVER_VERSION=2.40.0
 CHROME_DRIVER_VERSION=2.20
