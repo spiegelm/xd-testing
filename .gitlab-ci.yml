@@ -1,0 +1,11 @@
+before_script:
+  - apt-get update && apt-get install -y nodejs
+  - node --version
+  - npm --version
+  - npm install
+  - ./scripts/setup_ci.sh
+
+test:
+  script:
+    - ./scripts/run_ci.sh
+
