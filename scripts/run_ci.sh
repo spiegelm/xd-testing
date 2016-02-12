@@ -8,21 +8,21 @@ PROJECT_ROOT=$(git rev-parse --show-toplevel)
 # Run gallery
 echo "Run gallery app"
 cd ${PROJECT_ROOT}/testapp/XD-MVC/Examples/Gallery
-node gallery-polymer.js &> /dev/null &
+node gallery-polymer.js &
 GALLERY_PID=$!
 echo $GALLERY_PID
 
 # Run maps
 echo "Run gallery app"
 cd ${PROJECT_ROOT}/testapp/XD-MVC/Examples/Maps
-node server.js &> /dev/null &
+node server.js &
 MAPS_PID=$!
 echo $MAPS_PID
 
 # Setup selenium server
 cd ${PROJECT_ROOT}
 echo "Start selenium sever"
-./start_selenium.sh &> /dev/null &
+./start_selenium.sh &
 SELENIUM_PID=$!
 echo $SELENIUM_PID
 
