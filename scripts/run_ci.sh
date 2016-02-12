@@ -13,25 +13,29 @@ fuser -k 4444/tcp || true # Selenium server
 # Run gallery
 echo "Run gallery app"
 cd ${PROJECT_ROOT}/testapp/XD-MVC/Examples/Gallery
-node gallery-polymer.js &
+nohup node gallery-polymer.js > gallery.log &
 GALLERY_PID=$!
 echo $GALLERY_PID
 
 # Run maps
 echo "Run gallery app"
 cd ${PROJECT_ROOT}/testapp/XD-MVC/Examples/Maps
-node server.js &
+nohup node server.js > maps.log &
 MAPS_PID=$!
 echo $MAPS_PID
 
 # Setup selenium server
 cd ${PROJECT_ROOT}
 echo "Start selenium sever"
-./start_selenium.sh &
+nohup ./start_selenium.sh > selenium.log &
 SELENIUM_PID=$!
 echo $SELENIUM_PID
 
 sleep 5 # Wait for selenium server to start up
+
+cat gallery.out || true
+cat maps.out || true
+cat selenium.out || true
 
 echo "Generate config file"
 ./lib/generate-config.js
