@@ -5,6 +5,11 @@ set -u # Abort on uninitialized variable usage
 
 PROJECT_ROOT=$(git rev-parse --show-toplevel)
 
+# Kill programs running on the required ports
+fuser -k 8080/tcp || true # Maps
+fuser -k 8082/tcp || true # Gallery
+fuser -k 4444/tcp || true # Selenium server
+
 # Run gallery
 echo "Run gallery app"
 cd ${PROJECT_ROOT}/testapp/XD-MVC/Examples/Gallery
@@ -26,15 +31,24 @@ echo "Start selenium sever"
 SELENIUM_PID=$!
 echo $SELENIUM_PID
 
+sleep 5 # Wait for selenium server to start up
+
 echo "Generate config file"
 ./lib/generate-config.js
 
 # Run the tests
 echo "Run tests"
+set +e
 npm test
+SUCCESS=$?
 
-# Kill background processes
-set +e # Ignore process kill errors
+
+# Kill our stuff
 kill $GALLERY_PID
 kill $MAPS_PID
 kill $SELENIUM_PID
+fuser -k 8080/tcp || true # Maps
+fuser -k 8082/tcp || true # Gallery
+fuser -k 4444/tcp || true # Selenium server
+
+exit $SUCCESS
