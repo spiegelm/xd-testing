@@ -1,5 +1,4 @@
 .idea
 node_modules/
-screenshots/*
 xd-testing.json
 *.log
