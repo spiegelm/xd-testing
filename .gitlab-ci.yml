@@ -15,7 +15,7 @@ test_linux:
 
 test_windows:
   script:
-    - git config http.sslVerify false
+    - git config --global http.sslVerify false
     - bash scripts/setup_ci.sh
     - bash scripts/run_ci.sh
   tags:
