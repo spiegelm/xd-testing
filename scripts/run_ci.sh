@@ -31,7 +31,13 @@ nohup ./start_selenium.sh > selenium.log &
 SELENIUM_PID=$!
 echo $SELENIUM_PID
 
-sleep 5 # Wait for selenium server to start up
+
+sleep 10 # Wait for servers to start up
+
+fuser 8080/tcp || (echo "Maps application is not running!" && exit 1)
+fuser 8082/tcp || (echo "Gallery application is not running!" && exit 1)
+fuser 4444/tcp || (echo "Selenium server is not running!" && exit 1)
+
 
 cat gallery.out || true
 cat maps.out || true
