@@ -17,5 +17,5 @@ test_windows:
   script:
     - bash scripts/setup.ci.sh
     - bash scripts/run_ci.sh
-  test:
+  tags:
     - windows
