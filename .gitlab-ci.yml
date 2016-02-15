@@ -16,7 +16,7 @@ test_linux:
 test_windows:
   script:
     - git config --global http.sslVerify false
-    - npm install
+    - call npm install # https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/issues/1025
     - bash scripts/setup_ci.sh
     - bash scripts/run_ci.sh
   tags:
