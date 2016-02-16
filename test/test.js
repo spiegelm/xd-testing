@@ -63,7 +63,9 @@ describe('XD-MVC Maps', function() {
     var self = this;
 
     // Set test timeout
-    this.timeout(30 * 1000);
+    this.timeout(60 * 1000);
+    self.async_timeout = 30 * 1000;
+    self.pauseTime = 5 * 1000;
 
     self.deviceOptions = {};
     self.devices = {};
@@ -127,7 +129,7 @@ describe('XD-MVC Maps', function() {
             var idB = vals[1];
 
             return deviceA.click('#menu-button')
-                .waitForVisible('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]', 5000)
+                .waitForVisible('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]', self.async_timeout)
                 .click('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]')
                 .waitUntil(function () {
                     return deviceA.execute(self.adapter.getEventCounter).then(function (ret) {
@@ -210,7 +212,7 @@ describe('XD-MVC Maps', function() {
                         });
 
                         return utility.multiAction(self.devices, allDevices, device => {
-                            return device.pause(1000).saveScreenshot(screenshotPath(test, device));
+                            return device.pause(self.pauseTime).saveScreenshot(screenshotPath(test, device));
                         });
                     });
                 });
@@ -224,7 +226,8 @@ describe('XD-MVC Gallery', function() {
     var self = this;
 
     // Set test timeout
-    this.timeout(30 * 1000);
+    this.timeout(60 * 1000);
+    self.async_timeout = 30000;
 
     self.deviceOptions = {};
     self.devices = {};
@@ -336,11 +339,11 @@ describe('XD-MVC Gallery', function() {
                 }).then(function() {
                     var deviceA = self.devices.select('A');
 
-                    return deviceA.waitForVisible('h2.gallery-overview', 5000).then(function () {
+                    return deviceA.waitForVisible('h2.gallery-overview', self.async_timeout).then(function () {
                         //debug('A: h2.gallery-overview is visible');
                     }).click('//*[text()="Bike Tours"]').then(function () {
                         //debug('A: clicked Bike Tours');
-                    }).waitForVisible('#gallery img:nth-of-type(1)', 5000).then(function () {
+                    }).waitForVisible('#gallery img:nth-of-type(1)', self.async_timeout).then(function () {
                         //debug('A: first image is visible');
                     }).click('#gallery img:nth-of-type(1)').then(function () {
                         //debug('A: clicked first image in galery');
@@ -361,7 +364,7 @@ describe('XD-MVC Gallery', function() {
                         debug(allButA);
 
                         return utility.multiAction(self.devices, allButA, function (device) {
-                            return device.waitForVisible('#image img', 3000);
+                            return device.waitForVisible('#image img', self.async_timeout);
                         }).then(function () {
                             return utility.multiAction(self.devices, allButA, function (device) {
                                 return device.getAttribute('#image img', 'src');
