@@ -8,8 +8,9 @@ test_linux:
     - npm --version
     - java -version # Required for selenium server
     - npm install
-    - ./scripts/setup_linux.sh
+    - xvfb-run ./scripts/setup_linux.sh
     - xvfb-run ./scripts/test.sh
+    - xvfb-run ./scripts/kill_applications.sh
   tags:
     - linux
 

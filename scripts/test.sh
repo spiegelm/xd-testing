@@ -25,11 +25,4 @@ set +e
 npm test
 SUCCESS=$?
 
-
-# Kill our stuff
-#kill $GALLERY_PID
-#kill $MAPS_PID
-#kill $SELENIUM_PID
-${PROJECT_ROOT}/scripts/kill_applications.sh
-
 exit $SUCCESS
