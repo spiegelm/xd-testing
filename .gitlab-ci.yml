@@ -1,0 +1,23 @@
+before_script:
+  - echo "Starting tests..."
+
+test_linux:
+  script:
+    - apt-get update && apt-get install -y nodejs
+    - node --version
+    - npm --version
+    - java -version # Required for selenium server
+    - npm install
+    - ./scripts/setup_ci.sh
+    - xvfb-run ./scripts/run_ci.sh
+  tags:
+    - linux
+
+#test_windows:
+#  script:
+#    - git config --global http.sslVerify false
+#    - call npm install # https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/issues/1025
+#    - bash scripts/setup_ci.sh
+#    - bash scripts/run_ci.sh
+#  tags:
+#    - windows

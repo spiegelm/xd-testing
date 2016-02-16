@@ -23,16 +23,16 @@ else
 fi
 
 # Clone XD-MVC repository
-git clone --depth 1 https://github.com/mhusm/XD-MVC.git XD-MVC
+git clone --depth 1 https://github.com/spiegelm/XD-MVC.git XD-MVC
 
 # Setup gallery app
 echo "Setup gallery app"
 cd ${PROJECT_ROOT}/testapp/XD-MVC/Examples/Gallery
 npm install
-bower install
+./node_modules/.bin/bower install
 
 # Setup maps app
 echo "Setup maps app"
 cd ${PROJECT_ROOT}/testapp/XD-MVC/Examples/Maps
 npm install
-bower install
+./node_modules/.bin/bower install
