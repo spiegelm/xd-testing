@@ -3,7 +3,7 @@ before_script:
 
 test_linux:
   script:
-    - apt-get install -y nodejs nodejs-legacy npm default-jre
+    #- apt-get install -y nodejs nodejs-legacy npm default-jre
     - node --version
     - npm --version
     - java -version # Required for selenium server
