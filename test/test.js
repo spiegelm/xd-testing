@@ -129,9 +129,16 @@ describe('XD-MVC Maps', function() {
             var idB = vals[1];
 
             return deviceA.click('#menu-button')
-                .waitForVisible('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]', self.async_timeout)
+                .waitUntil(() => {
+                    // Wait until the other device shows up in list
+                    return deviceA.isVisible('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]')
+                        // If list does not contain device, refresh list and keep waiting
+                        .then(isVisible => isVisible ? true : deviceA.click('#showDevices').then(() => false));
+                }, self.async_timeout)
+                // Click on device id
                 .click('//*[@id="availableDeviceList"]//*[@class="id"][text()="' + idB + '"]')
                 .waitUntil(function () {
+                    // Wait for connection event
                     return deviceA.execute(self.adapter.getEventCounter).then(function (ret) {
                         debug('A: got eventCounter: ');
                         debug(ret.value);
