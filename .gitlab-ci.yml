@@ -13,6 +13,7 @@ test_linux:
     - xvfb-run ./scripts/kill_applications.sh
   tags:
     - linux
+  allow_failure: true
 
 test_windows:
   script:
