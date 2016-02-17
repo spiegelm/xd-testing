@@ -22,6 +22,6 @@ test_windows:
     - call scripts\kill_applications.bat
     - call npm install # https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/issues/1025
     - bash scripts/setup_windows.sh
-    - bash scripts/test.sh
+    - call scripts\test.bat
   tags:
     - windows
