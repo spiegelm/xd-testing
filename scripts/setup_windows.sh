@@ -9,7 +9,6 @@ cd ${PROJECT_ROOT}
 
 set +e # Ignore errors
 
-./scripts/kill_applications.sh
 ./scripts/install_applications.sh
 ./scripts/start_applications.sh
 

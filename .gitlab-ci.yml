@@ -18,6 +18,7 @@ test_windows:
   script:
     - git config --global http.sslVerify false
     - call npm install # https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/issues/1025
+    - scripts\kill_applications.bat
     - bash scripts/setup_windows.sh
     - bash scripts/test.sh
   tags:
