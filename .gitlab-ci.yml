@@ -8,6 +8,7 @@ test_linux:
     - npm --version
     - java -version # Required for selenium server
     - npm install
+    - xvfb-run ./scripts/kill_applications.sh
     - xvfb-run ./scripts/setup_linux.sh
     - xvfb-run ./scripts/test.sh
     - xvfb-run ./scripts/kill_applications.sh
@@ -22,6 +23,5 @@ test_windows:
     - call npm install # https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/issues/1025
     - bash scripts/setup_windows.sh
     - bash scripts/test.sh
-    - call scripts\kill_applications.bat
   tags:
     - windows

@@ -7,7 +7,6 @@ PROJECT_ROOT=$(git rev-parse --show-toplevel)
 
 cd ${PROJECT_ROOT}
 
-./scripts/kill_applications.sh
 ./scripts/install_applications.sh
 ./scripts/start_applications.sh
 
