@@ -15,23 +15,7 @@ var debug = function() {
     }
 };
 
-
-var templates = {
-    chrome: function() {
-        // Generate a new object
-        return {
-            name: 'Chrome',
-            desiredCapabilities: {browserName: 'chrome'}
-        };
-    },
-    nexus4: function() {
-        // Generate a new object
-        return {
-            name: 'Nexus 4',
-            desiredCapabilities: {browserName: 'chrome'}
-        }
-    }
-};
+var templates = require('../lib/templates');
 
 /**
  * Resolve templates
