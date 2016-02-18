@@ -48,7 +48,7 @@ describe('XD-MVC Maps', function() {
 
     // Set test timeout
     this.timeout(60 * 1000);
-    self.async_timeout = 30 * 1000;
+    self.async_timeout = utility.waitforTimeout = 30 * 1000;
     self.pauseTime = 5 * 1000;
 
     self.deviceOptions = {};
@@ -128,7 +128,7 @@ describe('XD-MVC Maps', function() {
                         debug(ret.value);
                         return ret.value.XDconnection == 1;
                     });
-                });
+                }, self.async_timeout);
         });
     };
 
@@ -182,7 +182,7 @@ describe('XD-MVC Maps', function() {
                     }).then(() => utility.multiAction(self.devices, passiveDevices, device => {
                         return device.waitUntil(() => device.execute(function (lastSyncCounter) {
                             return eventLogger.eventCounter.XDsync > lastSyncCounter;
-                        }, lastXDSyncCounts[device.options.id]))
+                        }, lastXDSyncCounts[device.options.id]), self.async_timeout)
                     })).then(() => utility.multiAction(self.devices, passiveDevices, device =>
                         device.execute(function(id) {
                             return {
@@ -218,7 +218,7 @@ describe('XD-MVC Gallery', function() {
 
     // Set test timeout
     this.timeout(60 * 1000);
-    self.async_timeout = 30000;
+    self.async_timeout = utility.waitforTimeout = 30 * 1000;
 
     self.deviceOptions = {};
     self.devices = {};
@@ -338,7 +338,7 @@ describe('XD-MVC Gallery', function() {
                         //debug('A: first image is visible');
                     }).click('#gallery img:nth-of-type(1)').then(function () {
                         //debug('A: clicked first image in galery');
-                    }).waitForVisible('#image img').then(function () {
+                    }).waitForVisible('#image img', self.async_timeout).then(function () {
                         //debug('A: #image img is visible');
                     }).scroll(0, 10000).then(function () {
                         //debug('A: scrolled down to the end');
