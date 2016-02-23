@@ -1,20 +1,20 @@
 before_script:
   - echo "Starting tests..."
 
-test_linux:
-  script:
-    #- apt-get install -y nodejs nodejs-legacy npm default-jre
-    - node --version
-    - npm --version
-    - java -version # Required for selenium server
-    - npm install
-    - xvfb-run ./scripts/kill_applications.sh
-    - xvfb-run ./scripts/setup_linux.sh
-    - xvfb-run ./scripts/test.sh
-    - xvfb-run ./scripts/kill_applications.sh
-  tags:
-    - linux
-  allow_failure: true
+#test_linux:
+#  script:
+#    #- apt-get install -y nodejs nodejs-legacy npm default-jre
+#    - node --version
+#    - npm --version
+#    - java -version # Required for selenium server
+#    - npm install
+#    - xvfb-run ./scripts/kill_applications.sh
+#    - xvfb-run ./scripts/setup_linux.sh
+#    - xvfb-run ./scripts/test.sh
+#    - xvfb-run ./scripts/kill_applications.sh
+#  tags:
+#    - linux
+#  allow_failure: true
 
 test_windows:
   script:
