@@ -70,7 +70,7 @@ describe('XD-MVC Maps', function() {
 
 
     it('should pair via XDmvc.connectTo', function () {
-        var devices = {A: templates.chrome(), B: templates.chrome()};
+        var devices = {A: templates.devices.chrome(), B: templates.devices.chrome()};
         return initWithDevices(devices).then(() => self.pairDevicesViaXDMVC()).then(() => {
             return self.devices.select('A').execute(function () {
                 return XDmvc.getConnectedDevices().length;
@@ -133,7 +133,7 @@ describe('XD-MVC Maps', function() {
     };
 
     it('should pair via GUI', function() {
-        var devices = {A: templates.chrome(), B: templates.chrome()};
+        var devices = {A: templates.devices.chrome(), B: templates.devices.chrome()};
 
         return initWithDevices(devices).then(() => {
             return pairDevicesViaMapsGui();
@@ -240,7 +240,7 @@ describe('XD-MVC Gallery', function() {
         it ('should count XDconnection events', function() {
 
 
-            return initWithDevices({A: templates.chrome(), B: templates.chrome()}).then(function() {
+            return initWithDevices({A: templates.devices.chrome(), B: templates.devices.chrome()}).then(function() {
                 return self.pairDevicesViaURL();
             }).then(function() {
                 var deviceA = self.devices.select('A');
@@ -255,7 +255,7 @@ describe('XD-MVC Gallery', function() {
 
     it('should not share cookies across browser sessions', function () {
 
-        return initWithDevices({A: templates.chrome(), B: templates.chrome()}).then(function() {
+        return initWithDevices({A: templates.devices.chrome(), B: templates.devices.chrome()}).then(function() {
             return self.pairDevicesViaURL();
         }).then(function() {
             var deviceA = self.devices.select('A');
@@ -293,7 +293,7 @@ describe('XD-MVC Gallery', function() {
             localStorage.setItem(key, value);
         };
 
-        return initWithDevices({A: templates.chrome(), B: templates.chrome()}).then(function() {
+        return initWithDevices({A: templates.devices.chrome(), B: templates.devices.chrome()}).then(function() {
             return self.pairDevicesViaURL();
         }).then(function() {
             var deviceA = self.devices.select('A');
