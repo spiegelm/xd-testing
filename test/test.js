@@ -25,9 +25,9 @@ function normalizeConfig(config) {
     config['setups'].forEach(setup => {
         Object.keys(setup.devices).forEach(id => {
             var deviceConfig = setup.devices[id];
-            if (typeof deviceConfig == "string" && templates[deviceConfig]) {
+            if (typeof deviceConfig == "string" && templates.devices[deviceConfig]) {
                 // Replace template reference
-                setup.devices[id] = templates[deviceConfig]();
+                setup.devices[id] = templates.devices[deviceConfig]();
             }
         })
     });
