@@ -26,26 +26,32 @@ function returnsADeviceObject(devices, name) {
 
 describe('require("lib/template")', function() {
     describe('.devices', function() {
+        var deviceFunction = name => templates.devices[name]
 
         describe('.chrome()', function() {
-            it('returns an Device object', function() {
-                returnsADeviceObject(templates.devices, 'chrome')
-            })
-            it('.type is "desktop"', function() {
-                assert.equal(templates.devices.chrome().type, 'desktop')
-            })
+            var name = 'chrome'
+            it('returns an Device object',function() { returnsADeviceObject(templates.devices, name) })
+            it('.type is "desktop"', function() { assert.equal(deviceFunction(name)().type, 'desktop') })
         })
         describe('.nexus4()', function() {
-            it('returns an Device object', () => { returnsADeviceObject(templates.devices, 'nexus4') })
+            var name = 'nexus4'
+            it('returns an Device object', () => { returnsADeviceObject(templates.devices, name) })
+            it('.type is "phone"', function() { assert.equal(deviceFunction(name)().type, 'phone') })
         })
         describe('.nexus5()', function() {
-            it('returns an Device object', () => { returnsADeviceObject(templates.devices, 'nexus5') })
+            var name = 'nexus5'
+            it('returns an Device object', () => { returnsADeviceObject(templates.devices, name) })
+            it('.type is "phone"', function() { assert.equal(deviceFunction(name)().type, 'phone') })
         })
         describe('.nexus7()', function() {
-            it('returns an Device object', () => { returnsADeviceObject(templates.devices, 'nexus7') })
+            var name = 'nexus7'
+            it('returns an Device object', () => { returnsADeviceObject(templates.devices, name) })
+            it('.type is "tablet"', function() { assert.equal(deviceFunction(name)().type, 'tablet') })
         })
         describe('.nexus10()', function() {
-            it('returns an Device object', () => { returnsADeviceObject(templates.devices, 'nexus10') })
+            var name = 'nexus10'
+            it('returns an Device object', () => { returnsADeviceObject(templates.devices, name) })
+            it('.type is "tablet"', function() { assert.equal(deviceFunction(name)().type, 'tablet') })
         })
     })
 })
