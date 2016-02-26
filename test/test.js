@@ -42,6 +42,33 @@ var config = require(process.cwd() + '/xd-testing.json');
 normalizeConfig(config);
 var setups = config['setups'];
 
+describe('MultiDevice', function () {
+    var self = this;
+
+    // Set test timeout
+    this.timeout(60 * 1000);
+    utility.waitforTimeout = 30 * 1000;
+    self.pauseTime = 5 * 1000;
+
+    self.devices = {};
+    self.baseUrl = "http://localhost:8090/";
+
+    afterEach(function () {
+        // Close browsers before completing a test
+        return self.devices.endAll();
+    });
+
+    it.only('should support WebdriverIO commands', function () {
+        var options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
+        return self.devices = xdTesting.multiremote(options)
+            .init()
+            .url(self.baseUrl)
+            .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '-')))
+            .click('#button')
+            .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '1')))
+            ;
+    })
+});
 
 describe('XD-MVC Maps', function() {
     var self = this;
@@ -67,23 +94,6 @@ describe('XD-MVC Maps', function() {
         // Close browsers before completing a test
         return self.devices.end();
     });
-
-    it('test multiDevice', function() {
-        var options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
-        return self.devices = xdTesting.multiremote(options).init().then(() => {
-            var twoDevices = self.devices.selectById(['A', 'B']);
-
-            var urlGoogle = 'https://www.google.ch/';
-            return twoDevices.url(urlGoogle).pause(5).getUrl().then(function() {
-                console.log(arguments, urlGoogle);
-                Object.keys(arguments).forEach(key => {
-                    let url = arguments[key];
-                    assert.equal(url, urlGoogle);
-                });
-            });
-        }).endAll();
-    })
-
 
     it('should pair via XDmvc.connectTo', function () {
         var devices = {A: templates.devices.chrome(), B: templates.devices.chrome()};
