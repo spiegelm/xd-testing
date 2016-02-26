@@ -58,7 +58,7 @@ describe('MultiDevice', function () {
         return self.devices.endAll();
     });
 
-    it.only('should support WebdriverIO commands', function () {
+    it('should support WebdriverIO commands', function () {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
         return self.devices = xdTesting.multiremote(options)
             .init()
