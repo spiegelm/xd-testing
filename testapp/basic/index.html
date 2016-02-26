@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+</head>
+<body>
+
+<script>
+    var counter = 0;
+
+    $(function() {
+
+        $('#button').click(function() {
+            click();
+        })
+
+        function click() {
+            $('#status').text('button clicked');
+            $('#counter').text(++counter);
+        }
+    });
+
+</script>
+
+<input id="button" type="button" value="click me">
+
+<span id="status">nothing happened</span>
+<span id="counter">-</span>
+
+</body>
+</html>

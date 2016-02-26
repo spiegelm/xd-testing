@@ -36,3 +36,7 @@ echo "Setup maps app"
 cd ${PROJECT_ROOT}/testapp/XD-MVC/Examples/Maps
 npm install
 ./node_modules/.bin/bower install
+
+echo "Setup basic test app"
+cd ${PROJECT_ROOT}/testapp/basic
+npm install

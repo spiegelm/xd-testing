@@ -1,0 +1,8 @@
+{
+  "name": "application-name",
+  "version": "0.0.1",
+  "dependencies": {
+    "http-server": "^0.9.0",
+    "jquery": "^2.2.1"
+  }
+}
