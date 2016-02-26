@@ -88,10 +88,11 @@ describe('MultiDevice', function () {
             return self.devices = xdTesting.multiremote(options)
                 .init()
                 .url(self.baseUrl)
-                .selectById(['B', 'C'])
-                .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '-')))
-                .click('#button')
-                .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '1')))
+                .then(() => self.devices.selectById(['B', 'C'])
+                    .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '-')))
+                    .click('#button')
+                    .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '1')))
+                )
                 ;
         });
 
@@ -100,14 +101,13 @@ describe('MultiDevice', function () {
             return self.devices = xdTesting.multiremote(options)
                 .init()
                 .url(self.baseUrl)
-                .selectById(['B', 'C'])
-                .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '-')))
-                .click('#button')
-                .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '1')))
-                .then(() => {
-                    return self.devices.select('A')
-                        .getText('#counter').then(textA => assert.equal(text, '-'))
-                })
+                .then(() => self.devices.selectById(['B', 'C'])
+                    .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '-')))
+                    .click('#button')
+                    .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '1')))
+                ).then(() => self.devices.select('A')
+                    .getText('#counter').then(textA => assert.equal(textA, '-'))
+                )
                 ;
         });
     });
