@@ -112,7 +112,7 @@ describe('MultiDevice', function () {
         });
     });
 
-    describe.only('getCount', function() {
+    describe('getCount', function() {
         it ('should count a single device', function() {
             var options = {A: templates.devices.chrome()};
             return self.devices = xdTesting.multiremote(options)
