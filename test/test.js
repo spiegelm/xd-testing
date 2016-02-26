@@ -1,8 +1,9 @@
 "use strict";
 
 var assert = require('chai').assert;
-var webdriverio = require('webdriverio');
 var utility = require('../lib/utility')
+var xdTesting = require('../lib/index')
+var templates = require('../lib/templates');
 
 /**
  * @type {Q}
@@ -15,7 +16,6 @@ var debug = function() {
     }
 };
 
-var templates = require('../lib/templates');
 
 /**
  * Resolve templates
@@ -67,6 +67,22 @@ describe('XD-MVC Maps', function() {
         // Close browsers before completing a test
         return self.devices.end();
     });
+
+    it.only('test multiDevice', function() {
+        var options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
+        return self.devices = xdTesting.multiremote(options).init().then(() => {
+            var twoDevices = self.devices.selectById(['A', 'B']);
+
+            var urlGoogle = 'https://www.google.ch/';
+            return twoDevices.url(urlGoogle).pause(5).getUrl().then(function() {
+                console.log(arguments, urlGoogle);
+                Object.keys(arguments).forEach(key => {
+                    let url = arguments[key];
+                    assert.equal(url, urlGoogle);
+                });
+            });
+        }).endAll();
+    })
 
 
     it('should pair via XDmvc.connectTo', function () {
