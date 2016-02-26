@@ -58,16 +58,59 @@ describe('MultiDevice', function () {
         return self.devices.endAll();
     });
 
-    it('should support WebdriverIO commands', function () {
-        var options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
-        return self.devices = xdTesting.multiremote(options)
-            .init()
-            .url(self.baseUrl)
-            .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '-')))
-            .click('#button')
-            .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '1')))
-            ;
+    describe('WebdriverIO commands', function() {
+        it('should be supported on multiple devices', function () {
+            var options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
+            return self.devices = xdTesting.multiremote(options)
+                .init()
+                .url(self.baseUrl)
+                .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '-')))
+                .click('#button')
+                .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '1')))
+                ;
+        });
+
+        it.skip('should be supported on a single device', function () {
+            var options = {A: templates.devices.chrome()};
+            return self.devices = xdTesting.multiremote(options)
+                .init()
+                .url(self.baseUrl)
+                .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '-')))
+                .click('#button')
+                .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '1')))
+                ;
+        });
     })
+
+    describe('selectById', function () {
+        it('should act on the specified devices', function() {
+            var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()};
+            return self.devices = xdTesting.multiremote(options)
+                .init()
+                .url(self.baseUrl)
+                .selectById(['B', 'C'])
+                .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '-')))
+                .click('#button')
+                .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '1')))
+                ;
+        });
+
+        it('should not act on other devices', function() {
+            var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()};
+            return self.devices = xdTesting.multiremote(options)
+                .init()
+                .url(self.baseUrl)
+                .selectById(['B', 'C'])
+                .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '-')))
+                .click('#button')
+                .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '1')))
+                .then(() => {
+                    return self.devices.select('A')
+                        .getText('#counter').then(textA => assert.equal(text, '-'))
+                })
+                ;
+        });
+    });
 });
 
 describe('XD-MVC Maps', function() {
