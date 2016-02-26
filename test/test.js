@@ -68,7 +68,7 @@ describe('XD-MVC Maps', function() {
         return self.devices.end();
     });
 
-    it.only('test multiDevice', function() {
+    it('test multiDevice', function() {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
         return self.devices = xdTesting.multiremote(options).init().then(() => {
             var twoDevices = self.devices.selectById(['A', 'B']);
