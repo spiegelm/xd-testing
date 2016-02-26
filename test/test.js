@@ -111,6 +111,19 @@ describe('MultiDevice', function () {
                 ;
         });
     });
+
+    describe.only('getCount', function() {
+        it ('should count a single device', function() {
+            var options = {A: templates.devices.chrome()};
+            return self.devices = xdTesting.multiremote(options)
+                .init()
+                .getCount().then((count) => {
+                    console.log(count, arguments);
+                    assert.equal(count, 1);
+                    assert.equal(Object.keys(arguments).length, 0)
+                });
+        })
+    })
 });
 
 describe('XD-MVC Maps', function() {
