@@ -118,11 +118,30 @@ describe('MultiDevice', function () {
             return self.devices = xdTesting.multiremote(options)
                 .init()
                 .getCount().then((count) => {
-                    console.log(count, arguments);
                     assert.equal(count, 1);
                     assert.equal(Object.keys(arguments).length, 0)
                 });
-        })
+        });
+
+        it ('should count two devices', function() {
+            var options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
+            return self.devices = xdTesting.multiremote(options)
+                .init()
+                .getCount().then((count) => {
+                    assert.equal(count, 2);
+                    assert.equal(Object.keys(arguments).length, 0)
+                });
+        });
+
+        it ('should count several devices', function() {
+            var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome(), D: templates.devices.chrome()};
+            return self.devices = xdTesting.multiremote(options)
+                .init()
+                .getCount().then((count) => {
+                    assert.equal(count, 4);
+                    assert.equal(Object.keys(arguments).length, 0)
+                });
+        });
     })
 });
 
