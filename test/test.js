@@ -142,7 +142,23 @@ describe('MultiDevice', function () {
                     assert.equal(Object.keys(arguments).length, 0)
                 });
         });
-    })
+
+        it('should support method chaining', function () {
+            var options = {A: templates.devices.chrome()};
+            return self.devices = xdTesting.multiremote(options)
+                .init()
+                .url(self.baseUrl)
+                .getCount().then((count) => {
+                    assert.equal(count, 1);
+                    assert.equal(Object.keys(arguments).length, 0)
+                }).getCount().then((count) => {
+                    assert.equal(count, 1);
+                    assert.equal(Object.keys(arguments).length, 0)
+                }).getUrl().then(url => {
+                    assert.equal(url, self.baseUrl);
+                });
+        });
+    });
 });
 
 describe('XD-MVC Maps', function() {
