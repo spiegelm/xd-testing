@@ -1,7 +1,10 @@
+"use strict";
+
 var assert = require('chai').assert;
 var utility = require('../../../lib/utility')
 var xdTesting = require('../../../lib/index')
 var templates = require('../../../lib/templates');
+var q = require('q');
 
 describe('forEach', function () {
     var self = this;
@@ -35,20 +38,24 @@ describe('forEach', function () {
         ;
     });
 
-    //it('should return promises', function(done) {
-    //    var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
-    //    var counter = 0;
-    //    self.devices = xdTesting.multiremote(options)
-    //        .init()
-    //        .getCount().then(count => assert.equal(count, 2, 'getCount does not match'))
-    //        .forEach(function (device) {
-    //            console.log(device);
-    //            counter++;
-    //        })
-    //        .then(function () {
-    //            assert.equal(counter, 2, 'has not been called twice');
-    //            done();
-    //        })
-    //    ;
-    //});
+    it('should return a promise', function(done) {
+        var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+        var counter = 0;
+        var defer = q.defer();
+        self.devices = xdTesting.multiremote(options)
+            .init()
+            .getCount().then(count => assert.equal(count, 2, 'getCount does not match'))
+            .forEach(function (device) {
+                setTimeout(function () {
+                    counter++;
+                    defer.resolve();
+                }, 1000)
+                return defer.promise;
+            })
+            .then(function () {
+                assert.equal(counter, 2, 'has not been called twice');
+                done();
+            })
+        ;
+    });
 });
