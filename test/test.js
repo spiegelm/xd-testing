@@ -10,7 +10,7 @@ var templates = require('../lib/templates');
  */
 var q = require('q');
 
-var debug = function() {
+var debug = function () {
     if (false) {
         console.log.apply(console, arguments);
     }
@@ -34,7 +34,7 @@ function normalizeConfig(config) {
 }
 
 
-var screenshotPath = function(test, device) {
+var screenshotPath = function (test, device) {
     return './screenshots/' + test.fullTitle() + ' - ' + device.options.id + ' ' + device.options.name + '.png';
 };
 
@@ -58,7 +58,7 @@ describe('MultiDevice', function () {
         return self.devices.endAll();
     });
 
-    describe('WebdriverIO commands', function() {
+    describe('WebdriverIO commands', function () {
         it('should be supported on multiple devices', function () {
             var options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
             return self.devices = xdTesting.multiremote(options)
@@ -83,7 +83,7 @@ describe('MultiDevice', function () {
     })
 
     describe('selectById', function () {
-        it('should act on the specified devices', function() {
+        it('should act on the specified devices', function () {
             var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()};
             return self.devices = xdTesting.multiremote(options)
                 .init()
@@ -96,7 +96,7 @@ describe('MultiDevice', function () {
                 ;
         });
 
-        it('should not act on other devices', function() {
+        it('should not act on other devices', function () {
             var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()};
             return self.devices = xdTesting.multiremote(options)
                 .init()
@@ -112,8 +112,8 @@ describe('MultiDevice', function () {
         });
     });
 
-    describe('getCount', function() {
-        it ('should count a single device', function() {
+    describe('getCount', function () {
+        it('should count a single device', function () {
             var options = {A: templates.devices.chrome()};
             return self.devices = xdTesting.multiremote(options)
                 .init()
@@ -123,7 +123,7 @@ describe('MultiDevice', function () {
                 });
         });
 
-        it ('should count two devices', function() {
+        it('should count two devices', function () {
             var options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
             return self.devices = xdTesting.multiremote(options)
                 .init()
@@ -133,8 +133,13 @@ describe('MultiDevice', function () {
                 });
         });
 
-        it ('should count several devices', function() {
-            var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome(), D: templates.devices.chrome()};
+        it('should count several devices', function () {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome(),
+                C: templates.devices.chrome(),
+                D: templates.devices.chrome()
+            };
             return self.devices = xdTesting.multiremote(options)
                 .init()
                 .getCount().then((count) => {
