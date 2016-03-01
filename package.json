@@ -15,7 +15,7 @@
   "devDependencies": {},
   "scripts": {
     "pretest": "npm run cleanup",
-    "test": "./node_modules/.bin/mocha",
+    "test": "./node_modules/.bin/mocha --recursive test/",
     "cleanup": "rm -rf screenshots/*"
   },
   "author": "Michael Spiegel"
