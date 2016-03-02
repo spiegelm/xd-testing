@@ -25,28 +25,31 @@ describe('forEach', function () {
     it('should call function on each device', function(done) {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
         var counter = 0;
+        var calledIds = [];
         self.devices = xdTesting.multiremote(options)
             .init()
             .getCount().then(count => assert.equal(count, 2, 'getCount does not match'))
             .forEach(function (device) {
                 counter++;
+                calledIds.push(device.options.id);
             })
             .then(function () {
                 assert.equal(counter, 2, 'has not been called twice');
+                assert.deepEqual(calledIds.sort(), ['A', 'B'], 'has not been called for each device');
                 done();
             });
     });
 
     it('should call function with index parameter', function(done) {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
-        var list = [];
+        var indices = [];
         return self.devices = xdTesting.multiremote(options)
             .init()
             .forEach(function (device, index) {
-                list.push(index);
+                indices.push(index);
             })
             .then(function () {
-                assert.deepEqual(list.sort(), [0, 1], 'callback has not been called with each index');
+                assert.deepEqual(indices.sort(), [0, 1], 'callback has not been called with each index');
                 done();
             });
     });
