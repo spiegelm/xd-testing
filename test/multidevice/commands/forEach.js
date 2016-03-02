@@ -10,8 +10,8 @@ describe('forEach', function () {
     var self = this;
 
     // Set test timeout
-    this.timeout(5 * 1000);
-    utility.waitforTimeout = 5 * 1000;
+    this.timeout(30 * 1000);
+    utility.waitforTimeout = 30 * 1000;
 
     self.devices = {};
     self.baseUrl = "http://localhost:8090/";
