@@ -34,8 +34,21 @@ describe('forEach', function () {
             .then(function () {
                 assert.equal(counter, 2, 'has not been called twice');
                 done();
+            });
+    });
+
+    it('should call function with index parameter', function(done) {
+        var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+        var list = [];
+        return self.devices = xdTesting.multiremote(options)
+            .init()
+            .forEach(function (device, index) {
+                list.push(index);
             })
-        ;
+            .then(function () {
+                assert.deepEqual(list.sort(), [0, 1], 'callback has not been called with each index');
+                done();
+            });
     });
 
     it('should return a promise', function(done) {
@@ -55,7 +68,6 @@ describe('forEach', function () {
             .then(function () {
                 assert.equal(counter, 2, 'has not been called twice');
                 done();
-            })
-        ;
+            });
     });
 });
