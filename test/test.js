@@ -112,6 +112,36 @@ describe('MultiDevice', function () {
         });
     });
 
+    describe('selectBySize', function () {
+        it ('should act on the specified devices', function () {
+            var options = {A: templates.devices.nexus4(), B: templates.devices.nexus4(), C: templates.devices.nexus10()};
+            return self.devices = xdTesting.multiremote(options)
+                .init()
+                .url(self.baseUrl)
+                .then(() => self.devices.selectBySize(['small'])
+                    .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
+                    .click('#button')
+                    .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
+                )
+                ;
+        });
+
+        it ('should not act on other devices', function () {
+            var options = {A: templates.devices.nexus4(), B: templates.devices.nexus4(), C: templates.devices.nexus10()};
+            return self.devices = xdTesting.multiremote(options)
+                .init()
+                .url(self.baseUrl)
+                .then(() => self.devices.selectBySize(['small'])
+                    .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
+                    .click('#button')
+                    .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
+                ).then(() => self.devices.select('C')
+                    .getText('#counter').then(textC => assert.equal(textC, '-'))
+                )
+                ;
+        });
+    });
+
     describe('getCount', function () {
         it('should count a single device', function () {
             var options = {A: templates.devices.chrome()};
