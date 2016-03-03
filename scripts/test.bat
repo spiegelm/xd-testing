@@ -1,4 +1,5 @@
 bash scripts/test.sh
-set return=%errorlevel% # store return code
-call scripts\kill_applications.bat
+REM store return code
+set return=%errorlevel%
+call scripts\kill_applications.bat > kill.log
 exit /B %return%
