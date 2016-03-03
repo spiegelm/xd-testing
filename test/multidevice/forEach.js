@@ -5,23 +5,24 @@ var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates');
 var q = require('q');
 
-describe('forEach', function () {
-    var self = this;
+describe('MultiDevice - forEach', function () {
+    var test = this;
 
-    self.devices = {};
-    self.baseUrl = "http://localhost:8090/";
+    test.devices = {};
+    test.baseUrl = "http://localhost:8090/";
 
     afterEach(function () {
         // Close browsers before completing a test
-        return self.devices.endAll();
+        if (typeof test.devices['endAll'] == 'function') {
+            return test.devices.endAll();
+        }
     });
-
 
     it('should call function on each device', function(done) {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
         var counter = 0;
         var calledIds = [];
-        self.devices = xdTesting.multiremote(options)
+        test.devices = xdTesting.multiremote(options)
             .init()
             .getCount().then(count => assert.equal(count, 2, 'getCount does not match'))
             .forEach(function (device) {
@@ -38,7 +39,7 @@ describe('forEach', function () {
     it('should call function with index parameter', function(done) {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
         var indices = [];
-        return self.devices = xdTesting.multiremote(options)
+        return test.devices = xdTesting.multiremote(options)
             .init()
             .forEach(function (device, index) {
                 indices.push(index);
@@ -53,7 +54,7 @@ describe('forEach', function () {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
         var counter = 0;
         var defer = q.defer();
-        self.devices = xdTesting.multiremote(options)
+        test.devices = xdTesting.multiremote(options)
             .init()
             .getCount().then(count => assert.equal(count, 2, 'getCount does not match'))
             .forEach(function (device) {
