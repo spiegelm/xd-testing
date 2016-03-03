@@ -9,13 +9,6 @@ var templates = require('../lib/templates');
  */
 var q = require('q');
 
-var debug = function () {
-    if (false) {
-        console.log.apply(console, arguments);
-    }
-};
-
-
 /**
  * Resolve templates
  * @param config
@@ -81,25 +74,21 @@ describe('XD-MVC Maps', function() {
         var deviceA = self.devices.select('A');
         var deviceB = self.devices.select('B');
 
-        var deviceIdA = deviceA.url(self.baseUrl).then(function () {
-            debug('A: init');
-        }).execute(self.adapter.injectEventLogger).then(function () {
-            debug('A: injected event logger');
-        }).execute(function () {
-            return XDmvc.deviceId;
-        }).then(function (ret) {
-            return ret.value;
-        });
+        var deviceIdA = deviceA.url(self.baseUrl)
+            .execute(self.adapter.injectEventLogger)
+            .execute(function () {
+                return XDmvc.deviceId;
+            }).then(function (ret) {
+                return ret.value;
+            });
 
-        var deviceIdB = deviceB.url(self.baseUrl).then(function () {
-            debug('B: init');
-        }).execute(self.adapter.injectEventLogger).then(function () {
-            debug('B: injected event logger');
-        }).execute(function () {
-            return XDmvc.deviceId;
-        }).then(function (ret) {
-            return ret.value;
-        });
+        var deviceIdB = deviceB.url(self.baseUrl)
+            .execute(self.adapter.injectEventLogger)
+            .execute(function () {
+                return XDmvc.deviceId;
+            }).then(function (ret) {
+                return ret.value;
+            });
 
         return q.all([deviceIdA, deviceIdB]).then(function (vals) {
             // Both devices are ready
@@ -118,8 +107,6 @@ describe('XD-MVC Maps', function() {
                 .waitUntil(function () {
                     // Wait for connection event
                     return deviceA.execute(self.adapter.getEventCounter).then(function (ret) {
-                        debug('A: got eventCounter: ');
-                        debug(ret.value);
                         return ret.value.XDconnection == 1;
                     });
                 }, self.async_timeout);
@@ -241,8 +228,6 @@ describe('XD-MVC Gallery', function () {
             }).then(function () {
                 var deviceA = self.devices.select('A');
                 return deviceA.execute(self.adapter.getEventCounter).then(function (ret) {
-                    debug('A: got eventCounter: ');
-                    debug(ret.value);
                     assert.equal(ret.value.XDconnection, self.devicesCount() - 1);
                 });
             });
