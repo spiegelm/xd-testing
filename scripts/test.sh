@@ -5,8 +5,6 @@ set -u # Abort on uninitialized variable usage
 
 PROJECT_ROOT=$(git rev-parse --show-toplevel)
 
-sleep 10 # Wait for servers to start up
-
 fuser 8080/tcp || (echo "Maps application is maybe not running!")
 fuser 8082/tcp || (echo "Gallery application is maybe not running!")
 fuser 4444/tcp || (echo "Selenium server is maybe not running!")
