@@ -1,17 +1,12 @@
 "use strict";
 
 var assert = require('chai').assert;
-var utility = require('../../../lib/utility')
-var xdTesting = require('../../../lib/index')
-var templates = require('../../../lib/templates');
+var xdTesting = require('../../lib/index')
+var templates = require('../../lib/templates');
 var q = require('q');
 
 describe('forEach', function () {
     var self = this;
-
-    // Set test timeout
-    this.timeout(30 * 1000);
-    utility.waitforTimeout = 30 * 1000;
 
     self.devices = {};
     self.baseUrl = "http://localhost:8090/";
