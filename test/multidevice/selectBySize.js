@@ -48,4 +48,19 @@ describe('MultiDevice - selectBySize', function () {
                 .getText('#counter').then(textC => assert.equal(textC, '-'))
             );
     });
+
+    it('should be callable on the monad chain', function() {
+        var options = {
+            A: templates.devices.nexus4(),
+            B: templates.devices.nexus4(),
+            C: templates.devices.nexus10()
+        };
+        return test.devices = xdTesting.multiremote(options)
+            .init()
+            .url(test.baseUrl)
+            .selectBySize(['small'])
+            .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
+            .click('#button')
+            .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')));
+    });
 });
