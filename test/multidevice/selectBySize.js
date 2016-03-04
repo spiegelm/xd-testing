@@ -24,7 +24,8 @@ describe('MultiDevice - selectBySize', function () {
         return test.devices = xdTesting.multiremote(options)
             .init()
             .url(test.baseUrl)
-            .then(() => test.devices.selectBySize(['small'])
+            .selectBySize(['small'])
+            .then(x => x.selectedDevices
                 .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
                 .click('#button')
                 .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
@@ -40,7 +41,8 @@ describe('MultiDevice - selectBySize', function () {
         return test.devices = xdTesting.multiremote(options)
             .init()
             .url(test.baseUrl)
-            .then(() => test.devices.selectBySize(['small'])
+            .selectBySize(['small'])
+            .then(x => x.selectedDevices
                 .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
                 .click('#button')
                 .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
