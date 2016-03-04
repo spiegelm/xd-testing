@@ -55,12 +55,77 @@ describe('MultiDevice - selectBySize', function () {
             B: templates.devices.nexus4(),
             C: templates.devices.nexus10()
         };
-        return test.devices = xdTesting.multiremote(options)
-            .init()
+        test.devices = xdTesting.multiremote(options)
+            .init();
+
+        return test.devices
             .url(test.baseUrl)
-            .selectBySize(['small'])
-            .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
-            .click('#button')
-            .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')));
+            //.selectBySize(['small'])
+            .then(() => {
+                return "smallDevicesStub";
+            }).then((stub) => {
+                assert.equal(stub, "smallDevicesStub");
+            }).selectBySize(['small'])
+            .then((value) => {
+                var smallDevices = value.selectedDevices;
+                return smallDevices.getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
+                    .click('#button')
+                    .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
+            });
+    });
+
+    it('should be callable on the monad chain -- debug', function() {
+        var options = {
+            A: templates.devices.nexus4(),
+            B: templates.devices.nexus4(),
+            C: templates.devices.nexus10()
+        };
+        test.devices = xdTesting.multiremote(options)
+            .init();
+
+        return test.devices
+            .url(test.baseUrl)
+            //.selectBySize(['small'])
+            .then(() => {
+                return "smallDevicesStub";
+            }).then((stub) => {
+                assert.equal(stub, "smallDevicesStub");
+            }).then(() => {
+                /*!
+                 * Simulate context
+                 */
+                var size = ['small'];
+                var multiDevice = {
+                    options: options,
+                    instances: {
+                        A: test.devices.select('A'),
+                        B: test.devices.select('B'),
+                        C: test.devices.select('C')
+                    }
+                };
+                var MultiDevice = require('../../lib/multidevice');
+
+                /*!
+                 * Original function
+                 */
+
+                var matchingInstanceIds = Object.keys(multiDevice.options).filter(id => size.indexOf(multiDevice.options[id].size) >= 0);
+
+                // TODO Refactor this: Merge with multiremote() ?
+
+                // TODO use only corresponding option items
+                var newOptions = multiDevice.options;
+                var newMultiDevice = new MultiDevice(newOptions);
+                matchingInstanceIds.forEach(id => {
+                    newMultiDevice.addInstance(id, multiDevice.instances[id]);
+                });
+                var remote = xdTesting.remote(multiDevice.options, newMultiDevice.getModifier(), newMultiDevice);
+                return {x: remote};
+            }).then((value) => {
+                var smallDevices = value.x;
+                return smallDevices.getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
+                    .click('#button')
+                    .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
+            });
     });
 });
