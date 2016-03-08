@@ -78,190 +78,195 @@ describe('MultiDevice - selectBySize', function () {
             .end();
     });
 
-    it.skip('should be callable on the monad chain and return a client', function() {
-        var options = {
-            A: templates.devices.nexus4(),
-            B: templates.devices.nexus4(),
-            C: templates.devices.nexus10()
-        };
-        test.devices = xdTesting.multiremote(options)
-            .init();
 
-        return test.devices
-            .selectBySize(['small'])
-            .then(smallDevices => {
-                assert.isNotNull(smallDevices);
-                assert.hasProperty(smallDevices, 'click');
-                assert.hasProperty(smallDevices, 'url');
-                assert.hasProperty(smallDevices, 'then');
-            });
-    });
 
-    it.skip('should be callable on the monad chain and return a `selectedDevices` property', function() {
-        var options = {
-            A: templates.devices.nexus4(),
-            B: templates.devices.nexus4(),
-            C: templates.devices.nexus10()
-        };
-        test.devices = xdTesting.multiremote(options)
-            .init();
+    describe('unused approaches', function() {
+        it.skip('should be callable on the monad chain and return a client', function() {
+            var options = {
+                A: templates.devices.nexus4(),
+                B: templates.devices.nexus4(),
+                C: templates.devices.nexus10()
+            };
+            test.devices = xdTesting.multiremote(options)
+                .init();
 
-        return test.devices
-            .url(test.baseUrl)
-            .then(() => test.devices.selectBySize(['small']).selectedDevices
-                .then((value) => {
-                    var smallDevices = value.selectedDevices;
-                    return smallDevices.getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
+            return test.devices
+                .selectBySize(['small'])
+                .then(smallDevices => {
+                    assert.isNotNull(smallDevices);
+                    assert.hasProperty(smallDevices, 'click');
+                    assert.hasProperty(smallDevices, 'url');
+                    assert.hasProperty(smallDevices, 'then');
+                });
+        });
+
+        it.skip('should be callable on the monad chain and return a `selectedDevices` property', function() {
+            var options = {
+                A: templates.devices.nexus4(),
+                B: templates.devices.nexus4(),
+                C: templates.devices.nexus10()
+            };
+            test.devices = xdTesting.multiremote(options)
+                .init();
+
+            return test.devices
+                .url(test.baseUrl)
+                .then(() => test.devices.selectBySize(['small']).selectedDevices
+                    .then((value) => {
+                        var smallDevices = value.selectedDevices;
+                        return smallDevices.getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
+                            .click('#button')
+                            .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
+                    })
+                );
+        });
+
+        it.skip('debug -- promises', function() {
+            var options = {
+                A: templates.devices.nexus4(),
+                B: templates.devices.nexus4(),
+                C: templates.devices.nexus10()
+            };
+            test.devices = xdTesting.multiremote(options)
+                .init();
+
+            return test.devices
+                .url(test.baseUrl)
+                .then(() => {
+                    return "smallDevicesStub";
+                }).then((stub) => {
+                    assert.equal(stub, "smallDevicesStub");
+                }).then(() => {
+                    var remote = "remote";
+                    // Note: We cannot use `then` because it will no be propagated as a value, but as a promise
+                    return {
+                        andThen: function (callback) {
+                            callback(remote);
+                        }
+                    };
+                }).then((value) => {
+                    assert.isNotNull(value);
+                    var x = function(remote) {
+                        assert.equal(remote, "remote");
+                    };
+                    return value.andThen(x);
+                });
+        });
+
+        it.skip('debug -- monad chain: return `andThen` property', function() {
+            var options = {
+                A: templates.devices.nexus4(),
+                B: templates.devices.nexus4(),
+                C: templates.devices.nexus10()
+            };
+            test.devices = xdTesting.multiremote(options)
+                .init();
+
+            return test.devices
+                .url(test.baseUrl)
+                .then(() => {
+                    /*!
+                     * Simulate context
+                     */
+                    var size = ['small'];
+                    var multiDevice = {
+                        options: options,
+                        instances: {
+                            A: test.devices.select('A'),
+                            B: test.devices.select('B'),
+                            C: test.devices.select('C')
+                        }
+                    };
+                    var MultiDevice = require('../../lib/multidevice');
+
+                    /*!
+                     * Original function
+                     */
+
+                    var matchingInstanceIds = Object.keys(multiDevice.options).filter(id => size.indexOf(multiDevice.options[id].size) >= 0);
+
+                    // TODO Refactor this: Merge with multiremote() ?
+
+                    // TODO use only corresponding option items
+                    var newOptions = multiDevice.options;
+                    var newMultiDevice = new MultiDevice(newOptions);
+                    matchingInstanceIds.forEach(id => {
+                        newMultiDevice.addInstance(id, multiDevice.instances[id]);
+                    });
+                    var newRemote = xdTesting.remote(multiDevice.options, newMultiDevice.getModifier(), newMultiDevice);
+
+
+                    var then = function myThen(callback) {
+                        return callback(newRemote);
+                    }
+                    // Note: We cannot use `then` because it will no be propagated as a value, but as a promise
+                    return {andThen: then};
+                }).then((remote) => {
+                    assert.isNotNull(remote);
+                    assert.isDefined(remote);
+
+                    remote.andThen(smallDevices => smallDevices.getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
                         .click('#button')
                         .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
-                })
-            );
-    });
-
-    it('debug -- promises', function() {
-        var options = {
-            A: templates.devices.nexus4(),
-            B: templates.devices.nexus4(),
-            C: templates.devices.nexus10()
-        };
-        test.devices = xdTesting.multiremote(options)
-            .init();
-
-        return test.devices
-            .url(test.baseUrl)
-            .then(() => {
-                return "smallDevicesStub";
-            }).then((stub) => {
-                assert.equal(stub, "smallDevicesStub");
-            }).then(() => {
-                var remote = "remote";
-                // Note: We cannot use `then` because it will no be propagated as a value, but as a promise
-                return {
-                    andThen: function (callback) {
-                        callback(remote);
-                    }
-                };
-            }).then((value) => {
-                assert.isNotNull(value);
-                var x = function(remote) {
-                    assert.equal(remote, "remote");
-                };
-                return value.andThen(x);
-            });
-    });
-
-    it('debug -- monad chain: return `andThen` property', function() {
-        var options = {
-            A: templates.devices.nexus4(),
-            B: templates.devices.nexus4(),
-            C: templates.devices.nexus10()
-        };
-        test.devices = xdTesting.multiremote(options)
-            .init();
-
-        return test.devices
-            .url(test.baseUrl)
-            .then(() => {
-                /*!
-                 * Simulate context
-                 */
-                var size = ['small'];
-                var multiDevice = {
-                    options: options,
-                    instances: {
-                        A: test.devices.select('A'),
-                        B: test.devices.select('B'),
-                        C: test.devices.select('C')
-                    }
-                };
-                var MultiDevice = require('../../lib/multidevice');
-
-                /*!
-                 * Original function
-                 */
-
-                var matchingInstanceIds = Object.keys(multiDevice.options).filter(id => size.indexOf(multiDevice.options[id].size) >= 0);
-
-                // TODO Refactor this: Merge with multiremote() ?
-
-                // TODO use only corresponding option items
-                var newOptions = multiDevice.options;
-                var newMultiDevice = new MultiDevice(newOptions);
-                matchingInstanceIds.forEach(id => {
-                    newMultiDevice.addInstance(id, multiDevice.instances[id]);
+                    );
                 });
-                var newRemote = xdTesting.remote(multiDevice.options, newMultiDevice.getModifier(), newMultiDevice);
+        });
 
+        it.skip('debug -- monad chain: return promise returning client', function() {
+            var options = {
+                A: templates.devices.nexus4(),
+                B: templates.devices.nexus4(),
+                C: templates.devices.nexus10()
+            };
+            test.devices = xdTesting.multiremote(options)
+                .init();
 
-                var then = function myThen(callback) {
-                    return callback(newRemote);
-                }
-                // Note: We cannot use `then` because it will no be propagated as a value, but as a promise
-                return {andThen: then};
-            }).then((remote) => {
-                assert.isNotNull(remote);
-                assert.isDefined(remote);
+            return test.devices
+                .url(test.baseUrl)
+                .then(() => {
+                    /*!
+                     * Simulate context
+                     */
+                    var size = ['small'];
+                    var multiDevice = {
+                        options: options,
+                        instances: {
+                            A: test.devices.select('A'),
+                            B: test.devices.select('B'),
+                            C: test.devices.select('C')
+                        }
+                    };
+                    var MultiDevice = require('../../lib/multidevice');
 
-                remote.andThen(smallDevices => smallDevices.getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
-                    .click('#button')
-                    .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
-                );
-            });
-    });
+                    /*!
+                     * Original function
+                     */
 
-    it.skip('debug -- monad chain: return promise returning client', function() {
-        var options = {
-            A: templates.devices.nexus4(),
-            B: templates.devices.nexus4(),
-            C: templates.devices.nexus10()
-        };
-        test.devices = xdTesting.multiremote(options)
-            .init();
+                    var matchingInstanceIds = Object.keys(multiDevice.options).filter(id => size.indexOf(multiDevice.options[id].size) >= 0);
 
-        return test.devices
-            .url(test.baseUrl)
-            .then(() => {
-                /*!
-                 * Simulate context
-                 */
-                var size = ['small'];
-                var multiDevice = {
-                    options: options,
-                    instances: {
-                        A: test.devices.select('A'),
-                        B: test.devices.select('B'),
-                        C: test.devices.select('C')
-                    }
-                };
-                var MultiDevice = require('../../lib/multidevice');
+                    // TODO Refactor this: Merge with multiremote() ?
 
-                /*!
-                 * Original function
-                 */
+                    // TODO use only corresponding option items
+                    var newOptions = multiDevice.options;
+                    var newMultiDevice = new MultiDevice(newOptions);
+                    matchingInstanceIds.forEach(id => {
+                        newMultiDevice.addInstance(id, multiDevice.instances[id]);
+                    });
+                    var newClient = xdTesting.remote(multiDevice.options, newMultiDevice.getModifier(), newMultiDevice);
 
-                var matchingInstanceIds = Object.keys(multiDevice.options).filter(id => size.indexOf(multiDevice.options[id].size) >= 0);
+                    var q = require('q');
+                    var defer = q.defer();
+                    defer.resolve(newClient);
+                    return defer.promise;
+                }).then((newClient) => {
+                    assert.isNotNull(newClient);
+                    assert.isDefined(newClient);
 
-                // TODO Refactor this: Merge with multiremote() ?
-
-                // TODO use only corresponding option items
-                var newOptions = multiDevice.options;
-                var newMultiDevice = new MultiDevice(newOptions);
-                matchingInstanceIds.forEach(id => {
-                    newMultiDevice.addInstance(id, multiDevice.instances[id]);
+                    return newClient.getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
+                        .click('#button')
+                        .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')));
                 });
-                var newClient = xdTesting.remote(multiDevice.options, newMultiDevice.getModifier(), newMultiDevice);
-
-                var q = require('q');
-                var defer = q.defer();
-                defer.resolve(newClient);
-                return defer.promise;
-            }).then((newClient) => {
-                assert.isNotNull(newClient);
-                assert.isDefined(newClient);
-
-                return newClient.getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
-                    .click('#button')
-                    .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')));
-            });
+        });
     });
+
 });
