@@ -4,7 +4,7 @@ var assert = require('chai').assert;
 var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates');
 
-describe('MultiDevice - WebdriverIO commands', function () {
+describe.skip('MultiDevice - WebdriverIO commands', function () {
     var test = this;
 
     test.devices = {};
@@ -23,7 +23,7 @@ describe('MultiDevice - WebdriverIO commands', function () {
             .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '-')))
             .click('#button')
             .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '1')))
-            ;
+            .end();
     });
 
     it.skip('should be supported on a single device', function () {
@@ -34,6 +34,6 @@ describe('MultiDevice - WebdriverIO commands', function () {
             .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '-')))
             .click('#button')
             .getText('#counter').then((textA, textB) => [textA, textB].forEach(text => assert.equal(text, '1')))
-            ;
+            .end();
     });
 });
