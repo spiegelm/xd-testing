@@ -10,10 +10,16 @@ describe('MultiDevice - selectBySize', function () {
     test.devices = {};
     test.baseUrl = "http://localhost:8090/";
 
-    afterEach(function () {
-        // Close browsers before completing a test
-        return test.devices.endAll();
-    });
+    //afterEach(function () {
+    //    // Close browsers before completing a test
+    //    return test.devices.endAll();
+    //});
+
+    //after(function () {
+    //    // Close browsers before completing a test
+    //    return xdTesting.multiremote({}).endAll();
+    //});
+
 
     it('should act on the specified devices', function () {
         var options = {
@@ -24,7 +30,7 @@ describe('MultiDevice - selectBySize', function () {
         return test.devices = xdTesting.multiremote(options)
             .init()
             .url(test.baseUrl)
-            .then(() => test.devices.selectBySize(['small'])
+            .then(() => test.devices.selectBySize(['small']).selectedDevices
                 .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
                 .click('#button')
                 .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
@@ -40,13 +46,65 @@ describe('MultiDevice - selectBySize', function () {
         return test.devices = xdTesting.multiremote(options)
             .init()
             .url(test.baseUrl)
-            .then(() => test.devices.selectBySize(['small'])
+            .then(() => test.devices.selectBySize(['small']).selectedDevices
                 .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
                 .click('#button')
                 .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
             ).then(() => test.devices.select('C')
                 .getText('#counter').then(textC => assert.equal(textC, '-'))
             );
+    });
+
+    it.skip('should accept a callback', function() {
+        var options = {
+            A: templates.devices.nexus4(),
+            B: templates.devices.nexus4(),
+            C: templates.devices.nexus10()
+        };
+
+        var queue = '';
+        return test.devices = xdTesting.multiremote(options)
+            .init()
+            .then(() => queue += '0')
+            .then(() => test.devices
+                //.select('A')
+                .selectBySize('small', small => small
+
+                    //return small.then(() => {
+                    //return test.devices
+                    .then(() => {
+                        queue += '1';
+                    })
+                )
+                    //return small
+                    //    .then(() => {
+                    //        queue += '1'
+                    //    })
+                    //    .forEach((device, index) => {
+                    //        queue += '2';
+                    //    })
+                    //    .then(() => {
+                    //        queue += '3'
+                    //    })
+                    //    .url(test.baseUrl)
+                    //    .getCount().then(count => {
+                    //        assert.equal(2);
+                    //    })
+                    //    .getUrl().then((urlA, urlB) => {
+                    //        assert.equal(urlA, test.baseUrl);
+                    //        assert.equal(urlB, test.baseUrl);
+                    //        queue += '4';
+                    //    });
+                //}
+            )
+            .then(() => {
+                queue += '5';
+            })
+            .then(() => {
+                assert.equal(queue, '015');
+                //assert.equal(queue, '0122345');
+                //done();
+            }).endAll();
     });
 
     it.skip('should be callable on the monad chain and return a client', function() {
@@ -59,7 +117,7 @@ describe('MultiDevice - selectBySize', function () {
             .init();
 
         return test.devices
-            .selectBySize(['small'])
+            .selectBySize(['small']).selectedDevices
             .then(smallDevices => {
                 assert.isNotNull(smallDevices);
                 assert.hasProperty(smallDevices, 'click');
@@ -79,7 +137,7 @@ describe('MultiDevice - selectBySize', function () {
 
         return test.devices
             .url(test.baseUrl)
-            .then(() => test.devices.selectBySize(['small'])
+            .then(() => test.devices.selectBySize(['small']).selectedDevices
                 .then((value) => {
                     var smallDevices = value.selectedDevices;
                     return smallDevices.getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
