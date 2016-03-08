@@ -78,47 +78,6 @@ describe('MultiDevice - selectBySize', function () {
             .end();
     });
 
-    it('should execute the callback in order', function() {
-        var options = {
-            A: templates.devices.nexus4(),
-            B: templates.devices.nexus4(),
-            C: templates.devices.nexus10()
-        };
-
-        var queue = '';
-        return test.devices = xdTesting.multiremote(options)
-            .then(() => queue += '0')
-            .selectBySizeCommand('small', () => {
-                queue += '1';
-            })
-            .then(() => queue += '2')
-            .then(() => assert.equal(queue, '012'))
-            .end();
-});
-
-    it('debug -- should execute the sequentialCommand callback in order', function() {
-        var options = {
-            A: templates.devices.nexus4(),
-            B: templates.devices.nexus4(),
-            C: templates.devices.nexus10()
-        };
-
-        var queue = '';
-        return test.devices = xdTesting.multiremote(options)
-            .then(() => queue += '0')
-            .sequentialCommand(() => {
-                queue += '1';
-            })
-            .then(() => {
-                queue += '5';
-            })
-            .then(() => {
-                assert.equal(queue, '015');
-                //assert.equal(queue, '0122345');
-                //done();
-            }).end();
-    });
-
     it.skip('should be callable on the monad chain and return a client', function() {
         var options = {
             A: templates.devices.nexus4(),
