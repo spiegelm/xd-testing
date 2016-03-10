@@ -21,7 +21,7 @@ describe('MultiDevice - selectById', function () {
         return test.devices = xdTesting.multiremote(options)
             .init()
             .url(test.baseUrl)
-            .then(() => test.devices.selectById(['B', 'C'])
+            .selectById(['B', 'C'], selectedDevices => selectedDevices
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '-')))
                 .click('#button')
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '1')))
@@ -34,7 +34,7 @@ describe('MultiDevice - selectById', function () {
         return test.devices = xdTesting.multiremote(options)
             .init()
             .url(test.baseUrl)
-            .then(() => test.devices.selectById(['B', 'C'])
+            .selectById(['B', 'C'], selectedDevices => selectedDevices
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '-')))
                 .click('#button')
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '1')))
@@ -42,4 +42,22 @@ describe('MultiDevice - selectById', function () {
                 .getText('#counter').then(textA => assert.equal(textA, '-'))
             );
     });
+
+    it('should execute promises callback', function() {
+        var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()};
+
+        var queue = '';
+        return test.devices = xdTesting.multiremote(options)
+            .then(() => queue += '0')
+            .selectById(['B', 'C'], selectedDevices => {
+                queue += '1';
+                return selectedDevices.then(() => {
+                    queue += '2';
+                });
+            })
+            .then(() => queue += '3')
+            .then(() => assert.equal(queue, '0123'))
+            .end();
+    });
+
 });
