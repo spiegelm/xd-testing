@@ -50,6 +50,36 @@ describe('MultiDevice - forEach', function () {
             });
     });
 
+    it('should respect promise chain', function() {
+        var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+        var queue = '';
+        return test.devices = xdTesting.multiremote(options)
+            .then(() => queue += '0' )
+            .forEach(function (device, index) {
+                var defer = q.defer();
+                defer.resolve();
+                return defer.promise.delay(1000).then(() => queue += '1');
+            })
+            .then(() => queue += '2')
+            .then(() => {
+                assert.equal(queue, '0112');
+            });
+    });
+
+    it('should wrap callback in promise', function() {
+        var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+        var queue = '';
+        return test.devices = xdTesting.multiremote(options)
+            .then(() => queue += '0' )
+            .forEach(function (device, index) {
+                queue += '1';
+            })
+            .then(() => queue += '2')
+            .then(() => {
+                assert.equal(queue, '0112');
+            });
+    });
+
     it('should return a promise', function(done) {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
         var counter = 0;
