@@ -18,12 +18,6 @@ describe('MultiDevice - selectBySize', function () {
         }
     });
 
-    //after(function () {
-    //    // Close browsers before completing a test
-    //    return xdTesting.multiremote({}).endAll();
-    //});
-
-
     it('should act on the specified devices', function () {
         var options = {
             A: templates.devices.nexus4(),
@@ -79,48 +73,25 @@ describe('MultiDevice - selectBySize', function () {
             .end();
     });
 
-    it('should retain the command history', function() {
+    it('should adapt options to selection', function() {
         var options = {
-            A: templates.devices.nexus4(),
+            A: templates.devices.nexus10(),
             B: templates.devices.nexus4(),
-            C: templates.devices.nexus10()
+            C: templates.devices.nexus4()
         };
 
         return test.devices = xdTesting.multiremote(options)
-            .init() // 1 command
-            .url(test.baseUrl) // 1 command
-            .click('#button') // 3 commands total
             .selectBySize('small', selectedDevices => selectedDevices
-                .click('#button') // 3 commands total
-                .getText('#counter') // 3 commands total
-            )
-            .then(() => {
-                return q.all([
-                    test.devices.select('A').getCommandHistory().then(h => {
-                        assert.equal(h.length, 11);
-                        assert.deepEqual(h.map(element => element.name),
-                            ['init', 'url', 'click', 'element', 'elementIdClick', 'click',
-                                'element', 'elementIdClick', 'getText', 'elements', 'elementIdText']
-                        );
-                    }),
-                    test.devices.select('B').getCommandHistory().then(h => {
-                        assert.equal(h.length, 11);
-                        assert.deepEqual(h.map(element => element.name),
-                            ['init', 'url', 'click', 'element', 'elementIdClick', 'click',
-                                'element', 'elementIdClick', 'getText', 'elements', 'elementIdText']
-                        );
-                    }),
-                    test.devices.select('C').getCommandHistory().then(h => {
-                        assert.equal(h.length, 5);
-                        assert.deepEqual(h.map(element => element.name),
-                            ['init', 'url', 'click', 'element', 'elementIdClick']
-                        );
-                    })
-                ]);
-            })
-            .end();
+                .then(() => {
+                    assert.property(selectedDevices, 'options');
+                    assert.notProperty(selectedDevices.options, 'A');
+                    assert.property(selectedDevices.options, 'B');
+                    assert.property(selectedDevices.options, 'C');
+                    assert.deepEqual(selectedDevices.options.B, options.B)
+                    assert.deepEqual(selectedDevices.options.C, options.C)
+                })
+            );
     });
-
 
     describe('unused approaches', function() {
         it.skip('should be callable on the monad chain and return a client', function() {

@@ -40,9 +40,12 @@ describe('MultiDevice - selectByType', function () {
     });
 
     it('should adapt options to selection', function() {
-        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
+        var options = {
+            A: templates.devices.nexus10(),
+            B: templates.devices.nexus4(),
+            C: templates.devices.nexus4()
+        };
 
-        let queue = [];
         return test.devices = xdTesting.multiremote(options)
             .selectByType('phone', selectedDevices => selectedDevices
                 .then(() => {
