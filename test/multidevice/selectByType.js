@@ -12,7 +12,9 @@ describe('MultiDevice - selectByType', function () {
 
     afterEach(function () {
         // Close browsers before completing a test
-        return test.devices.endAll();
+        if (test.devices && test.devices.endAll) {
+            return test.devices.endAll();
+        }
     });
 
     it('should only act on the specified devices', function () {
@@ -62,5 +64,19 @@ describe('MultiDevice - selectByType', function () {
                     assert.deepEqual(selectedDevices.options.C, options.C)
                 })
             );
+    });
+
+    it('should handle empty selections', function() {
+        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
+
+        let queue = '';
+        return test.devices = xdTesting.multiremote(options)
+            .selectByType('desktop', selectedDevices => selectedDevices
+                .then(() => queue += '0')
+                .forEach((device, index) => queue += device.options.id)
+                .then(() => queue += '1')
+            ).then(() => {
+                assert.equal(queue, '01');
+            });
     });
 });

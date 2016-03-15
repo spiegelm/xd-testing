@@ -13,7 +13,9 @@ describe('MultiDevice - selectById', function () {
 
     afterEach(function () {
         // Close browsers before completing a test
-        return test.devices.endAll();
+        if (test.devices && test.devices.endAll) {
+            return test.devices.endAll();
+        }
     });
 
     it('should act on the specified devices', function () {
@@ -81,21 +83,16 @@ describe('MultiDevice - selectById', function () {
             );
     });
 
-    it('should handle empty selections', function() {
+    it('should deny undefined ids', function() {
         var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
 
-        let queue = '';
-        return test.devices = xdTesting.multiremote(options)
-            .selectById('Z', selectedDevices => selectedDevices
-                .then(() => queue += '0')
-                .forEach((device, index) => queue += device.options.id)
-                .then(() => queue += '1')
-            ).then(() => {
-                assert.equal(queue, '01');
-            });
+        assert.throws(() => {
+            return test.devices = xdTesting.multiremote(options)
+                .selectById('Z', () => {})
+        }, Error, 'browser "Z" is not defined');
     });
 
-    it.only('should support nested usage', function() {
+    it('should support nested usage', function() {
         var options = {
             A: templates.devices.nexus10(),
             B: templates.devices.nexus4(),

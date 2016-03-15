@@ -77,6 +77,20 @@ describe('MultiDevice - selectBySize', function () {
             );
     });
 
+    it('should handle empty selections', function() {
+        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
+
+        let queue = '';
+        return test.devices = xdTesting.multiremote(options)
+            .selectBySize('medium', selectedDevices => selectedDevices
+                .then(() => queue += '0')
+                .forEach((device, index) => queue += device.options.id)
+                .then(() => queue += '1')
+            ).then(() => {
+                assert.equal(queue, '01');
+            });
+    });
+
     describe('unused approaches', function() {
         it.skip('should be callable on the monad chain and return a client', function() {
             var options = {
