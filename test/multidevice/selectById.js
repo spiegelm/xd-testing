@@ -94,6 +94,54 @@ describe('MultiDevice - selectById', function () {
                 assert.equal(queue, '01');
             });
     });
+
+    it.only('should support nested usage', function() {
+        var options = {
+            A: templates.devices.nexus10(),
+            B: templates.devices.nexus4(),
+            C: templates.devices.nexus4()
+        };
+
+        let queue = '';
+        return test.devices = xdTesting.multiremote(options)
+            .selectById(['A', 'B', 'C'], allDevices => allDevices
+                .then(() => queue += '0')
+                .selectById(['B', 'C'], devicesBC => devicesBC
+                    .then(() => queue += '1')
+                    .selectById(['C'], deviceC => deviceC
+                        .then(() => queue += '2')
+                        .then(() => {
+                            assert.property(deviceC, 'options');
+                            assert.notProperty(deviceC.options, 'A');
+                            assert.notProperty(deviceC.options, 'B');
+                            assert.property(deviceC.options, 'C');
+                            assert.deepEqual(deviceC.options.C, options.C)
+                        })
+                        .then(() => queue += '3')
+                    )
+                    .then(() => {
+                        assert.property(devicesBC, 'options');
+                        assert.notProperty(devicesBC.options, 'A');
+                        assert.property(devicesBC.options, 'B');
+                        assert.property(devicesBC.options, 'C');
+                        assert.deepEqual(devicesBC.options.B, options.B)
+                        assert.deepEqual(devicesBC.options.C, options.C)
+                    })
+                    .then(() => queue += '4')
+                )
+                .then(() => {
+                    assert.equal(queue, '01234');
+                    assert.property(allDevices, 'options');
+                    assert.property(allDevices.options, 'A');
+                    assert.property(allDevices.options, 'B');
+                    assert.property(allDevices.options, 'C');
+                    assert.deepEqual(allDevices.options.A, options.A)
+                    assert.deepEqual(allDevices.options.B, options.B)
+                    assert.deepEqual(allDevices.options.C, options.C)
+                })
+            );
+    });
+
     it('should retain the command history', function() {
         var options = {
             A: templates.devices.nexus4(),
