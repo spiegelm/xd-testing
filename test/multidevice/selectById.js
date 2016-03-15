@@ -3,6 +3,7 @@
 var assert = require('chai').assert;
 var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates');
+var q = require('q');
 
 describe('MultiDevice - selectById', function () {
     var test = this;
