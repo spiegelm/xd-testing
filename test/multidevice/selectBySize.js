@@ -18,23 +18,7 @@ describe('MultiDevice - selectBySize', function () {
         }
     });
 
-    it('should act on the specified devices', function () {
-        var options = {
-            A: templates.devices.nexus4(),
-            B: templates.devices.nexus4(),
-            C: templates.devices.nexus10()
-        };
-        return test.devices = xdTesting.multiremote(options)
-            .init()
-            .url(test.baseUrl)
-            .selectBySize('small', selectedDevices => selectedDevices
-                .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
-                .click('#button')
-                .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
-            );
-    });
-
-    it('should not act on other devices', function () {
+    it('should only act on the specified devices', function () {
         var options = {
             A: templates.devices.nexus4(),
             B: templates.devices.nexus4(),

@@ -27,16 +27,21 @@ describe('MultiDevice - selectByType', function () {
             });
     });
 
-    it('should handle empty selections', function() {
+    it('should execute promises callback', function() {
         var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
 
-        let queue = [];
+        var queue = '';
         return test.devices = xdTesting.multiremote(options)
-            .selectByType('phone', selectedDevices => selectedDevices
-                .forEach((device, index) => queue.push(device.options.id))
-            ).then(() => {
-                assert.deepEqual(queue.sort(), ['B', 'C'])
-            });
+            .then(() => queue += '0')
+            .selectByType('phone', selectedDevices => {
+                queue += '1';
+                return selectedDevices.then(() => {
+                    queue += '2';
+                });
+            })
+            .then(() => queue += '3')
+            .then(() => assert.equal(queue, '0123'))
+            .end();
     });
 
     it('should adapt options to selection', function() {
@@ -58,22 +63,4 @@ describe('MultiDevice - selectByType', function () {
                 })
             );
     });
-
-    it('should execute promises callback', function() {
-        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
-
-        var queue = '';
-        return test.devices = xdTesting.multiremote(options)
-            .then(() => queue += '0')
-            .selectByType('phone', selectedDevices => {
-                queue += '1';
-                return selectedDevices.then(() => {
-                    queue += '2';
-                });
-            })
-            .then(() => queue += '3')
-            .then(() => assert.equal(queue, '0123'))
-            .end();
-    });
-
 });

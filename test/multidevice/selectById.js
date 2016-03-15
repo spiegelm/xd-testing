@@ -81,6 +81,19 @@ describe('MultiDevice - selectById', function () {
             );
     });
 
+    it('should handle empty selections', function() {
+        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
+
+        let queue = '';
+        return test.devices = xdTesting.multiremote(options)
+            .selectById('Z', selectedDevices => selectedDevices
+                .then(() => queue += '0')
+                .forEach((device, index) => queue += device.options.id)
+                .then(() => queue += '1')
+            ).then(() => {
+                assert.equal(queue, '01');
+            });
+    });
     it('should retain the command history', function() {
         var options = {
             A: templates.devices.nexus4(),
