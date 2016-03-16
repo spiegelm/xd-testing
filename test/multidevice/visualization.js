@@ -1,0 +1,34 @@
+"use strict";
+
+var assert = require('chai').assert;
+var xdTesting = require('../../lib/index')
+var templates = require('../../lib/templates');
+var q = require('q');
+
+describe('MultiDevice - visualization', function () {
+    var test = this;
+
+    test.devices = {};
+    test.baseUrl = "http://localhost:8090/";
+
+    //afterEach(function () {
+    //    // Close browsers before completing a test
+    //    if (test.devices && test.devices.endAll) {
+    //        return test.devices.endAll();
+    //    }
+    //});
+
+    it('script', function() {
+        var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()};
+
+        return test.devices = xdTesting.multiremote(options)
+            .init()
+            .url(test.baseUrl)
+            .selectById(['B', 'C'], selectedDevices => selectedDevices
+                .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '-')))
+                .click('#button')
+                .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '1')))
+            )
+            .endAll();
+    });
+});
