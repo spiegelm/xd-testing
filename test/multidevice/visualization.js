@@ -23,6 +23,7 @@ describe('MultiDevice - visualization', function () {
 
         return test.devices = xdTesting.multiremote(options)
             .init()
+            .windowHandleSize({width: 200, height: 200})
             .url(test.baseUrl)
             .selectById(['B', 'C'], selectedDevices => selectedDevices
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '-')))
