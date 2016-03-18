@@ -1,6 +1,7 @@
 {
-  "name": "xd-test-gallery",
-  "version": "0.1.0",
+  "name": "xd-testing",
+  "author": "Michael Spiegel",
+  "version": "0.2.0",
   "description": "",
   "dependencies": {
     "chai": "^3.5.0",
@@ -15,8 +16,7 @@
   "devDependencies": {},
   "scripts": {
     "pretest": "npm run cleanup",
-    "test": "./node_modules/.bin/mocha",
+    "test": "./node_modules/.bin/mocha --recursive test/",
     "cleanup": "rm -rf screenshots/*"
-  },
-  "author": "Michael Spiegel"
+  }
 }

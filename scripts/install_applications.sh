@@ -28,11 +28,15 @@ git clone --depth 1 https://github.com/spiegelm/XD-MVC.git XD-MVC
 # Setup gallery app
 echo "Setup gallery app"
 cd ${PROJECT_ROOT}/testapp/XD-MVC/Examples/Gallery
-npm install
-./node_modules/.bin/bower install
+npm install > install.log
+./node_modules/.bin/bower install >> install.log
 
 # Setup maps app
 echo "Setup maps app"
 cd ${PROJECT_ROOT}/testapp/XD-MVC/Examples/Maps
+npm install > install.log
+./node_modules/.bin/bower install >> install.log
+
+echo "Setup basic test app"
+cd ${PROJECT_ROOT}/testapp/basic
 npm install
-./node_modules/.bin/bower install
