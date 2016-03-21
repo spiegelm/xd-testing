@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="flow.css">
+    <title>xd-testing Application Flow</title>
+</head>
+<body>
+
+<div class="header">
+    {{#devices}}
+        <div class="device{{.}}">{{.}}</div>
+    {{/devices}}
+</div>
+
+<div class="steps">
+    {{#steps}}
+        <div class="step device{{deviceId}}" id="step{{step}}">
+            <span class="command">{{command}}</span>
+            <img src="{{image}}">
+        </div>
+    {{/steps}}
+</div>
+
+</body>
+</html>

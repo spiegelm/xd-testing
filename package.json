@@ -4,9 +4,11 @@
   "version": "0.2.0",
   "description": "",
   "dependencies": {
+    "bower": "^1.7.7",
     "chai": "^3.5.0",
     "chromedriver": "^2.20.0",
     "mocha": "^2.4.5",
+    "mustache": "^2.2.1",
     "q": "^1.4.1",
     "selenium-standalone": "^4.8.0",
     "selenium-webdriver": "^2.48.2",

@@ -1,0 +1,19 @@
+img {
+    border: 1px solid grey;
+}
+
+.header {
+    font-weight: bold;
+}
+
+.deviceB {
+    margin-left: 300px;
+}
+
+.deviceC {
+    margin-left: 600px;
+}
+
+.step .command {
+    display: block;
+}
