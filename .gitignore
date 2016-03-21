@@ -1,4 +1,7 @@
 .idea
 node_modules/
+bower_components/
 xd-testing.json
 *.log
+steps.json
+flow.html
