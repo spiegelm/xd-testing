@@ -1,9 +1,15 @@
 "use strict";
 
+/**
+ * @type {Chai.Assert}
+ */
 var assert = require('chai').assert;
 var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates');
 var q = require('q');
+var StepStorage = require('../../lib/stepStorage'),
+    Step = require('../../lib/step');
+
 
 describe('MultiDevice - visualization', function () {
     var test = this;
@@ -32,4 +38,19 @@ describe('MultiDevice - visualization', function () {
             )
             .endAll();
     });
+
+    describe('unit', function() {
+        it('should load the stored steps', function() {
+            let step = new Step('A', 13, 'commandName', 'D:\\www\\xd-testing\\screenshots\\step5C_windowHandleSize.png');
+            (new StepStorage()).addStep(step).store();
+
+            let steps = (new StepStorage()).load().steps;
+
+            assert.lengthOf(steps, 1);
+            assert.property(steps[0], 'image');
+            assert.equal(steps[0].image, step.image);
+        })
+
+    })
+
 });
