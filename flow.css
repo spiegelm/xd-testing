@@ -14,6 +14,6 @@ img {
     margin-left: 600px;
 }
 
-.step .command {
+.step .commands, .step .command {
     display: block;
 }

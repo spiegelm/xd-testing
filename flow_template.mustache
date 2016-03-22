@@ -21,7 +21,7 @@
 <div class="steps">
     {{#steps}}
         <div class="step device{{deviceId}}" id="step{{step}}">
-            <span class="command">{{#command}}{{.}}{{/command}}</span>
+            <span class="commands">{{#commands}}<span class="command">{{.}}</span>{{/commands}}</span>
             <img src="data:image/png;base64,{{imageBase64}}">
         </div>
     {{/steps}}
