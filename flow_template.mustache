@@ -6,25 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="flow.css">
+    <link rel="stylesheet" href="static/flow.css">
     <title>xd-testing Application Flow</title>
 </head>
 <body>
 
-<div class="header">
-    {{#devices}}
-        <!-- TODO show device name etc. -->
-        <div class="device{{.}}">{{.}}</div>
-    {{/devices}}
-</div>
 
-<div class="steps">
-    {{#steps}}
-        <div class="step device{{deviceId}}" id="step{{step}}">
-            <span class="commands">{{#commands}}<span class="command">{{.}}</span>{{/commands}}</span>
-            <img src="data:image/png;base64,{{imageBase64}}">
+<div class="device-container">
+    {{#deviceSteps}}
+        <div class="device">
+            <div class="header">
+                {{deviceId}}
+                <!-- TODO show device name etc. -->
+            </div>
+
+            <div class="steps">
+                {{#steps}}
+                    <div class="step device{{deviceId}}" id="step{{step}}">
+                        <span class="commands">{{#commands}}<span class="command">{{.}}</span>{{/commands}}</span>
+                        <img src="data:image/png;base64,{{imageBase64}}">
+                    </div>
+                {{/steps}}
+            </div>
         </div>
-    {{/steps}}
+    {{/deviceSteps}}
 </div>
 
 </body>
