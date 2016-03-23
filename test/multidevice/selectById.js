@@ -157,22 +157,22 @@ describe('MultiDevice - selectById', function () {
             .then(() => {
                 return q.all([
                     test.devices.select('A').getCommandHistory().then(h => {
-                        assert.equal(h.length, 11);
-                        assert.deepEqual(h.map(element => element.name),
+                        let filteredHistory = h.filter(element => ['screenshot', 'saveScreenshot'].indexOf(element.name) === -1);
+                        assert.deepEqual(filteredHistory.map(element => element.name),
                             ['init', 'url', 'click', 'element', 'elementIdClick', 'click',
                                 'element', 'elementIdClick', 'getText', 'elements', 'elementIdText']
                         );
                     }),
                     test.devices.select('B').getCommandHistory().then(h => {
-                        assert.equal(h.length, 11);
-                        assert.deepEqual(h.map(element => element.name),
+                        let filteredHistory = h.filter(element => ['screenshot', 'saveScreenshot'].indexOf(element.name) === -1);
+                        assert.deepEqual(filteredHistory.map(element => element.name),
                             ['init', 'url', 'click', 'element', 'elementIdClick', 'click',
                                 'element', 'elementIdClick', 'getText', 'elements', 'elementIdText']
                         );
                     }),
                     test.devices.select('C').getCommandHistory().then(h => {
-                        assert.equal(h.length, 5);
-                        assert.deepEqual(h.map(element => element.name),
+                        let filteredHistory = h.filter(element => ['screenshot', 'saveScreenshot'].indexOf(element.name) === -1);
+                        assert.deepEqual(filteredHistory.map(element => element.name),
                             ['init', 'url', 'click', 'element', 'elementIdClick']
                         );
                     })
