@@ -13,9 +13,14 @@ img {
 
 .device-container {
     display: table;
+    max-width: 100%;
 }
 
 .device {
     display: table-cell;
     padding: 10px;
+}
+
+.step img {
+    max-width: 100%;
 }
