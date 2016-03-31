@@ -15,7 +15,7 @@ describe.skip('MultiDevice - WebdriverIO commands', function () {
         return test.devices.endAll();
     });
 
-    it('should be supported on multiple devices', function () {
+    it('should be supported on multiple devices @large', function () {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
         return test.devices = xdTesting.multiremote(options)
             .init()
@@ -26,7 +26,7 @@ describe.skip('MultiDevice - WebdriverIO commands', function () {
             .end();
     });
 
-    it.skip('should be supported on a single device', function () {
+    it.skip('should be supported on a single device @large', function () {
         var options = {A: templates.devices.chrome()};
         return test.devices = xdTesting.multiremote(options)
             .init()

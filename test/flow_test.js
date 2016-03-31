@@ -8,7 +8,7 @@ var Flow = require('../lib/flow'),
     Step = require('../lib/step');
 
 
-describe('Flow', function () {
+describe('Flow @small', function () {
 
     describe('#load', function () {
         it('should return the previously stored steps', function () {

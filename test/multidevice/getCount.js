@@ -15,27 +15,25 @@ describe('MultiDevice - getCount', function () {
         return test.devices.endAll();
     });
 
-    it('should count a single device', function () {
+    it('should count a single device @medium', function () {
         var options = {A: templates.devices.chrome()};
         return test.devices = xdTesting.multiremote(options)
-            .init()
             .getCount().then((count) => {
                 assert.equal(count, 1);
                 assert.equal(Object.keys(arguments).length, 0)
             });
     });
 
-    it('should count two devices', function () {
+    it('should count two devices @medium', function () {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
         return test.devices = xdTesting.multiremote(options)
-            .init()
             .getCount().then((count) => {
                 assert.equal(count, 2);
                 assert.equal(Object.keys(arguments).length, 0)
             });
     });
 
-    it('should count several devices', function () {
+    it('should count several devices @medium', function () {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome(),
@@ -43,14 +41,13 @@ describe('MultiDevice - getCount', function () {
             D: templates.devices.chrome()
         };
         return test.devices = xdTesting.multiremote(options)
-            .init()
             .getCount().then((count) => {
                 assert.equal(count, 4);
                 assert.equal(Object.keys(arguments).length, 0)
             });
     });
 
-    it('should support method chaining', function () {
+    it('should support method chaining @large', function () {
         var options = {A: templates.devices.chrome()};
         return test.devices = xdTesting.multiremote(options)
             .init()
