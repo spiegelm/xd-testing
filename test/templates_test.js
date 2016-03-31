@@ -24,7 +24,7 @@ function returnsADeviceObject(devices, name) {
     assert.isNumber(devices[name]().height);
 }
 
-describe('require("lib/template")', function() {
+describe('require("lib/template") @small', function() {
     describe('.devices', function() {
         var deviceFunction = name => templates.devices[name]
 

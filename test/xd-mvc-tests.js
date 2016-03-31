@@ -34,7 +34,7 @@ var config = require(process.cwd() + '/xd-testing.json');
 normalizeConfig(config);
 var setups = config['setups'];
 
-describe('XD-MVC Maps', function() {
+describe('XD-MVC Maps @large', function() {
     var self = this;
 
     // Set test timeout
@@ -211,7 +211,7 @@ describe('XD-MVC Maps', function() {
 
 });
 
-describe('XD-MVC Gallery', function () {
+describe('XD-MVC Gallery @large', function () {
     var self = this;
 
     // Set test timeout

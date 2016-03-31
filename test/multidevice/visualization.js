@@ -21,7 +21,7 @@ describe('MultiDevice - visualization', function () {
     //    }
     //});
 
-    it('script', function () {
+    it('script @large', function () {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()};
 
         return test.devices = xdTesting.multiremote(options)

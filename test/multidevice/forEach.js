@@ -5,7 +5,7 @@ var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates');
 var q = require('q');
 
-describe('MultiDevice - forEach', function () {
+describe('MultiDevice - forEach @medium', function () {
     var test = this;
 
     test.devices = {};
@@ -18,12 +18,11 @@ describe('MultiDevice - forEach', function () {
         }
     });
 
-    it('should call function on each device', function(done) {
+    it('should call function on each device', function() {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
         var counter = 0;
         var calledIds = [];
-        test.devices = xdTesting.multiremote(options)
-            .init()
+        return test.devices = xdTesting.multiremote(options)
             .getCount().then(count => assert.equal(count, 2, 'getCount does not match'))
             .forEach(function (device) {
                 counter++;
@@ -32,21 +31,18 @@ describe('MultiDevice - forEach', function () {
             .then(function () {
                 assert.equal(counter, 2, 'has not been called twice');
                 assert.deepEqual(calledIds.sort(), ['A', 'B'], 'has not been called for each device');
-                done();
             });
     });
 
-    it('should call function with index parameter', function(done) {
+    it('should call function with index parameter', function() {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
         var indices = [];
         return test.devices = xdTesting.multiremote(options)
-            .init()
             .forEach(function (device, index) {
                 indices.push(index);
             })
             .then(function () {
                 assert.deepEqual(indices.sort(), [0, 1], 'callback has not been called with each index');
-                done();
             });
     });
 
@@ -85,7 +81,6 @@ describe('MultiDevice - forEach', function () {
         var counter = 0;
         var defer = q.defer();
         test.devices = xdTesting.multiremote(options)
-            .init()
             .getCount().then(count => assert.equal(count, 2, 'getCount does not match'))
             .forEach(function (device) {
                 setTimeout(function () {
