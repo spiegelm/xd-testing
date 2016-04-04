@@ -3,5 +3,5 @@ node_modules/
 bower_components/
 xd-testing.json
 *.log
-steps.json
+steps*.json
 flow.html
