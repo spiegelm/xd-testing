@@ -10,12 +10,14 @@ var Flow = require('../lib/flow'),
 
 describe('Flow @small', function () {
 
+    const FLOW_TEST_FILE = 'steps_test.json'
+
     describe('#load', function () {
         it('should return the previously stored steps', function () {
             let step = new Step('A', 13, 'commandName', new Buffer([]));
-            (new Flow()).addStep(step).store();
+            (new Flow()).addStep(step).store(FLOW_TEST_FILE);
 
-            let steps = (new Flow()).load().steps;
+            let steps = (new Flow()).load(FLOW_TEST_FILE).steps;
 
             assert.lengthOf(steps, 1);
             assert.deepEqual(steps, [step]);
@@ -24,9 +26,9 @@ describe('Flow @small', function () {
         it('should handle binary images', function () {
             let image = new Buffer([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 1, 19, 0, 0, 0, 111, 8, 2, 0, 0, 0, 64, 92, 179, 225, 0, 0, 1, 68, 73, 68, 65, 84, 120, 156, 237, 211, 193, 13, 192, 32, 16, 192, 176, 210, 253, 119, 62, 102, 32, 31, 132, 100, 79, 144, 79, 214, 204, 124, 192, 161, 255, 118, 0, 60, 201, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 133, 115, 160, 112, 14, 20, 206, 129, 194, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 133, 115, 160, 112, 14, 20, 206, 129, 194, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 133, 115, 160, 112, 14, 20, 206, 129, 194, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 133, 115, 160, 112, 14, 20, 206, 129, 194, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 133, 115, 160, 112, 14, 20, 206, 129, 194, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 133, 115, 160, 112, 14, 20, 206, 129, 194, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 133, 115, 160, 112, 14, 20, 206, 129, 194, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 133, 115, 160, 112, 14, 20, 206, 129, 194, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 133, 115, 160, 112, 14, 20, 206, 129, 194, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 133, 115, 160, 112, 14, 20, 206, 129, 194, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 133, 115, 160, 112, 14, 20, 206, 129, 194, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 133, 115, 160, 112, 14, 20, 206, 129, 194, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 133, 115, 160, 112, 14, 20, 206, 129, 194, 57, 80, 56, 7, 10, 231, 64, 225, 28, 40, 156, 3, 197, 6, 50, 25, 3, 219, 128, 104, 53, 250, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130])
             let step = new Step('A', 13, 'commandName', image);
-            (new Flow()).addStep(step).store();
+            (new Flow()).addStep(step).store(FLOW_TEST_FILE);
 
-            let steps = (new Flow()).load().steps;
+            let steps = (new Flow()).load(FLOW_TEST_FILE).steps;
 
             assert.lengthOf(steps, 1);
             assert.property(steps[0], 'image');
@@ -103,6 +105,45 @@ describe('Flow @small', function () {
 
             assert.deepEqual(compressedSteps[0].commands, ['commandA', 'commandB'])
             assert.equal(compressedSteps[0].deviceId, 'A')
+        })
+
+        it('should not merge checkpoints with following steps0', function() {
+            let step0 = new Step('A', 13, 'commandA', new Buffer([13, 37]), {}, true),
+                step1 = new Step('A', 14, 'commandB', new Buffer([13, 37]), {}, true),
+                step2 = new Step('A', 15, 'commandC', new Buffer([13, 37]), {}, false)
+            let compressedSteps = (new Flow())
+                .addStep(step0)
+                .addStep(step1)
+                .addStep(step2)
+                .compressSteps()
+                .steps
+
+            assert.lengthOf(compressedSteps, 3);
+            assert.isTrue(step0.image.equals(compressedSteps[0].image));
+            assert.isTrue(step1.image.equals(compressedSteps[1].image));
+            assert.isTrue(step2.image.equals(compressedSteps[2].image));
+        })
+    })
+
+    describe('#fixCommandAlignment', function() {
+        it ('should move the first screen shot in a separate step', function() {
+            let step0 = new Step('A', 0, 'commandA', new Buffer([13, 37]), {}, true)
+
+            let alignedSteps = (new Flow())
+                .addStep(step0)
+                .fixCommandAlignment()
+                .steps
+
+            assert.lengthOf(alignedSteps, 2);
+
+            assert.isNotNull(alignedSteps[0].image)
+            assert.equal(alignedSteps[0].image.toString('base64'), (new Buffer([13, 37])).toString('base64'), 'first step should keep the screenshot');
+            assert.isTrue(alignedSteps[0].image.equals((new Buffer([13, 37]))), 'first step should keep the screenshot');
+            assert.equal(alignedSteps[0].stepIndex, 0)
+            assert.deepEqual(alignedSteps[0].commands, [], 'commands don\'t match')
+
+            assert.deepEqual(alignedSteps[1].commands, step0.commands)
+            assert.isTrue(alignedSteps[1].image.equals(new Buffer([])))
         })
     })
 })
