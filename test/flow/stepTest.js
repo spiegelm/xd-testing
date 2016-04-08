@@ -32,13 +32,13 @@ describe('Step @small', function() {
     })
 
     describe('#toJSON', function () {
-        it('returns JSON string with stepId, commands, image in base64 encoding', function () {
+        it('returns object with stepId, commands, image in base64 encoding', function () {
             let json = (new Step(0, ['commandName'], new Buffer([13, 37]))).toJSON()
-            assert.deepEqual(json, JSON.stringify({
+            assert.deepEqual(json, {
                 stepId: 0,
                 commands: ['commandName'],
                 image: new Buffer([13, 37]).toString('base64')
-            }))
+            })
         })
     })
 

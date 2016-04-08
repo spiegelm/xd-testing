@@ -4,9 +4,8 @@
  * @type Chai.Assert
  */
 var assert = require('chai').assert;
-var Flow = require('../../lib/flow/flow'),
-    Step = require('../../lib/flow/step'),
-    Checkpoint = require('../../lib/flow/checkpoint')
+var Step = require('../../lib/flow/step')
+var Checkpoint = require('../../lib/flow/checkpoint')
 
 
 describe('Checkpoint @small', function () {
@@ -18,11 +17,10 @@ describe('Checkpoint @small', function () {
     })
 
     describe('#toJSON', function() {
-        it('returns JSON string with name property and array of step ids', function() {
-            assert.equal(
-                JSON.stringify({id: 0, name: 'checkpointName', steps: []}),
-                new Checkpoint(0, 'checkpointName').toJSON(),
-                "stringified objects don't match"
+        it('returns object with name property and array of step ids', function() {
+            assert.deepEqual(
+                {id: 0, name: 'checkpointName', steps: []},
+                new Checkpoint(0, 'checkpointName').toJSON()
             )
         })
     })

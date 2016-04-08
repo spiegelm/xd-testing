@@ -9,11 +9,15 @@ var Checkpoint = require('../../lib/flow/checkpoint');
 
 describe('Device @small', function () {
     describe('#toJSON', function() {
-        it('returns JSON string with device', function() {
+        it('returns object with deviceOptions and checkpoints', function() {
+            assert.deepEqual(
+                {deviceOptions: {id: 'A'}, checkpoints: []},
+                new Device({id: 'A'}).toJSON()
+            )
+
             assert.equal(
-                JSON.stringify({deviceOptions: {id: 0}, checkpoints: []}),
-                new Device({id: 0}).toJSON(),
-                "stringified objects don't match"
+                JSON.stringify({deviceOptions: {id: 'A'}, checkpoints: []}),
+                JSON.stringify(new Device({id: 'A'}).toJSON())
             )
         })
     })
