@@ -11,26 +11,57 @@
 </head>
 <body>
 
-
 <div class="device-container">
-    {{#deviceSteps}}
+    {{#devices}}
         <div class="device">
             <div class="header">
-                {{deviceId}}
+                <h1>{{deviceId}}</h1>
+                {{#json}}{{deviceOptions}}{{/json}}
                 <!-- TODO show device name etc. -->
             </div>
 
-            <div class="steps">
-                {{#steps}}
-                    <div class="step device{{deviceId}}" id="step{{step}}">
-                        <span class="commands">{{#commands}}<span class="command">{{.}}</span>{{/commands}}</span>
-                        <img src="data:image/png;base64,{{imageBase64}}">
+            <div class="checkpoints">
+                {{#checkpoints}}
+                    <div><h2>Checkpoint #{{id}}: {{name}}</h2></div>
+
+                    <div class="steps">
+                        {{#steps}}
+                            <div class="step device{{deviceId}}" id="step{{step}}">
+                                <span class="commands">{{#commands}}<span class="command">{{.}}</span>{{/commands}}</span>
+                                <img src="data:image/png;base64,{{imageBase64}}">
+                            </div>
+                        {{/steps}}
                     </div>
-                {{/steps}}
+                {{/checkpoints}}
             </div>
         </div>
-    {{/deviceSteps}}
+    {{/devices}}
 </div>
+
+
+<!--<div class="flow">-->
+    <!--<div class="header">-->
+        <!--{{#devices}}-->
+            <!--{{deviceId}}-->
+
+            <!--<div class="checkpoints">-->
+                <!--{{#checkpoints}}-->
+                    <!--<div>#{{id}}: {{name}}</div>-->
+                    <!--<div class="steps">-->
+                        <!--{{#steps}}-->
+                            <!--<div class="step device{{deviceId}}" id="step{{step}}">-->
+                                <!--<span class="commands">{{#commands}}<span class="command">{{.}}</span>{{/commands}}-->
+                                <!--</span>-->
+                                <!--<img src="data:image/png;base64,{{imageBase64}}">-->
+                            <!--</div>-->
+                        <!--{{/steps}}-->
+                    <!--</div>-->
+                <!--{{/checkpoints}}-->
+            <!--</div>-->
+
+        <!--{{/devices}}-->
+    <!--</div>-->
+<!--</div>-->
 
 </body>
 </html>
