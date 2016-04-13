@@ -6,14 +6,46 @@ img {
     font-weight: bold;
 }
 
-
 .step .commands, .step .command {
     display: block;
 }
 
-.device-container {
+.grid {
     display: table;
+    border-collapse: collapse;
     max-width: 100%;
+}
+
+.header-devices {
+    display: table-row;
+}
+
+.header-device {
+    display: table-cell;
+}
+
+.checkpoint-row {
+    display: table-row;
+    border: 1px solid black;
+    border-width: 1px 0;
+}
+
+.checkpoint-name, .header-device:first-of-type {
+    display: table-cell;
+    padding: 0 10px;
+}
+
+.checkpoint {
+    display: table-cell;
+}
+
+/* All cells */
+.header-device, .checkpoint {
+    padding: 10px 5px;    
+}
+
+.checkpoint-title {
+    display: none;
 }
 
 .device {

@@ -11,31 +11,42 @@
 </head>
 <body>
 
-<div class="device-container">
-    {{#devices}}
-        <div class="device">
-            <div class="header">
-                <h1>{{deviceId}}</h1>
-                {{#json}}{{deviceOptions}}{{/json}}
-                <!-- TODO show device name etc. -->
+<h1>Flow Visualization</h1>
+
+<div class="grid">
+    <div class="header-devices">
+        <div class="header-device">
+            Devices
+        </div>
+        {{#devices}}
+            <div class="header-device">
+                <h2>{{deviceId}}</h2>
             </div>
-
-            <div class="checkpoints">
+        {{/devices}}
+    </div>
+    {{#grid}}
+        {{#.}}
+            <div class="checkpoint-row">
+                <span class="checkpoint-name">{{name}}</span><!--{{name}}-->
                 {{#checkpoints}}
-                    <div><h2>Checkpoint #{{id}}: {{name}}</h2></div>
-
-                    <div class="steps">
-                        {{#steps}}
-                            <div class="step device{{deviceId}}" id="step{{step}}">
-                                <span class="commands">{{#commands}}<span class="command">{{.}}</span>{{/commands}}</span>
-                                {{#img}}{{imageBase64}}{{/img}}
+                    {{#.}}
+                        <div class="checkpoint">
+                            <div class="checkpoint-title"><h2>Checkpoint #{{id}}: {{name}}</h2></div>
+                            <div class="steps">
+                                {{#steps}}
+                                    <div class="step device{{deviceId}}" id="step{{stepId}}">
+                                    <span class="commands">{{#commands}}<span
+                                            class="command">{{.}}</span>{{/commands}}</span>
+                                        {{#img}}{{imageBase64}}{{/img}}
+                                    </div>
+                                {{/steps}}
                             </div>
-                        {{/steps}}
-                    </div>
+                        </div>
+                    {{/.}}
                 {{/checkpoints}}
             </div>
-        </div>
-    {{/devices}}
+        {{/.}}
+    {{/grid}}
 </div>
 
 
