@@ -5,9 +5,10 @@
  */
 var assert = require('chai').assert
 var fs = require('fs')
-var Flow = require('../../lib/flow/flow'),
-    Device = require('../../lib/flow/device'),
-    Step = require('../../lib/flow/step');
+var Flow = require('../../lib/flow/flow')
+var Device = require('../../lib/flow/device')
+var Step = require('../../lib/flow/step')
+var path = require('path')
 
 
 describe('Flow @small', function () {
@@ -128,6 +129,15 @@ describe('Flow @small', function () {
     //        assert.deepEqual(flow.checkpoints[0].stepIds, [0])
     //    })
     //})
+
+    describe('#grid', function() {
+        it('x test', function() {
+            let FLOW_TEST_FILE = __dirname + path.sep + 'steps.json'
+            Flow.load(FLOW_TEST_FILE).grid()
+
+            // TODO finish test
+        })
+    })
 
     describe('#generateStepId', function() {
         // TODO write test
