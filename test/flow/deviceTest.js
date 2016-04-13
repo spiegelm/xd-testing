@@ -36,4 +36,17 @@ describe('Device @small', function () {
         })
     })
 
+    describe('#addStep', function() {
+        // TODO write test
+        it('should store step')
+    })
+
+    describe('#addCheckpoint', function() {
+        // TODO write test
+        it('should add the checkpoint')
+
+        // TODO write test
+        it('should add previous steps to the checkpoint')
+    })
+
 })

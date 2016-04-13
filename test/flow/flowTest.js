@@ -128,5 +128,15 @@ describe('Flow @small', function () {
     //        assert.deepEqual(flow.checkpoints[0].stepIds, [0])
     //    })
     //})
+
+    describe('#generateStepId', function() {
+        // TODO write test
+        it('should return the count of stored steps')
+    })
+
+    describe('#generateCheckpointId', function() {
+        // TODO write test
+        it('should return the count of stored checkpoints')
+    })
 })
 
