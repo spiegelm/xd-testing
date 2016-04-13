@@ -122,7 +122,7 @@ describe('Flow @small', function () {
 
     describe('#grid', function() {
         it('x test', function() {
-            let FLOW_TEST_FILE = __dirname + path.sep + 'steps.json'
+            let FLOW_TEST_FILE = path.join(__dirname, 'fixtures', 'flow.json')
             Flow.load(FLOW_TEST_FILE).grid()
 
             // TODO finish test
