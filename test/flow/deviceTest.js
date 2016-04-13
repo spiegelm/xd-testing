@@ -38,15 +38,18 @@ describe('Device @small', function () {
 
     describe('#addStep', function() {
         // TODO write test
-        it('should store step')
+        it('adds the step to the unfinished checkpoint')
     })
 
     describe('#addCheckpoint', function() {
         // TODO write test
-        it('should add the checkpoint')
+        it('adds the checkpoint to the checkpoints array')
 
         // TODO write test
-        it('should add previous steps to the checkpoint')
+        it('adds steps from the unfinished checkpoint to the given checkpoint')
+
+        // TODO write test
+        it('clears the steps from the unfinished checkpoint')
     })
 
 })

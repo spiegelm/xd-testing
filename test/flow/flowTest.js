@@ -45,16 +45,18 @@ describe('Flow @small', function () {
     //})
 
     describe('#compressSteps', function () {
-        it('same Buffer objects should equal', function () {
-            assert.isTrue((new Buffer([13, 37]).equals(new Buffer([13, 37]))));
-        })
+        describe('prerequisites', function() {
+            it('same Buffer objects should equal', function () {
+                assert.isTrue((new Buffer([13, 37]).equals(new Buffer([13, 37]))));
+            })
 
-        it('different Buffer objects should not equal', function () {
-            assert.isNotTrue((new Buffer([13, 38]).equals(new Buffer([13, 37]))));
-        })
+            it('different Buffer objects should not equal', function () {
+                assert.isNotTrue((new Buffer([13, 38]).equals(new Buffer([13, 37]))));
+            })
 
-        it('array.concat works', function () {
-            assert.deepEqual(['A'].concat(['B']), ['A', 'B'])
+            it('array.concat returns concatenated array', function () {
+                assert.deepEqual(['A'].concat(['B']), ['A', 'B'])
+            })
         })
 
         it('should merge consecutive steps with identical screen shots of the same device')
@@ -115,18 +117,6 @@ describe('Flow @small', function () {
     //
     //        assert.deepEqual(alignedSteps[1].commands, step0.commands)
     //        assert.isTrue(alignedSteps[1].image.equals(new Buffer([])))
-    //    })
-    //})
-    //
-    //describe('#addCheckpoint', function() {
-    //    it('adds a new checkpoint to the checkpoints array', function() {
-    //        let step0 = new Step('A', 0, 'commandA', new Buffer([13, 37]), {}, true)
-    //
-    //        let flow = (new Flow()).addStep(step0)
-    //
-    //        flow.addCheckpoint('A', 'checkpoint')
-    //        assert.lengthOf(flow.checkpoints, 1)
-    //        assert.deepEqual(flow.checkpoints[0].stepIds, [0])
     //    })
     //})
 
