@@ -28,11 +28,15 @@ describe('MultiDevice - visualization', function () {
             .init()
             .windowHandleSize({width: 200, height: 200})
             .url(test.baseUrl)
+            .checkpoint('loaded')
+            .checkpoint('loaded#2')
             .selectById(['B', 'C'], selectedDevices => selectedDevices
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '-')))
                 .click('#button')
+                .checkpoint('click')
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '1')))
             )
+            .checkpoint('end')
             .endAll();
     });
 
