@@ -28,7 +28,7 @@
                         {{#steps}}
                             <div class="step device{{deviceId}}" id="step{{step}}">
                                 <span class="commands">{{#commands}}<span class="command">{{.}}</span>{{/commands}}</span>
-                                <img src="data:image/png;base64,{{imageBase64}}">
+                                {{#img}}{{imageBase64}}{{/img}}
                             </div>
                         {{/steps}}
                     </div>
@@ -38,30 +38,6 @@
     {{/devices}}
 </div>
 
-
-<!--<div class="flow">-->
-    <!--<div class="header">-->
-        <!--{{#devices}}-->
-            <!--{{deviceId}}-->
-
-            <!--<div class="checkpoints">-->
-                <!--{{#checkpoints}}-->
-                    <!--<div>#{{id}}: {{name}}</div>-->
-                    <!--<div class="steps">-->
-                        <!--{{#steps}}-->
-                            <!--<div class="step device{{deviceId}}" id="step{{step}}">-->
-                                <!--<span class="commands">{{#commands}}<span class="command">{{.}}</span>{{/commands}}-->
-                                <!--</span>-->
-                                <!--<img src="data:image/png;base64,{{imageBase64}}">-->
-                            <!--</div>-->
-                        <!--{{/steps}}-->
-                    <!--</div>-->
-                <!--{{/checkpoints}}-->
-            <!--</div>-->
-
-        <!--{{/devices}}-->
-    <!--</div>-->
-<!--</div>-->
 
 </body>
 </html>
