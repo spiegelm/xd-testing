@@ -16,7 +16,7 @@ describe('Flow @small', function () {
     const FLOW_TEST_FILE = 'steps_test.json'
 
     describe('#load', function () {
-        it('should return the flow with devices stored by #store', function () {
+        it('returns the flow with devices stored by #store', function () {
             let flow = new Flow().addDevices([new Device({id: 'A'})]).store(FLOW_TEST_FILE)
 
             let loadedFlow = Flow.load(FLOW_TEST_FILE)
@@ -28,21 +28,22 @@ describe('Flow @small', function () {
         });
     })
 
-    //describe('#devices', function () {
-    //    it('should return a list of devices contained in the steps', function () {
-    //        assert.deepEqual(
-    //            (new Flow())
-    //                .addStep(new Step('A', 13, 'commandName', new Buffer([])))
-    //                .addStep(new Step('B', 14, 'commandName', new Buffer([])))
-    //                .addStep(new Step('C', 15, 'commandName', new Buffer([])))
-    //                .addStep(new Step('A', 13, 'commandName', new Buffer([])))
-    //                .addStep(new Step('B', 14, 'commandName', new Buffer([])))
-    //                .addStep(new Step('C', 15, 'commandName', new Buffer([])))
-    //                .devices(),
-    //            ['A', 'B', 'C']
-    //        );
-    //    })
-    //})
+    describe('#addDevice', function () {
+        it('adds the device to the devices array')
+            //, function () {
+            //        assert.deepEqual(
+            //            (new Flow())
+            //                .addStep(new Step('A', 13, 'commandName', new Buffer([])))
+            //                .addStep(new Step('B', 14, 'commandName', new Buffer([])))
+            //                .addStep(new Step('C', 15, 'commandName', new Buffer([])))
+            //                .addStep(new Step('A', 13, 'commandName', new Buffer([])))
+            //                .addStep(new Step('B', 14, 'commandName', new Buffer([])))
+            //                .addStep(new Step('C', 15, 'commandName', new Buffer([])))
+            //                .devices(),
+            //            ['A', 'B', 'C']
+            //        );
+            //})
+    })
 
     describe('#compressSteps', function () {
         describe('prerequisites', function() {
@@ -59,7 +60,7 @@ describe('Flow @small', function () {
             })
         })
 
-        it('should merge consecutive steps with identical screen shots of the same device')
+        it('merges consecutive steps with identical screen shots of the same device')
             /*, function () {
             let step0 = new Step('A', 13, 'commandA', new Buffer([13, 37])),
                 step1 = new Step('A', 14, 'commandB', new Buffer([13, 37]))
@@ -79,7 +80,7 @@ describe('Flow @small', function () {
         })
         */
 
-        it('should not merge checkpoints with following steps') /*, function() {
+        it('does not merge checkpoints with following steps') /*, function() {
             let step0 = new Step('A', 13, 'commandA', new Buffer([13, 37]), {}, true),
                 step1 = new Step('A', 14, 'commandB', new Buffer([13, 37]), {}, true),
                 step2 = new Step('A', 15, 'commandC', new Buffer([13, 37]), {}, false)
@@ -131,12 +132,12 @@ describe('Flow @small', function () {
 
     describe('#generateStepId', function() {
         // TODO write test
-        it('should return the count of stored steps')
+        it('returns the count of stored steps')
     })
 
     describe('#generateCheckpointId', function() {
         // TODO write test
-        it('should return the count of stored checkpoints')
+        it('returns the count of stored checkpoints')
     })
 })
 
