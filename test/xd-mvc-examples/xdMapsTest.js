@@ -148,12 +148,13 @@ describe('XD-MVC Maps @large', function() {
             it('on ' + setupName, function () {
                 var test = this.test;
 
-                var devices = setup.devices;
+                var setupDevices = setup.devices;
 
-                return initWithDevices(devices)
+                return initWithDevices(setupDevices)
+                    .name(setupName)
                     .then(() => self.pairDevicesViaXDMVC())
-                    .then(() => {
-                        var deviceA = self.devices.select('A');
+                    .checkpoint('paired')
+                    .selectById('A', deviceA => {
 
                         var lastXDSyncCounts;
 
@@ -176,11 +177,13 @@ describe('XD-MVC Maps @large', function() {
                             // Adjust map location
                             return deviceA.execute(function () {
                                 map.setCenter({lat: 47.3783569289, lng: 8.5487177968});
-                            });
+                            })
+                                .checkpoint('set map center');
                         }).then(() => utility.multiAction(self.devices, passiveDevices, device => {
                             return device.waitUntil(() => device.execute(function (lastSyncCounter) {
-                                return eventLogger.eventCounter.XDsync > lastSyncCounter;
-                            }, lastXDSyncCounts[device.options.id]), self.async_timeout)
+                                    return eventLogger.eventCounter.XDsync > lastSyncCounter;
+                                }, lastXDSyncCounts[device.options.id]), self.async_timeout)
+                                .checkpoint('wait for synchronisation')
                         })).then(() => utility.multiAction(self.devices, passiveDevices, device =>
                             device.execute(function (id) {
                                 return {
@@ -205,7 +208,8 @@ describe('XD-MVC Maps @large', function() {
                             });
                         })
                     })
-                    .then(() => self.devices.end());
+                    .checkpoint('end')
+                    .then(() => self.devices.end())
             });
         });
     });
