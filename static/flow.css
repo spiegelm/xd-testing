@@ -37,6 +37,7 @@ img {
 
 .checkpoint {
     display: table-cell;
+    vertical-align: top;
 }
 
 /* All cells */
