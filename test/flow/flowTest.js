@@ -99,28 +99,6 @@ describe('Flow @small', function () {
         */
     })
 
-    //describe('#fixCommandAlignment', function() {
-    //    it('should move the first screen shot in a separate step', function() {
-    //        let step0 = new Step('A', 0, 'commandA', new Buffer([13, 37]), {}, true)
-    //
-    //        let alignedSteps = (new Flow())
-    //            .addStep(step0)
-    //            .fixCommandAlignment()
-    //            .steps
-    //
-    //        assert.lengthOf(alignedSteps, 2);
-    //
-    //        assert.isNotNull(alignedSteps[0].image)
-    //        assert.equal(alignedSteps[0].image.toString('base64'), (new Buffer([13, 37])).toString('base64'), 'first step should keep the screenshot');
-    //        assert.isTrue(alignedSteps[0].image.equals((new Buffer([13, 37]))), 'first step should keep the screenshot');
-    //        assert.equal(alignedSteps[0].stepId, 0)
-    //        assert.deepEqual(alignedSteps[0].commands, [], 'commands don\'t match')
-    //
-    //        assert.deepEqual(alignedSteps[1].commands, step0.commands)
-    //        assert.isTrue(alignedSteps[1].image.equals(new Buffer([])))
-    //    })
-    //})
-
     describe('#grid', function() {
         it('x test', function() {
             let FLOW_TEST_FILE = path.join(__dirname, 'fixtures', 'flow.json')
