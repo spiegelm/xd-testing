@@ -3,7 +3,7 @@
 
 var fs = require('fs'),
     path = require('path'),
-    Flow = require('./flow/flow');
+    Flow = require('./../lib/flow/flow');
 var Mustache = require('mustache');
 
 var express = require('express');
@@ -18,6 +18,8 @@ app.get('/', function (req, res) {
     }
     const STEPS_FILE = path.join(process.cwd(), file);
 
+    let header =
+
     console.log(STEPS_FILE);
 
     fs.access(STEPS_FILE, fs.F_OK, function(err) {
@@ -30,7 +32,7 @@ app.get('/', function (req, res) {
         let flow = Flow.load(file);
 
         // Load template
-        let template = fs.readFileSync('flow_template.mustache', 'utf-8');
+        let template = fs.readFileSync(path.join(__dirname, 'views/flow_template.mustache'), 'utf-8');
 
         //let flow = flow.fixCommandAlignment().compressSteps();
 
@@ -90,7 +92,7 @@ app.get('/', function (req, res) {
     });
 });
 
-app.use('/static', express.static(path.join(__dirname, '/../static')));
+app.use('/public', express.static(path.join(__dirname, '/public')));
 app.use('/bower_components', express.static(path.join(__dirname, '/../bower_components')));
 
 //app.use(errorHandler())
