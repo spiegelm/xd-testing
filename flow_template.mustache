@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="static/flow.css">
     <title>xd-testing Application Flow</title>
 </head>
@@ -20,7 +21,9 @@
         </div>
         {{#devices}}
             <div class="header-device">
-                <h2>{{deviceId}}</h2>
+                {{#deviceOptions}}
+                    <h2><span title="ID: {{id}}">{{name}}</span> {{#device-icon}}{{.}}{{/device-icon}}</h2>
+                {{/deviceOptions}}
             </div>
         {{/devices}}
     </div>
