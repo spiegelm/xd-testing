@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="public/flow.css">
+    <title>xd-testing Application Flow</title>
+</head>
+<body>
+
+<h1>Flow Visualization</h1>
+
+{{> flow_selection }}
+
+{{#messages}}
+    <div class="messages">
+        {{#.}}
+            <div class="message">{{.}}</div>
+        {{/.}}
+    </div>
+{{/messages}}
+
+<div class="grid">
+    <div class="header-devices">
+        {{#devices.length}}
+            <div class="header-device">
+                Devices
+            </div>
+            {{#devices}}
+                <div class="header-device">
+                    {{#deviceOptions}}
+                        <h2><span title="ID: {{id}}">{{name}}</span> {{{device-icon}}}</h2>
+                    {{/deviceOptions}}
+                </div>
+            {{/devices}}
+        {{/devices.length}}
+    </div>
+    {{#grid}}
+        {{#.}}
+            <div class="checkpoint-row">
+                <span class="checkpoint-name">{{name}}</span><!--{{name}}-->
+                {{#checkpoints}}
+                    {{#.}}
+                        <div class="checkpoint">
+                            <div class="checkpoint-title"><h2>Checkpoint #{{id}}: {{name}}</h2></div>
+                            <div class="steps">
+                                {{#steps}}
+                                    <div class="step device{{deviceId}}" id="step{{stepId}}">
+                                    <span class="commands">{{#commands}}<span
+                                            class="command">{{.}}</span>{{/commands}}</span>
+                                        {{#img}}{{imageBase64}}{{/img}}
+                                    </div>
+                                {{/steps}}
+                            </div>
+                        </div>
+                    {{/.}}
+                {{/checkpoints}}
+            </div>
+        {{/.}}
+    {{/grid}}
+</div>
+
+
+</body>
+</html>

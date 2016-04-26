@@ -23,7 +23,7 @@ rm -rf XD-MVC
 #fi
 
 # Clone XD-MVC repository
-git clone --depth 1 https://github.com/spiegelm/XD-MVC.git XD-MVC
+git clone -b master --single-branch --depth 1 https://github.com/spiegelm/XD-MVC.git XD-MVC
 
 # Setup gallery app
 echo "Setup gallery app"

@@ -17,7 +17,7 @@ describe('MultiDevice - selectByType', function () {
         }
     });
 
-    it('should only act on the specified devices', function () {
+    it('should only act on the specified devices @medium', function () {
         var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
 
         let queue = [];
@@ -29,7 +29,7 @@ describe('MultiDevice - selectByType', function () {
             });
     });
 
-    it('should execute promises callback', function() {
+    it('should execute promises callback @medium', function() {
         var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
 
         var queue = '';
@@ -46,7 +46,7 @@ describe('MultiDevice - selectByType', function () {
             .end();
     });
 
-    it('should adapt options to selection', function() {
+    it('should adapt options to selection @medium', function() {
         var options = {
             A: templates.devices.nexus10(),
             B: templates.devices.nexus4(),
@@ -66,7 +66,7 @@ describe('MultiDevice - selectByType', function () {
             );
     });
 
-    it('should handle empty selections', function() {
+    it('should handle empty selections @medium', function() {
         var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
 
         let queue = '';

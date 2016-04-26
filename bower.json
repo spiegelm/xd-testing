@@ -1,0 +1,24 @@
+{
+  "name": "xd-testing",
+  "description": "",
+  "main": "",
+  "authors": [
+    "Michael Spiegel"
+  ],
+  "moduleType": [
+    "node"
+  ],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "font-awesome": "^4.6.1"
+  }
+}

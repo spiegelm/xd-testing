@@ -18,7 +18,7 @@ describe('MultiDevice - selectById', function () {
         }
     });
 
-    it('should act on the specified devices', function () {
+    it('should act on the specified devices @large', function () {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()};
 
         return test.devices = xdTesting.multiremote(options)
@@ -31,7 +31,7 @@ describe('MultiDevice - selectById', function () {
             );
     });
 
-    it('should not act on other devices', function () {
+    it('should not act on other devices @large', function () {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()};
 
         return test.devices = xdTesting.multiremote(options)
@@ -46,7 +46,7 @@ describe('MultiDevice - selectById', function () {
             );
     });
 
-    it('should execute promises callback', function() {
+    it('should execute promises callback @medium', function() {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()};
 
         var queue = '';
@@ -63,7 +63,7 @@ describe('MultiDevice - selectById', function () {
             .end();
     });
 
-    it('should adapt options to selection', function() {
+    it('should adapt options to selection @medium', function() {
         var options = {
             A: templates.devices.nexus10(),
             B: templates.devices.nexus4(),
@@ -83,7 +83,7 @@ describe('MultiDevice - selectById', function () {
             );
     });
 
-    it('should deny undefined ids', function() {
+    it('should deny undefined ids @medium', function() {
         var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
 
         assert.throws(() => {
@@ -92,7 +92,7 @@ describe('MultiDevice - selectById', function () {
         }, Error, 'browser "Z" is not defined');
     });
 
-    it('should support nested usage', function() {
+    it('should support nested usage @medium', function() {
         var options = {
             A: templates.devices.nexus10(),
             B: templates.devices.nexus4(),
@@ -139,7 +139,7 @@ describe('MultiDevice - selectById', function () {
             );
     });
 
-    it('should retain the command history', function() {
+    it('should retain the command history @large', function() {
         var options = {
             A: templates.devices.nexus4(),
             B: templates.devices.nexus4(),
@@ -157,22 +157,22 @@ describe('MultiDevice - selectById', function () {
             .then(() => {
                 return q.all([
                     test.devices.select('A').getCommandHistory().then(h => {
-                        assert.equal(h.length, 11);
-                        assert.deepEqual(h.map(element => element.name),
+                        let filteredHistory = h.filter(element => ['screenshot', 'saveScreenshot'].indexOf(element.name) === -1);
+                        assert.deepEqual(filteredHistory.map(element => element.name),
                             ['init', 'url', 'click', 'element', 'elementIdClick', 'click',
                                 'element', 'elementIdClick', 'getText', 'elements', 'elementIdText']
                         );
                     }),
                     test.devices.select('B').getCommandHistory().then(h => {
-                        assert.equal(h.length, 11);
-                        assert.deepEqual(h.map(element => element.name),
+                        let filteredHistory = h.filter(element => ['screenshot', 'saveScreenshot'].indexOf(element.name) === -1);
+                        assert.deepEqual(filteredHistory.map(element => element.name),
                             ['init', 'url', 'click', 'element', 'elementIdClick', 'click',
                                 'element', 'elementIdClick', 'getText', 'elements', 'elementIdText']
                         );
                     }),
                     test.devices.select('C').getCommandHistory().then(h => {
-                        assert.equal(h.length, 5);
-                        assert.deepEqual(h.map(element => element.name),
+                        let filteredHistory = h.filter(element => ['screenshot', 'saveScreenshot'].indexOf(element.name) === -1);
+                        assert.deepEqual(filteredHistory.map(element => element.name),
                             ['init', 'url', 'click', 'element', 'elementIdClick']
                         );
                     })
@@ -180,6 +180,5 @@ describe('MultiDevice - selectById', function () {
             })
             .end();
     });
-
 
 });
