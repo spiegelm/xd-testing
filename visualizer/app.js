@@ -10,12 +10,8 @@ var express = require('express')
 var app = express()
 
 app.get('/', function (req, res) {
-    let file = req.query['file'] || null
-    if (!file) {
-        // Explicitly redirect to default file
-        res.redirect('/?file=' + Flow.FILE)
-        return
-    }
+    const file = req.query['file'] || ''
+
     const FLOW_DIRECTORY = path.join(process.cwd(), 'flows');
     const STEPS_FILE = path.join(FLOW_DIRECTORY, file)
 
@@ -73,7 +69,9 @@ app.get('/', function (req, res) {
         }
 
 
-        if (err) {
+        if (!file) {
+            view.messages.push("Please select a flow file.")
+        } else if (err) {
             view.messages.push("No such file. " + (err.path || ""))
             res.status(404)
         } else {
