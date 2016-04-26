@@ -23,8 +23,6 @@ describe('xdTesting @large', function() {
                     let steps = flow.steps()
                     let stepCommandNames = steps.map(step => step.commands)
                         .filter(commands => commands.length > 0)
-                    console.log(stepCommandNames)
-                    console.log(flow.steps())
                     assert.lengthOf(stepCommandNames, 2)
                 })
                 .end()
