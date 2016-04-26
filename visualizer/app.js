@@ -16,7 +16,11 @@ app.get('/', function (req, res) {
         res.redirect('/?file=' + Flow.FILE)
         return
     }
-    const STEPS_FILE = path.join(process.cwd(), file)
+    const FLOW_DIRECTORY = path.join(process.cwd(), 'flows');
+    const STEPS_FILE = path.join(FLOW_DIRECTORY, file)
+
+    let flowFiles = fs.readdirSync(FLOW_DIRECTORY)
+        .filter(filename => fs.statSync(path.join(FLOW_DIRECTORY, filename)).isFile() && path.extname(filename) == '.json')
 
     console.log(STEPS_FILE)
 
@@ -28,6 +32,8 @@ app.get('/', function (req, res) {
         }
 
         let view = {
+            'files': flowFiles,
+            'flowDirectory': FLOW_DIRECTORY,
             'messages': [],
             'json': function() {
                 return function(json, render) {
@@ -72,13 +78,10 @@ app.get('/', function (req, res) {
             res.status(404)
         } else {
             // Load flow
-            let flow = Flow.load(file)
+            let flow = Flow.load(STEPS_FILE)
 
-
-            Object.assign(view, {
-                'devices': flow.deviceArray(),
-                'grid': flow.grid()
-            })
+            view.devices = flow.deviceArray()
+            view.grid = flow.grid()
         }
 
         // Render template
@@ -95,9 +98,6 @@ app.get('/', function (req, res) {
 app.use('/public', express.static(path.join(__dirname, '/public')))
 app.use('/bower_components', express.static(path.join(__dirname, '/../bower_components')))
 
-//app.use(errorHandler())
-
 app.listen(3000, function () {
     console.log('Listening on port 3000.')
 })
-
