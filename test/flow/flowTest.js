@@ -17,14 +17,14 @@ describe('Flow @small', function () {
 
     describe('#load', function () {
         it('returns the flow with devices stored by #store', function () {
-            let flow = new Flow().addDevices([new Device({id: 'A'})]).store(FLOW_TEST_FILE)
+            let flow = new Flow().setName('test').addDevices([new Device({id: 'A'})]).store(FLOW_TEST_FILE)
 
             let loadedFlow = Flow.load(FLOW_TEST_FILE)
 
             fs.unlinkSync(FLOW_TEST_FILE)
 
             assert.lengthOf(Object.keys(loadedFlow.devices), 1);
-            assert.deepEqual(loadedFlow, flow);
+            assert.deepEqual(loadedFlow.toJSON(), flow.toJSON());
         });
     })
 
