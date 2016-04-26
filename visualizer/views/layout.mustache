@@ -14,18 +14,30 @@
 
 <h1>Flow Visualization</h1>
 
+{{> flow_selection }}
+
+{{#messages}}
+    <div class="messages">
+        {{#.}}
+            <div class="message">{{.}}</div>
+        {{/.}}
+    </div>
+{{/messages}}
+
 <div class="grid">
     <div class="header-devices">
-        <div class="header-device">
-            Devices
-        </div>
-        {{#devices}}
+        {{#devices.length}}
             <div class="header-device">
-                {{#deviceOptions}}
-                    <h2><span title="ID: {{id}}">{{name}}</span> {{#device-icon}}{{.}}{{/device-icon}}</h2>
-                {{/deviceOptions}}
+                Devices
             </div>
-        {{/devices}}
+            {{#devices}}
+                <div class="header-device">
+                    {{#deviceOptions}}
+                        <h2><span title="ID: {{id}}">{{name}}</span> {{{device-icon}}}</h2>
+                    {{/deviceOptions}}
+                </div>
+            {{/devices}}
+        {{/devices.length}}
     </div>
     {{#grid}}
         {{#.}}
