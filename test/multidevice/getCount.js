@@ -74,4 +74,21 @@ describe('MultiDevice - getCount', function () {
                 })
             )
     })
+
+    it('should support selectById with multiple ids @medium', function() {
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome(),
+            C: templates.devices.chrome()
+        }
+        return test.devices = xdTesting.multiremote(options)
+            .getCount().then(count => {
+                assert.equal(count, 3)
+            })
+            .selectById(['A', 'B'], device => device
+                .getCount(count => {
+                    assert.equal(count, 2)
+                })
+            )
+    })
 });
