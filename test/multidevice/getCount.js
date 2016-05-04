@@ -65,12 +65,12 @@ describe('MultiDevice - getCount', function () {
             });
     });
 
-    it('should support selectById @large', function() {
+    it('should support selectById @medium', function() {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
         }
-        return test.devices = xdTesting.multiremote(options).init()
+        return test.devices = xdTesting.multiremote(options)
             .getCount().then(count => {
                 assert.equal(count, 2)
             })
@@ -79,6 +79,5 @@ describe('MultiDevice - getCount', function () {
                     assert.equal(count, 1)
                 })
             )
-            .end()
     })
 });
