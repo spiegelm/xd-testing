@@ -10,13 +10,6 @@ describe('MultiDevice - getCount', function () {
     test.devices = {};
     test.baseUrl = "http://localhost:8090/";
 
-    afterEach(function () {
-        // Close browsers before completing a test
-        if (test.devices && test.devices.endAll) {
-            return test.devices.endAll();
-        }
-    });
-
     it('should count a single device @medium', function () {
         var options = {A: templates.devices.chrome()};
         return test.devices = xdTesting.multiremote(options)
@@ -62,7 +55,8 @@ describe('MultiDevice - getCount', function () {
                 assert.equal(Object.keys(arguments).length, 0)
             }).getUrl().then(url => {
                 assert.equal(url, test.baseUrl);
-            });
+            })
+            .end();
     });
 
     it('should support selectById @medium', function() {
