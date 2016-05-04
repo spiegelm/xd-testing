@@ -12,7 +12,9 @@ describe('MultiDevice - getCount', function () {
 
     afterEach(function () {
         // Close browsers before completing a test
-        return test.devices.endAll();
+        if (test.devices && test.devices.endAll) {
+            return test.devices.endAll();
+        }
     });
 
     it('should count a single device @medium', function () {
@@ -62,4 +64,21 @@ describe('MultiDevice - getCount', function () {
                 assert.equal(url, test.baseUrl);
             });
     });
+
+    it('should support selectById @large', function() {
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
+        return test.devices = xdTesting.multiremote(options).init()
+            .getCount().then(count => {
+                assert.equal(count, 2)
+            })
+            .selectById('A', device => device
+                .getCount(count => {
+                    assert.equal(count, 1)
+                })
+            )
+            .end()
+    })
 });
