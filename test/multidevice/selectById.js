@@ -8,8 +8,11 @@ var q = require('q');
 describe('MultiDevice - selectById', function () {
     var test = this;
 
-    test.devices = {};
     test.baseUrl = "http://localhost:8090/";
+
+    beforeEach(() => {
+        test.devices = {}
+    })
 
     afterEach(function () {
         // Close browsers before completing a test
@@ -86,10 +89,14 @@ describe('MultiDevice - selectById', function () {
     it('should deny undefined ids @medium', function() {
         var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
 
-        assert.throws(() => {
-            return test.devices = xdTesting.multiremote(options)
-                .selectById('Z', () => {})
-        }, Error, 'browser "Z" is not defined');
+        return xdTesting.multiremote(options)
+            .selectById('Z', () => {})
+            .then(result => {
+                throw new Error('Promise was unexpectedly fulfilled. Result: ' + result);
+            }, error => {
+                assert.instanceOf(error, Error)
+                assert.equal(error.message, 'browser "Z" is not defined')
+            });
     });
 
     it('should support nested usage @medium', function() {
@@ -180,5 +187,21 @@ describe('MultiDevice - selectById', function () {
             })
             .end();
     });
+
+    it('should support ids callback parameter', () => {
+        let options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome(),
+            C: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options)
+            .selectById(() => ['A', 'C'], devices => {
+                return devices
+                    .getCount()
+                    .then(count => assert.equal(count, 2))
+            })
+            .end()
+    })
 
 });
