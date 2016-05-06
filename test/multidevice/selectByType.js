@@ -18,7 +18,7 @@ describe('MultiDevice - selectByType', function () {
     });
 
     it('should only act on the specified devices @medium', function () {
-        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
+        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()}
 
         let queue = [];
         return test.devices = xdTesting.multiremote(options)
@@ -26,11 +26,11 @@ describe('MultiDevice - selectByType', function () {
                 .forEach((device, index) => queue.push(device.options.id))
             ).then(() => {
                 assert.deepEqual(queue.sort(), ['B', 'C'])
-            });
+            })
     });
 
     it('should execute promises callback @medium', function() {
-        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
+        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()}
 
         var queue = '';
         return test.devices = xdTesting.multiremote(options)
@@ -51,7 +51,7 @@ describe('MultiDevice - selectByType', function () {
             A: templates.devices.nexus10(),
             B: templates.devices.nexus4(),
             C: templates.devices.nexus4()
-        };
+        }
 
         return test.devices = xdTesting.multiremote(options)
             .selectByType('phone', selectedDevices => selectedDevices
@@ -63,11 +63,11 @@ describe('MultiDevice - selectByType', function () {
                     assert.deepEqual(selectedDevices.options.B, options.B)
                     assert.deepEqual(selectedDevices.options.C, options.C)
                 })
-            );
+            )
     });
 
     it('should handle empty selections @medium', function() {
-        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
+        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()}
 
         let queue = '';
         return test.devices = xdTesting.multiremote(options)
@@ -77,6 +77,6 @@ describe('MultiDevice - selectByType', function () {
                 .then(() => queue += '1')
             ).then(() => {
                 assert.equal(queue, '01');
-            });
+            })
     });
 });

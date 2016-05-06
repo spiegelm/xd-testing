@@ -14,7 +14,7 @@ describe('MultiDevice - selectByElement', function () {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
-        };
+        }
 
         return xdTesting.multiremote(options)
             .init()
@@ -29,13 +29,13 @@ describe('MultiDevice - selectByElement', function () {
                 .then(count => assert.equal(count, 2))
             )
             .end()
-    });
+    })
 
     it('should not select devices that don\'t contain the element @large', function () {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
-        };
+        }
         return xdTesting.multiremote(options)
             .init()
             .url(test.baseUrl)
@@ -49,13 +49,13 @@ describe('MultiDevice - selectByElement', function () {
                 .then(count => assert.equal(count, 0))
             )
             .end()
-    });
+    })
 
     it('should execute promises callback @large', function () {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
-        };
+        }
 
         var queue = '';
         return xdTesting.multiremote(options)
@@ -70,7 +70,7 @@ describe('MultiDevice - selectByElement', function () {
             })
             .then(() => queue += '3')
             .then(() => assert.equal(queue, '0123'))
-            .end();
+            .end()
     });
 
     describe.skip('todo', function () {

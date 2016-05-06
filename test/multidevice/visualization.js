@@ -11,20 +11,12 @@ var q = require('q');
 describe('MultiDevice - visualization', function () {
     var test = this;
 
-    test.devices = {};
     test.baseUrl = "http://localhost:8090/";
-
-    //afterEach(function () {
-    //    // Close browsers before completing a test
-    //    if (test.devices && test.devices.endAll) {
-    //        return test.devices.endAll();
-    //    }
-    //});
 
     it('script @large', function () {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()};
 
-        return test.devices = xdTesting.multiremote(options)
+        return xdTesting.multiremote(options)
             .init()
             .windowHandleSize({width: 200, height: 200})
             .url(test.baseUrl)
@@ -37,7 +29,7 @@ describe('MultiDevice - visualization', function () {
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '1')))
             )
             .checkpoint('end')
-            .endAll();
+            .end();
     });
 
 });
