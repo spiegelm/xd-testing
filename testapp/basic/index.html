@@ -10,7 +10,20 @@
 <script>
     var counter = 0;
 
+    function getUrlParameter(name) {
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+        if (results == null) {
+            return null;
+        } else {
+            return results[1] || 0;
+        }
+    }
+
     $(function() {
+
+        if (getUrlParameter('hideButton') != 1) {
+            $('#button').show()
+        }
 
         $('#button').click(function() {
             click();
@@ -24,7 +37,7 @@
 
 </script>
 
-<input id="button" type="button" value="click me">
+<input id="button" type="button" value="click me" style="display: none">
 
 <span id="status">nothing happened</span>
 <span id="counter">-</span>
