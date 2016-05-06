@@ -10,20 +10,21 @@ describe('MultiDevice - selectAny', function () {
 
     test.baseUrl = "http://localhost:8090/";
 
-    it('should select a single device @large', function () {
+    it('should select a single device @medium', function () {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
         };
 
         return xdTesting.multiremote(options)
+            .getCount().then(count => assert.equal(count, 2))
             .selectAny(device => device
                 .getCount().then(count => assert.equal(count, 1))
             )
             .end()
     });
 
-    it('should execute promises callback @large', function () {
+    it('should execute promises callback @medium', function () {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
