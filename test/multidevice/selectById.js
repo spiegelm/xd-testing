@@ -170,6 +170,8 @@ describe('MultiDevice - selectById', function () {
             C: templates.devices.nexus10()
         }
 
+        let commandHistoryFilter = element => ['screenshot', 'saveScreenshot', 'setImplicitDeviceSelection'].indexOf(element.name) === -1
+
         return test.devices = xdTesting.multiremote(options)
             .init() // 1 command
             .url(test.baseUrl) // 1 command
@@ -181,21 +183,21 @@ describe('MultiDevice - selectById', function () {
             .then(() => {
                 return q.all([
                     test.devices.select('A').getCommandHistory().then(h => {
-                        let filteredHistory = h.filter(element => ['screenshot', 'saveScreenshot'].indexOf(element.name) === -1)
+                        let filteredHistory = h.filter(commandHistoryFilter)
                         assert.deepEqual(filteredHistory.map(element => element.name),
                             ['init', 'url', 'click', 'element', 'elementIdClick', 'click',
                                 'element', 'elementIdClick', 'getText', 'elements', 'elementIdText']
                         )
                     }),
                     test.devices.select('B').getCommandHistory().then(h => {
-                        let filteredHistory = h.filter(element => ['screenshot', 'saveScreenshot'].indexOf(element.name) === -1)
+                        let filteredHistory = h.filter(commandHistoryFilter)
                         assert.deepEqual(filteredHistory.map(element => element.name),
                             ['init', 'url', 'click', 'element', 'elementIdClick', 'click',
                                 'element', 'elementIdClick', 'getText', 'elements', 'elementIdText']
                         )
                     }),
                     test.devices.select('C').getCommandHistory().then(h => {
-                        let filteredHistory = h.filter(element => ['screenshot', 'saveScreenshot'].indexOf(element.name) === -1)
+                        let filteredHistory = h.filter(commandHistoryFilter)
                         assert.deepEqual(filteredHistory.map(element => element.name),
                             ['init', 'url', 'click', 'element', 'elementIdClick']
                         )
