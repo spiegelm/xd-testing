@@ -14,7 +14,7 @@ describe('MultiDevice - implicit', function () {
     let urlWithButton = withButton => test.baseUrl + "?hideButton=" + (withButton ? 0 : 1)
 
     describe('prerequisites', () => {
-        it('urlWithButton returns correct urls @small', () => {
+        it('urlWithButton returns correct url @small', () => {
             assert.equal(urlWithButton(false), "http://localhost:8090/?hideButton=1")
             assert.equal(urlWithButton(true), "http://localhost:8090/?hideButton=0")
         })
@@ -60,7 +60,6 @@ describe('MultiDevice - implicit', function () {
 
         return xdTesting.multiremote(options)
             .getAddressingOptions()
-            .then(addr => console.log(addr))
             .implicit(devices => devices
                 .getAddressingOptions()
                 .then(addr => assert.equal(addr.implicit, true))
@@ -68,7 +67,7 @@ describe('MultiDevice - implicit', function () {
             .end()
     })
 
-    it.skip('should select all matching devices for each element related command @large', function () {
+    it('should select all matching devices for each element related command @large', function () {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
@@ -77,15 +76,13 @@ describe('MultiDevice - implicit', function () {
         return xdTesting.multiremote(options).init()
             .forEach((device, index) => device.url(urlWithButton(index === 0)))
             .getAddressingOptions()
-            .then(addr => console.log(addr))
             .implicit(devices => devices
                 .getAddressingOptions()
-                .then(addr => console.log(addr))
                 .click('#button')
             )
-            //.forEach(device => device
-            //    .getText('#counter').then(text => assert.equal(text, '1'))
-            //)
+            .forEach((device, index) => device
+                .getText('#counter').then(text => assert.equal(text, index === 0 ? '1' : '-'))
+            )
             .end()
     })
 
