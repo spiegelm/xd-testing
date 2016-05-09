@@ -86,8 +86,25 @@ describe('MultiDevice - selectById', function () {
             )
     })
 
+    it('should keep explicit device selection @medium', function() {
+        var options = {
+            A: templates.devices.nexus10()
+        }
+
+        return xdTesting.multiremote(options)
+            .getAddressingOptions().then(addr => assert.equal(addr.implicit, false))
+            .selectById('A', device => device
+                .getAddressingOptions().then(addr => assert.equal(addr.implicit, false))
+            )
+            .end()
+    })
+
     it('should deny undefined ids @medium', function() {
-        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()}
+        var options = {
+            A: templates.devices.nexus10(),
+            B: templates.devices.nexus4(),
+            C: templates.devices.nexus4()
+        }
 
         return xdTesting.multiremote(options)
             .selectById('Z', () => {})

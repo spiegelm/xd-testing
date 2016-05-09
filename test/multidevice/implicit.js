@@ -42,13 +42,23 @@ describe('MultiDevice - implicit', function () {
         })
     })
 
+    it('should not use implicit device selection per default', function() {
+        var options = {
+            A: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options)
+            .getAddressingOptions()
+            .then(addr => assert.equal(addr.implicit, false))
+            .end()
+    })
+
     it('should set implicit device selection @large', function () {
         var options = {
             A: templates.devices.chrome()
         }
 
-        return xdTesting.multiremote(options).init()
-            .forEach((device, index) => device.url(urlWithButton(index === 0)))
+        return xdTesting.multiremote(options)
             .getAddressingOptions()
             .then(addr => console.log(addr))
             .implicit(devices => devices
