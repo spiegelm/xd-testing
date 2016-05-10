@@ -42,7 +42,7 @@ describe('MultiDevice - implicit', function () {
         })
     })
 
-    it('should not use implicit device selection per default', function() {
+    it('should not use implicit device selection per default @medium', function() {
         var options = {
             A: templates.devices.chrome()
         }
@@ -53,7 +53,7 @@ describe('MultiDevice - implicit', function () {
             .end()
     })
 
-    it('should set implicit device selection @large', function () {
+    it('should set implicit device selection @medium', function () {
         var options = {
             A: templates.devices.chrome()
         }
