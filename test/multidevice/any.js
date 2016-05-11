@@ -37,9 +37,10 @@ describe('MultiDevice - any', function () {
             .end()
     })
 
-    it('should call callback on a single device @medium', function () {
+    it.skip('should call .forEach on a single device? @medium', function () {
         var options = {
-            A: templates.devices.chrome()
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
         }
 
         let counter = 0
@@ -51,6 +52,24 @@ describe('MultiDevice - any', function () {
             .then(() => assert.equal(counter, 1, "Failed asserting that callback was called exactly once."))
             .end()
     })
+
+    it.skip('should .getCount return 1? @medium', function () {
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
+
+        let counter = 0
+
+        return xdTesting.multiremote(options)
+            .any(devices => devices
+                .forEach(device => counter++)
+            )
+            .then(() => assert.equal(counter, 1, "Failed asserting that callback was called exactly once."))
+            .end()
+    })
+
+    it.skip('should return the selection when no callback argument is given')
 
     it('should select a single matching device for each command with element selector @large', function () {
         var options = {
