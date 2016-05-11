@@ -222,4 +222,17 @@ describe('MultiDevice - selectById', function () {
             .end()
     })
 
+    it('should return device selection if no callback is given', () => {
+        let options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options)
+            .getCount().then(count => assert.equal(count, 2))
+            .selectById('A')
+            .getCount().then(count => assert.equal(count, 1))
+            .end()
+    })
+
 })
