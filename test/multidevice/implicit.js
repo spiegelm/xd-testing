@@ -59,11 +59,25 @@ describe('MultiDevice - implicit', function () {
         }
 
         return xdTesting.multiremote(options)
-            .getAddressingOptions()
             .implicit(devices => devices
                 .getAddressingOptions()
                 .then(addr => assert.equal(addr.implicit, true))
             )
+            .end()
+    })
+
+    it('should call callback on all matching devices @medium', function () {
+        var options = {
+            A: templates.devices.chrome()
+        }
+
+        let counter = 0
+
+        return xdTesting.multiremote(options)
+            .any(devices => devices
+                .forEach(device => counter++)
+            )
+            .then(() => assert.equal(counter, 1, "Failed asserting that callback was called exactly once."))
             .end()
     })
 
@@ -75,9 +89,7 @@ describe('MultiDevice - implicit', function () {
 
         return xdTesting.multiremote(options).init()
             .forEach((device, index) => device.url(urlWithButton(index === 0)))
-            .getAddressingOptions()
             .implicit(devices => devices
-                .getAddressingOptions()
                 .click('#button')
             )
             .forEach((device, index) => device
@@ -86,7 +98,7 @@ describe('MultiDevice - implicit', function () {
             .end()
     })
 
-    it.skip('should execute promises callback @medium', function () {
+    it('should execute callback in order @medium', function () {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
@@ -95,7 +107,7 @@ describe('MultiDevice - implicit', function () {
         var queue = ''
         return xdTesting.multiremote(options)
             .then(() => queue += '0')
-            .selectAny(device => {
+            .implicit(device => {
                 queue += '1'
                 return device.then(() => {
                     queue += '2'
