@@ -119,4 +119,20 @@ describe('MultiDevice - implicit', function () {
             .end()
     })
 
+    it('should select all devices for non-element related commands @large', () => {
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options).init()
+            .implicit(devices => devices
+                .url(test.baseUrl)
+                .getUrl().then((urlA, urlB) => {
+                    assert.equal(urlA, test.baseUrl)
+                    assert.equal(urlB, test.baseUrl)
+                })
+            )
+            .end()
+    })
 })
