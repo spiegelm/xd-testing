@@ -207,7 +207,7 @@ describe('MultiDevice - selectById', function () {
             .end()
     })
 
-    it('should support ids callback parameter', () => {
+    it('should support ids callback parameter @medium', () => {
         let options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome(),
