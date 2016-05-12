@@ -69,8 +69,6 @@ describe('MultiDevice - any', function () {
             .end()
     })
 
-    it.skip('should return the selection when no callback argument is given')
-
     it('should select a single matching device for each command with element selector @large', function () {
         var options = {
             A: templates.devices.chrome(),
@@ -111,4 +109,15 @@ describe('MultiDevice - any', function () {
             .end()
     })
 
+    it('should return the any selection context when no callback argument is given @medium', () => {
+        var options = {
+            A: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options)
+            .getAddressingOptions().then(addr => assert.equal(addr.any, false))
+            .any()
+            .getAddressingOptions().then(addr => assert.equal(addr.any, true))
+            .end()
+    })
 })

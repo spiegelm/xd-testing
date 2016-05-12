@@ -82,7 +82,7 @@ describe('MultiDevice - implicit', function () {
             .end()
     })
 
-    it('should select all matching devices for each element related command @large', function () {
+    it('should select matching devices for element related commands @large', () => {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
@@ -133,6 +133,18 @@ describe('MultiDevice - implicit', function () {
                     assert.equal(urlB, test.baseUrl)
                 })
             )
+            .end()
+    })
+
+    it('should return the implicit selection context when no callback is given @medium', () => {
+        var options = {
+            A: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options)
+            .getAddressingOptions().then(addr => assert.equal(addr.implicit, false))
+            .implicit()
+            .getAddressingOptions().then(addr => assert.equal(addr.implicit, true))
             .end()
     })
 })
