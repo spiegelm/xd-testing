@@ -256,6 +256,37 @@ describe('MultiDevice - selectById', function () {
                 .then(() => assert.equal(queue, '0123'))
                 .end()
         })
+
+        it('should allow to break the selection chain and run async forks', () => {
+            let options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            let queue = []
+
+            let devices = xdTesting.multiremote(options)
+                .getCount().then(count => assert.equal(count, 2))
+                .then(() => queue.push('0'))
+
+            let A = devices
+                .then(() => queue.push('1'))
+                .selectById('A')
+                .then(() => queue.push('2'))
+                .getCount().then(count => assert.equal(count, 1))
+                .then(() => queue.push('3'))
+
+            let B = devices
+                .then(() => queue.push('4'))
+                .selectById('B')
+                .then(() => queue.push('5'))
+                .getCount().then(count => assert.equal(count, 1))
+                .then(() => queue.push('6'))
+
+            return devices
+                .then(() => q.all(A, B))
+                .then(() => assert.equal(queue.sort().join(''), '0123456'))
+        })
     })
 
 })
