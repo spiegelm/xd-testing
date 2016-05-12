@@ -37,6 +37,22 @@ describe('MultiDevice - any', function () {
             .end()
     })
 
+    it('should imply the implicit selection context @medium', () => {
+        var options = {
+            A: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options)
+            .getAddressingOptions().then(addr => assert.equal(addr.any, false))
+            .getAddressingOptions().then(addr => assert.equal(addr.implicit, false))
+            .any(devices => devices
+                .getAddressingOptions().then(addr => assert.equal(addr.any, true))
+                .getAddressingOptions().then(addr => assert.equal(addr.implicit, true))
+            )
+            .end()
+
+    })
+
     it.skip('should call .forEach on a single device? @medium', function () {
         var options = {
             A: templates.devices.chrome(),
