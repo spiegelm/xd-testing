@@ -222,17 +222,40 @@ describe('MultiDevice - selectById', function () {
             .end()
     })
 
-    it('should return device selection if no callback is given', () => {
-        let options = {
-            A: templates.devices.chrome(),
-            B: templates.devices.chrome()
-        }
+    describe('when no callback is given', () => {
 
-        return xdTesting.multiremote(options)
-            .getCount().then(count => assert.equal(count, 2))
-            .selectById('A')
-            .getCount().then(count => assert.equal(count, 1))
-            .end()
+        it('should return device selection', () => {
+            let options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            return xdTesting.multiremote(options)
+                .getCount().then(count => assert.equal(count, 2))
+                .selectById('A')
+                .getCount().then(count => assert.equal(count, 1))
+                .end()
+        })
+
+        it('should execute the commands in order', () => {
+            let options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            let queue = ''
+
+            return xdTesting.multiremote(options)
+                .then(() => queue += '0')
+                .getCount().then(count => assert.equal(count, 2))
+                .then(() => queue += '1')
+                .selectById('A')
+                .then(() => queue += '2')
+                .getCount().then(count => assert.equal(count, 1))
+                .then(() => queue += '3')
+                .then(() => assert.equal(queue, '0123'))
+                .end()
+        })
     })
 
 })
