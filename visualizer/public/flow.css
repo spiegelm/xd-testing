@@ -10,7 +10,13 @@ img {
     display: block;
 }
 
+/*.flows {*/
+    /*display: flex;*/
+    /*flex-direction: row*/
+/*}*/
+
 .grid {
+    /*flex: 1 1 auto;*/
     display: table;
     border-collapse: collapse;
     max-width: 100%;

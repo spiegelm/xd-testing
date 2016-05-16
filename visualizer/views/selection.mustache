@@ -1,11 +1,24 @@
 <div class="flow-selection">
     {{^files}}There are no flow files. To visualize your flow files put them in <code>{{flowDirectory}}</code>{{/files}}
     {{#files.length}}
-        Your flow files:
-        <ul>
-            {{#files}}
-                <li><a href="?file={{.}}">{{.}}</a></li>
-            {{/files}}
-        </ul>
+        <div style="display: flex; flex-direction: row;">
+            <div style="flex: 1 1 auto">
+                Your flow files:
+                <ul>
+                    {{#files}}
+                        <li><a href="?file={{.}}">{{.}}</a></li>
+                    {{/files}}
+                </ul>
+            </div>
+
+            <div style="flex: 1 1 auto">
+                Compare with:
+                <ul>
+                    {{#files}}
+                        <li><a href="?file={{file}}&compare={{.}}">{{.}}</a></li>
+                    {{/files}}
+                </ul>
+            </div>
+        </div>
     {{/files.length}}
 </div>

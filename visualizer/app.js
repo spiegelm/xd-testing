@@ -11,64 +11,67 @@ var app = express()
 
 app.get('/', function (req, res) {
     const file = req.query['file'] || ''
+    const compareFile = req.query['compare'] || ''
 
     const FLOW_DIRECTORY = path.join(process.cwd(), 'flows');
     const STEPS_FILE = path.join(FLOW_DIRECTORY, file)
+    const COMPARE_FILE = path.join(FLOW_DIRECTORY, compareFile)
 
     let flowFiles = fs.readdirSync(FLOW_DIRECTORY)
         .filter(filename => fs.statSync(path.join(FLOW_DIRECTORY, filename)).isFile() && path.extname(filename) == '.json')
 
     console.log(STEPS_FILE)
 
-    fs.access(STEPS_FILE, fs.F_OK, function(err) {
-        // Load templates
-        let template = fs.readFileSync(path.join(__dirname, 'views/layout.mustache'), 'utf-8')
-        let partials = {
-            'flow_selection': fs.readFileSync(path.join(__dirname, 'views/selection.mustache'), 'utf-8')
-        }
+    // Load templates
+    let template = fs.readFileSync(path.join(__dirname, 'views/layout.mustache'), 'utf-8')
+    let partials = {
+        'flow_selection': fs.readFileSync(path.join(__dirname, 'views/selection.mustache'), 'utf-8')
+    }
 
-        let view = {
-            'files': flowFiles,
-            'flowDirectory': FLOW_DIRECTORY,
-            'messages': [],
-            'json': function() {
-                return function(json, render) {
-                    return "JSON: " + render(json)
-                }
-            },
-            'img': function() {
-                return function(value, render) {
-                    let rendered = render(value) + ""
-                    let length = rendered.length
-                    return length > 0 ? ('<img src="data:image/png;base64,' + rendered + '">') : ''
-                }
-            },
-            'device-icon': function() {
-                let iconType = {
-                    'phone': 'mobile',
-                    'tablet': 'tablet',
-                    'desktop': 'desktop'
-                }
-                let faType = iconType[this.type]
-                let screenSize = null
-                if (this.width && this.height) {
-                    screenSize = this.width + "x" + this.height
-                }
+    let view = {
+        'file': file,
+        'files': flowFiles,
+        'flowDirectory': FLOW_DIRECTORY,
+        'messages': [],
+        'json': function() {
+            return function(json, render) {
+                return "JSON: " + render(json)
+            }
+        },
+        'img': function() {
+            return function(value, render) {
+                let rendered = render(value) + ""
+                let length = rendered.length
+                return length > 0 ? ('<img src="data:image/png;base64,' + rendered + '">') : ''
+            }
+        },
+        'device-icon': function() {
+            let iconType = {
+                'phone': 'mobile',
+                'tablet': 'tablet',
+                'desktop': 'desktop'
+            }
+            let faType = iconType[this.type]
+            let screenSize = null
+            if (this.width && this.height) {
+                screenSize = this.width + "x" + this.height
+            }
 
-                if (faType) {
-                    let capitalizeFirstLetter = string => string[0].toUpperCase() + string.slice(1)
-                    let title = Mustache.render("{{type}}{{#screenSize}}, {{.}}{{/screenSize}}", {
-                        'type': capitalizeFirstLetter(faType),
-                        'screenSize': screenSize
-                    })
-                    return '<i class="fa fa-' + faType + '" aria-hidden="true" title="' + title + '"></i>'
-                } else {
-                    return ''
-                }
+            if (faType) {
+                let capitalizeFirstLetter = string => string[0].toUpperCase() + string.slice(1)
+                let title = Mustache.render("{{type}}{{#screenSize}}, {{.}}{{/screenSize}}", {
+                    'type': capitalizeFirstLetter(faType),
+                    'screenSize': screenSize
+                })
+                return '<i class="fa fa-' + faType + '" aria-hidden="true" title="' + title + '"></i>'
+            } else {
+                return ''
             }
         }
+    }
 
-
+    fs.access(STEPS_FILE, fs.F_OK, function(err) {
+        view.flows = []
         if (!file) {
             view.messages.push("Please select a flow file.")
         } else if (err) {
@@ -78,18 +81,32 @@ app.get('/', function (req, res) {
             // Load flow
             let flow = Flow.load(STEPS_FILE)
 
-            view.devices = flow.deviceArray()
-            view.grid = flow.grid()
+            view.flows.push({
+                devices: flow.deviceArray(),
+                grid: flow.grid()
+            })
         }
 
-        // Render template
-        let html = Mustache.render(template, view, partials)
+        if (compareFile) {
+            fs.access(COMPARE_FILE, fs.F_OK, function(err) {
+                if (err) {
+                    view.messages.push("No such file. " + (err.path || ""))
+                } else {
+                    // Load flow
+                    let flow = Flow.load(COMPARE_FILE)
 
-        //let file = 'flow.html';
-        //fs.writeFileSync(file, html);
-        //console.log("Wrote file to " + file);
+                    view.flows.push({
+                        devices: flow.deviceArray(),
+                        grid: flow.grid()
+                    })
+                }
 
-        res.send(html)
+                // Render template
+                let html = Mustache.render(template, view, partials)
+
+                res.send(html)
+            });
+        }
     });
 });
 
