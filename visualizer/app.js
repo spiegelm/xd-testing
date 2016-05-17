@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 "use strict"
 
+var q = require('q')
 var fs = require('fs')
+var fsp = require('fs-promise')
 var path = require('path')
 var Flow = require('./../lib/flow/flow')
 var Mustache = require('mustache')
@@ -10,17 +12,18 @@ var express = require('express')
 var app = express()
 
 app.get('/', function (req, res) {
-    const file = req.query['file'] || ''
-    const compareFile = req.query['compare'] || ''
-
     const FLOW_DIRECTORY = path.join(process.cwd(), 'flows');
-    const STEPS_FILE = path.join(FLOW_DIRECTORY, file)
-    const COMPARE_FILE = path.join(FLOW_DIRECTORY, compareFile)
 
-    let flowFiles = fs.readdirSync(FLOW_DIRECTORY)
+    // Read files from query
+    let selectedFiles = req.query['files'] || []
+    // Make absolute file names
+    let absoluteFileNames = selectedFiles.map(file => path.join(FLOW_DIRECTORY, file) )
+
+
+    let allFiles = fs.readdirSync(FLOW_DIRECTORY)
         .filter(filename => fs.statSync(path.join(FLOW_DIRECTORY, filename)).isFile() && path.extname(filename) == '.json')
 
-    console.log(STEPS_FILE)
+    console.log('files:', selectedFiles)
 
     // Load templates
     let template = fs.readFileSync(path.join(__dirname, 'views/layout.mustache'), 'utf-8')
@@ -29,10 +32,11 @@ app.get('/', function (req, res) {
     }
 
     let view = {
-        'file': file,
-        'files': flowFiles,
+        'file': selectedFiles[0],
+        'allFiles': allFiles,
         'flowDirectory': FLOW_DIRECTORY,
         'messages': [],
+        'flows': [],
         'json': function() {
             return function(json, render) {
                 return "JSON: " + render(json)
@@ -70,44 +74,27 @@ app.get('/', function (req, res) {
         }
     }
 
-    fs.access(STEPS_FILE, fs.F_OK, function(err) {
-        view.flows = []
-        if (!file) {
-            view.messages.push("Please select a flow file.")
-        } else if (err) {
-            view.messages.push("No such file. " + (err.path || ""))
+    q.all(absoluteFileNames.map(fileName => fsp.access(fileName, fs.F_OK)
+        .catch(err => {
+            let message = "Error loading file. " + (err.path || "")
+            console.log(message)
+            view.messages.push(message)
             res.status(404)
-        } else {
-            // Load flow
-            let flow = Flow.load(STEPS_FILE)
+        })
+        .then(() => {
+            let flow = Flow.load(fileName)
 
             view.flows.push({
                 devices: flow.deviceArray(),
                 grid: flow.grid()
             })
-        }
+        })
+    )).then(() => {
+        // Render template
+        let html = Mustache.render(template, view, partials)
 
-        if (compareFile) {
-            fs.access(COMPARE_FILE, fs.F_OK, function(err) {
-                if (err) {
-                    view.messages.push("No such file. " + (err.path || ""))
-                } else {
-                    // Load flow
-                    let flow = Flow.load(COMPARE_FILE)
-
-                    view.flows.push({
-                        devices: flow.deviceArray(),
-                        grid: flow.grid()
-                    })
-                }
-
-                // Render template
-                let html = Mustache.render(template, view, partials)
-
-                res.send(html)
-            });
-        }
-    });
+        res.send(html)
+    })
 });
 
 app.use('/public', express.static(path.join(__dirname, '/public')))
