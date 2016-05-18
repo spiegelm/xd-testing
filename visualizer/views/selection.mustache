@@ -14,6 +14,7 @@
             <div style="flex: 1 1 auto">
                 Compare with:
                 <ul>
+                    <li><a href="?file={{file}}">none</a></li>
                     {{#allFiles}}
                         <li><a href="?files[]={{file}}&files[]={{.}}">{{.}}</a></li>
                     {{/allFiles}}
