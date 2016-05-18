@@ -147,4 +147,8 @@ describe('MultiDevice - implicit', function () {
             .getAddressingOptions().then(addr => assert.equal(addr.implicit, true))
             .end()
     })
+
+    describe('commands', () => {
+        it('')
+    })
 })
