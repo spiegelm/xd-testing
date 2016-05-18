@@ -1,5 +1,8 @@
 "use strict"
 
+/**
+ * @type {Chai.Assert}
+ */
 var assert = require('chai').assert
 var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates')
@@ -9,9 +12,19 @@ describe('MultiDevice - implicit', function () {
     let test = this
 
     test.baseUrl = "http://localhost:8090/"
-    const buttonSelector = '#button'
 
-    let urlWithButton = withButton => test.baseUrl + "?hideButton=" + (withButton ? 0 : 1)
+    let testApp = {
+        button: {
+            url: test.baseUrl,
+            buttonSelector: '#button'
+        },
+        scroll: {
+            url: test.baseUrl + 'scroll.html',
+            urlWithButton: withButton => testApp.scroll.url + '?hideButton=' + (withButton ? 0 : 1),
+            buttonSelector: '#button'
+        }
+    }
+    let urlWithButton = withButton => testApp.button.url + "?hideButton=" + (withButton ? 0 : 1)
 
     describe('prerequisites', () => {
         it('urlWithButton returns correct url @small', () => {
@@ -25,8 +38,8 @@ describe('MultiDevice - implicit', function () {
             }
 
             return xdTesting.multiremote(options).init()
-                .url(test.baseUrl)
-                .isVisible(buttonSelector).then(visible => assert.isTrue(visible))
+                .url(testApp.button.url)
+                .isVisible(testApp.button.buttonSelector).then(visible => assert.isTrue(visible))
                 .end()
         })
 
@@ -37,7 +50,7 @@ describe('MultiDevice - implicit', function () {
 
             return xdTesting.multiremote(options).init()
                 .url(urlWithButton(false))
-                .isVisible(buttonSelector).then(visible => assert.isFalse(visible))
+                .isVisible(testApp.button.buttonSelector).then(visible => assert.isFalse(visible))
                 .end()
         })
     })
@@ -127,10 +140,10 @@ describe('MultiDevice - implicit', function () {
 
         return xdTesting.multiremote(options).init()
             .implicit(devices => devices
-                .url(test.baseUrl)
+                .url(testApp.button.url)
                 .getUrl().then((urlA, urlB) => {
-                    assert.equal(urlA, test.baseUrl)
-                    assert.equal(urlB, test.baseUrl)
+                    assert.equal(urlA, testApp.button.url)
+                    assert.equal(urlB, testApp.button.url)
                 })
             )
             .end()
@@ -148,7 +161,48 @@ describe('MultiDevice - implicit', function () {
             .end()
     })
 
-    describe('commands', () => {
-        it('')
+    describe('optional selector command @large', () => {
+        it('with given selector is executed on matching devices', () => {
+            var options = {
+                A: templates.devices.nexus4(),
+                B: templates.devices.nexus4()
+            }
+
+            let app = testApp.scroll
+            return xdTesting.multiremote(options).init()
+
+                // TODO simulate the device screen size!
+                .windowHandleSize({width: options.A.width, height: options.A.height})
+
+                // Show the button only on device A
+                .forEach(device => device
+                    .url(app.urlWithButton(device.options.id === 'A'))
+                    .isVisible(app.buttonSelector).then(visible => assert.equal(visible, device.options.id === 'A'))
+                )
+                // Get scroll offsets
+                .execute(function() {
+                    return window.pageYOffset || document.documentElement.scrollTop
+                })
+                .then((resultA, resultB) => [resultA, resultB].map(result => result.value))
+                .then((topA, topB) => {
+                    assert.equal(topA, 0)
+                    assert.equal(topB, 0)
+                })
+                // Scroll to button on matching device A
+                .implicit(devices => devices
+                    .scroll(testApp.scroll.buttonSelector)
+                )
+                // Verify scroll offsets
+                .execute(function() {
+                    return window.pageYOffset || document.documentElement.scrollTop
+                })
+                .then((resultA, resultB) => [resultA, resultB].map(result => result.value))
+                .then((topA, topB) => {
+                    assert.isAtLeast(topA, 10)
+                    assert.equal(topB, 0)
+                })
+                .checkpoint('end')
+                .end()
+        })
     })
 })

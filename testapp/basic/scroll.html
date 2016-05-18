@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+</head>
+<body>
+
+<script>
+    var counter = 0;
+
+    function getUrlParameter(name) {
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+        if (results == null) {
+            return null;
+        } else {
+            return results[1] || 0;
+        }
+    }
+
+    $(function() {
+
+        if (getUrlParameter('hideButton') != 1) {
+            $('#button').show()
+        }
+
+        $('#button').click(function() {
+            click();
+        })
+
+        function click() {
+            $('#status').text('button clicked');
+            $('#counter').text(++counter);
+        }
+    });
+
+</script>
+
+<div style="height: 1000px">placeholder</div>
+
+<input id="button" type="button" value="click me" style="display: none">
+
+<span id="status">nothing happened</span>
+<span id="counter">-</span>
+
+</body>
+</html>
