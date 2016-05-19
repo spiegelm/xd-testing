@@ -11,14 +11,7 @@ describe('MultiDevice - forEach @medium', function () {
     test.devices = {}
     test.baseUrl = "http://localhost:8090/"
 
-    afterEach(function () {
-        // Close browsers before completing a test
-        if (typeof test.devices['endAll'] == 'function') {
-            return test.devices.endAll()
-        }
-    })
-
-    it('should call function on each device', function() {
+    it('should call callback on each device', function() {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
         var counter = 0
         var calledIds = []
@@ -34,7 +27,7 @@ describe('MultiDevice - forEach @medium', function () {
             })
     })
 
-    it('should call function with index parameter', function() {
+    it('should call callback with index parameter', function() {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
         var indices = []
         return test.devices = xdTesting.multiremote(options)
