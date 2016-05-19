@@ -6,16 +6,14 @@ var templates = require('../../lib/templates')
 var q = require('q')
 
 describe('MultiDevice - forEach @medium', function () {
-    var test = this
-
-    test.devices = {}
-    test.baseUrl = "http://localhost:8090/"
-
-    it('should call callback on each device', function() {
-        var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+    it('should call the callback on each device', function() {
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
         var counter = 0
         var calledIds = []
-        return test.devices = xdTesting.multiremote(options)
+        return xdTesting.multiremote(options)
             .getCount().then(count => assert.equal(count, 2, 'getCount does not match'))
             .forEach(function (device) {
                 counter++
@@ -27,10 +25,13 @@ describe('MultiDevice - forEach @medium', function () {
             })
     })
 
-    it('should call callback with index parameter', function() {
-        var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+    it('should call the callback with index parameter', function() {
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
         var indices = []
-        return test.devices = xdTesting.multiremote(options)
+        return xdTesting.multiremote(options)
             .forEach(function (device, index) {
                 indices.push(index)
             })
@@ -40,51 +41,34 @@ describe('MultiDevice - forEach @medium', function () {
     })
 
     it('should respect promise chain', function() {
-        var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
-        var queue = ''
-        return test.devices = xdTesting.multiremote(options)
-            .then(() => queue += '0' )
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
+        var queue = '0'
+        return xdTesting.multiremote(options)
+            .then(() => queue += '1' )
             .forEach(function (device, index) {
                 var defer = q.defer()
                 defer.resolve()
-                return defer.promise.delay(1000).then(() => queue += '1')
+                return defer.promise.delay(1000).then(() => queue += '2')
             })
-            .then(() => queue += '2')
-            .then(() => {
-                assert.equal(queue, '0112')
-            })
+            .then(() => queue += '3')
+            .then(() => assert.equal(queue, '01223'))
     })
 
     it('should wrap callback in promise', function() {
-        var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
-        var queue = ''
-        return test.devices = xdTesting.multiremote(options)
-            .then(() => queue += '0' )
-            .forEach(function (device, index) {
-                queue += '1'
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
+        var queue = '0'
+        return xdTesting.multiremote(options)
+            .then(() => queue += '1' )
+            .forEach((device, index) => {
+                queue += '2'
             })
-            .then(() => queue += '2')
-            .then(() => {
-                assert.equal(queue, '0112')
-            })
-    })
-
-    it('should return a promise', function(done) {
-        var options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
-        var counter = 0
-        var defer = q.defer()
-        test.devices = xdTesting.multiremote(options)
-            .getCount().then(count => assert.equal(count, 2, 'getCount does not match'))
-            .forEach(function (device) {
-                setTimeout(function () {
-                    counter++
-                    defer.resolve()
-                }, 1000)
-                return defer.promise
-            })
-            .then(function () {
-                assert.equal(counter, 2, 'has not been called twice')
-                done()
-            })
+            .then(() => queue += '3')
+            .then(() => assert.equal(queue, '01223'))
     })
 })
