@@ -23,7 +23,7 @@ describe('MultiDevice - selectBySize', function () {
             A: templates.devices.nexus4(),
             B: templates.devices.nexus4(),
             C: templates.devices.nexus10()
-        };
+        }
         return test.devices = xdTesting.multiremote(options)
             .init()
             .url(test.baseUrl)
@@ -33,28 +33,28 @@ describe('MultiDevice - selectBySize', function () {
                 .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
             ).then(() => test.devices.select('C')
                 .getText('#counter').then(textC => assert.equal(textC, '-'))
-            );
-    });
+            )
+    })
 
     it('should execute promises callback @medium', function() {
         var options = {
             A: templates.devices.nexus4(),
             B: templates.devices.nexus4(),
             C: templates.devices.nexus10()
-        };
+        }
 
-        var queue = '';
+        let queue = ''
         return test.devices = xdTesting.multiremote(options)
             .then(() => queue += '0')
             .selectBySize('small', function(selectedDevices) {
-                queue += '1';
+                queue += '1'
                 return selectedDevices.then(() => {
-                    queue += '2';
-                });
+                    queue += '2'
+                })
             })
             .then(() => queue += '3')
             .then(() => assert.equal(queue, '0123'))
-            .end();
+            .end()
     });
 
     it('should adapt options to selection @medium', function() {
@@ -62,7 +62,7 @@ describe('MultiDevice - selectBySize', function () {
             A: templates.devices.nexus10(),
             B: templates.devices.nexus4(),
             C: templates.devices.nexus4()
-        };
+        }
 
         return test.devices = xdTesting.multiremote(options)
             .selectBySize('small', selectedDevices => selectedDevices
@@ -74,13 +74,14 @@ describe('MultiDevice - selectBySize', function () {
                     assert.deepEqual(selectedDevices.options.B, options.B)
                     assert.deepEqual(selectedDevices.options.C, options.C)
                 })
-            );
+            )
+            .end()
     });
 
     it('should handle empty selections @medium', function() {
-        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()};
+        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()}
 
-        let queue = '';
+        let queue = ''
         return test.devices = xdTesting.multiremote(options)
             .selectBySize('medium', selectedDevices => selectedDevices
                 .then(() => queue += '0')
@@ -88,7 +89,7 @@ describe('MultiDevice - selectBySize', function () {
                 .then(() => queue += '1')
             ).then(() => {
                 assert.equal(queue, '01');
-            });
+            })
     });
 
     describe('unused approaches', function() {
