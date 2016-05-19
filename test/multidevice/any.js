@@ -53,7 +53,7 @@ describe('MultiDevice - any', function () {
 
     })
 
-    it.skip('should call .forEach on a single device? @medium', function () {
+    it('should call .forEach on a single device @medium', function () {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
@@ -65,23 +65,20 @@ describe('MultiDevice - any', function () {
             .any(devices => devices
                 .forEach(device => counter++)
             )
-            .then(() => assert.equal(counter, 1, "Failed asserting that callback was called exactly once."))
+            .then(() => assert.equal(counter, 1, "Failed asserting that callback was called exactly once"))
             .end()
     })
 
-    it.skip('should .getCount return 1? @medium', function () {
+    it('should .getCount return 1 @medium', function () {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
         }
 
-        let counter = 0
-
         return xdTesting.multiremote(options)
             .any(devices => devices
-                .forEach(device => counter++)
+                .getCount().then(count => assert.equal(count, 1, "Failed asserting that getCount returns 1"))
             )
-            .then(() => assert.equal(counter, 1, "Failed asserting that callback was called exactly once."))
             .end()
     })
 
@@ -101,7 +98,7 @@ describe('MultiDevice - any', function () {
             .forEach((device, index) => device
                 .getText('#counter').then(text => clickCount += +(text === '-' ? 0 : text))
             )
-            .then(() => assert.equal(1, clickCount, "Failed asserting that exactly one button was clicked."))
+            .then(() => assert.equal(1, clickCount, "Failed asserting that exactly one button was clicked"))
             .end()
     })
 
