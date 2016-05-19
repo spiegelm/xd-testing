@@ -109,23 +109,6 @@ describe('MultiDevice - implicit', function () {
             .end()
     })
 
-    it('should select matching devices for element related commands @large', () => {
-        var options = {
-            A: templates.devices.chrome(),
-            B: templates.devices.chrome()
-        }
-
-        return xdTesting.multiremote(options).init()
-            .forEach((device, index) => device.url(urlWithButton(index === 0)))
-            .implicit(devices => devices
-                .click('#button')
-            )
-            .forEach((device, index) => device
-                .getText('#counter').then(text => assert.equal(text, index === 0 ? '1' : '-'))
-            )
-            .end()
-    })
-
     it('should execute callback in order @medium', function () {
         var options = {
             A: templates.devices.chrome(),
@@ -146,23 +129,6 @@ describe('MultiDevice - implicit', function () {
             .end()
     })
 
-    it('should select all devices for non-element related commands @large', () => {
-        var options = {
-            A: templates.devices.chrome(),
-            B: templates.devices.chrome()
-        }
-
-        return xdTesting.multiremote(options).init()
-            .implicit(devices => devices
-                .url(testApp.button.url)
-                .getUrl().then((urlA, urlB) => {
-                    assert.equal(urlA, testApp.button.url)
-                    assert.equal(urlB, testApp.button.url)
-                })
-            )
-            .end()
-    })
-
     it('should return the implicit selection context when no callback is given @medium', () => {
         var options = {
             A: templates.devices.chrome()
@@ -175,24 +141,26 @@ describe('MultiDevice - implicit', function () {
             .end()
     })
 
-    it('command without element selector is executed on all devices @large', () => {
-        var options = {
-            A: templates.devices.nexus4(),
-            B: templates.devices.nexus4()
-        }
 
-        let urls = []
-        return xdTesting.multiremote(options).init()
-            .url(testApp.button.url)
-            .forEach(device => device
-                .getUrl().then(url => urls.push(url))
-            )
-            .then(() => assert.deepEqual(urls, [testApp.button.url, testApp.button.url]))
-            .end()
-    })
+    describe('should select matching devices', () => {
+        it('for element related commands @large', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
 
-    describe('command with optional element selector @large', () => {
-        it('and provided selector is executed on matching devices @large', () => {
+            return xdTesting.multiremote(options).init()
+                .forEach((device, index) => device.url(urlWithButton(index === 0)))
+                .implicit(devices => devices
+                    .click('#button')
+                )
+                .forEach((device, index) => device
+                    .getText('#counter').then(text => assert.equal(text, index === 0 ? '1' : '-'))
+                )
+                .end()
+        })
+
+        it('for optional element related commands with provided selector', () => {
             var options = {
                 A: templates.devices.nexus4(),
                 B: templates.devices.nexus4()
@@ -231,11 +199,12 @@ describe('MultiDevice - implicit', function () {
                     assert.isAtLeast(topA, 10)
                     assert.equal(topB, 0)
                 })
-                .checkpoint('end')
                 .end()
         })
+    })
 
-        it('and skipped selector is executed on all devices', () => {
+    describe('should select all devices', () => {
+        it('for optional element related commands without provided selector', () => {
             var options = {
                 A: templates.devices.nexus4(),
                 B: templates.devices.nexus4()
@@ -277,5 +246,23 @@ describe('MultiDevice - implicit', function () {
                 .checkpoint('end')
                 .end()
         })
+
+        it('for non-element related commands @large', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            return xdTesting.multiremote(options).init()
+                .implicit(devices => devices
+                    .url(testApp.button.url)
+                    .getUrl().then((urlA, urlB) => {
+                        assert.equal(urlA, testApp.button.url)
+                        assert.equal(urlB, testApp.button.url)
+                    })
+                )
+                .end()
+        })
+
     })
 })
