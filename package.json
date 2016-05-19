@@ -1,7 +1,7 @@
 {
   "name": "xd-testing",
   "author": "Michael Spiegel",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "",
   "dependencies": {
     "bower": "^1.7.7",
