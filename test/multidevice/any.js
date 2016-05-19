@@ -53,7 +53,7 @@ describe('MultiDevice - any', function () {
 
     })
 
-    it('should call .forEach on a single device @medium', function () {
+    it('should call .forEach callback on a single device @medium', function () {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
@@ -69,7 +69,7 @@ describe('MultiDevice - any', function () {
             .end()
     })
 
-    it('should .getCount return 1 @medium', function () {
+    it('.getCount should return 1 @medium', function () {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()

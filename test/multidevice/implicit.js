@@ -174,8 +174,8 @@ describe('MultiDevice - implicit', function () {
             .end()
     })
 
-    describe('optional selector command @large', () => {
-        it('with given selector is executed on matching devices', () => {
+    describe('command with optional element selector @large', () => {
+        it('and provided selector is executed on matching devices @large', () => {
             var options = {
                 A: templates.devices.nexus4(),
                 B: templates.devices.nexus4()
@@ -213,6 +213,49 @@ describe('MultiDevice - implicit', function () {
                 .then((topA, topB) => {
                     assert.isAtLeast(topA, 10)
                     assert.equal(topB, 0)
+                })
+                .checkpoint('end')
+                .end()
+        })
+
+        it('and skipped selector is executed on all devices', () => {
+            var options = {
+                A: templates.devices.nexus4(),
+                B: templates.devices.nexus4()
+            }
+
+            let app = testApp.scroll
+            return xdTesting.multiremote(options).init()
+
+                // TODO simulate the device screen size!
+                .windowHandleSize({width: options.A.width, height: options.A.height})
+
+                // Show the button only on device A
+                .forEach(device => device
+                    .url(app.urlWithButton(device.options.id === 'A'))
+                    .isVisible(app.buttonSelector).then(visible => assert.equal(visible, device.options.id === 'A'))
+                )
+                // Get scroll offsets
+                .execute(function() {
+                    return window.pageYOffset || document.documentElement.scrollTop
+                })
+                .then((resultA, resultB) => [resultA, resultB].map(result => result.value))
+                .then((topA, topB) => {
+                    assert.equal(topA, 0)
+                    assert.equal(topB, 0)
+                })
+                // Scroll down on all devices
+                .implicit(devices => devices
+                    .scroll(0, 1000)
+                )
+                // Verify scroll offsets
+                .execute(function() {
+                    return window.pageYOffset || document.documentElement.scrollTop
+                })
+                .then((resultA, resultB) => [resultA, resultB].map(result => result.value))
+                .then((topA, topB) => {
+                    assert.isAtLeast(topA, 10)
+                    assert.isAtLeast(topB, 10)
                 })
                 .checkpoint('end')
                 .end()
