@@ -79,7 +79,7 @@ describe('MultiDevice - implicit', function () {
             .end()
     })
 
-    it('should call callback on all matching devices @medium', function () {
+    it('should call .forEach callback on all matching devices @medium', function () {
         var options = {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
@@ -91,7 +91,20 @@ describe('MultiDevice - implicit', function () {
             .implicit(devices => devices
                 .forEach(device => counter++)
             )
-            .then(() => assert.equal(counter, 2, "Failed asserting that callback was called on all devices."))
+            .then(() => assert.equal(counter, 2, "Failed asserting that callback was called on all devices"))
+            .end()
+    })
+
+    it('.getCount should return undefined @medium', () => {
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options)
+            .implicit(devices => devices
+                .getCount().then(count => assert.strictEqual(count, undefined, "Failed asserting that getCount returns undefined."))
+            )
             .end()
     })
 
