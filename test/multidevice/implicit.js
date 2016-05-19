@@ -201,6 +201,11 @@ describe('MultiDevice - implicit', function () {
                 })
                 .end()
         })
+
+        it.skip('for commands related to two elements', () => {
+            // Omitted implementation, so nothing to test
+            // Basically it's only the drag and drop command
+        })
     })
 
     describe('should select all devices', () => {
