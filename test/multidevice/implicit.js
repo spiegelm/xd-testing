@@ -175,6 +175,22 @@ describe('MultiDevice - implicit', function () {
             .end()
     })
 
+    it('command without element selector is executed on all devices @large', () => {
+        var options = {
+            A: templates.devices.nexus4(),
+            B: templates.devices.nexus4()
+        }
+
+        let urls = []
+        return xdTesting.multiremote(options).init()
+            .url(testApp.button.url)
+            .forEach(device => device
+                .getUrl().then(url => urls.push(url))
+            )
+            .then(() => assert.deepEqual(urls, [testApp.button.url, testApp.button.url]))
+            .end()
+    })
+
     describe('command with optional element selector @large', () => {
         it('and provided selector is executed on matching devices @large', () => {
             var options = {
