@@ -37,167 +37,175 @@ var setups = config['setups'];
 
 
 describe('XD-MVC Gallery @large', function () {
-    var self = this;
+    var test = this
 
     // Set test timeout
-    this.timeout(180 * 1000);
-    self.async_timeout = utility.waitforTimeout = 30 * 1000;
+    test.timeout(180 * 1000)
+    test.async_timeout = utility.waitforTimeout = 30 * 1000
 
-    self.deviceOptions = {};
-    self.devices = {};
-    self.baseUrl = "http://localhost:8082/gallery.html";
+    test.deviceOptions = {}
+    test.devices = {}
+    test.baseUrl = "http://localhost:8082/gallery.html"
 
     // Bind function to this reference
-    self.adapter = require('../../lib/adapter/xdmvc');
-    self.pairDevicesViaURL = self.adapter.pairDevicesViaURL.bind(self);
-    self.pairDevicesViaXDMVC = self.adapter.pairDevicesViaXDMVC.bind(self);
-    self.devicesCount = self.adapter.devicesCount.bind(self);
-    var initWithDevices = utility.initWithDevices.bind(this);
+    test.adapter = require('../../lib/adapter/xdmvc')
+    test.pairDevicesViaURL = test.adapter.pairDevicesViaURL.bind(test)
+    test.pairDevicesViaXDMVC = test.adapter.pairDevicesViaXDMVC.bind(test)
+    test.devicesCount = test.adapter.devicesCount.bind(test)
+    var initWithDevices = utility.initWithDevices.bind(this)
 
-    afterEach(function () {
-        // Close browsers before completing a test
-        return self.devices.end();
+    describe('eventLogger', () => {
+        it('should count XDconnection events', () => {
+            let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+
+            let loadedUrlA
+
+            return test.devices = xdTesting.multiremote(options).init()
+                .url(test.baseUrl)
+                .execute(test.adapter.injectEventLogger)
+                .execute(test.adapter.getEventCounter)
+                .then(function (retA) {
+                    console.log(retA.value)
+                    assert.equal(retA.value.XDconnection, 0)
+                })
+                // Share url from A to B
+                .then(() => console.log('share url from A to B'))
+                .getUrl().then(urlA => loadedUrlA = urlA)
+                .selectById('B', B => B
+                    .url(loadedUrlA)
+                    .execute(test.adapter.injectEventLogger)
+                )
+                .then(() => console.log('shared url'))
+                // Assert connection event
+                .execute(test.adapter.getEventCounter)
+                .then(function (retA) {
+                    console.log(retA.value)
+                    assert.equal(retA.value.XDconnection, 1)
+                })
+                .end()
+        })
+    })
+
+    it('should pair two devices via url', () => {
+        let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+
+        test.devices = initWithDevices(options)
+        test.devices = test.adapter.pairDevicesViaURL(test.devices, test.baseUrl)
+        return test.devices
+            .then(() => console.log('paired'))
+            .selectById('A', device => device
+                .then(() => console.log('get event counter..'))
+                .execute(test.adapter.getEventCounter)
+                .then(ret => {
+                    console.log('got event counter', ret.value)
+                    assert.equal(ret.value.XDconnection, test.devicesCount() - 1)
+                })
+            )
+            .end()
     });
 
-    describe('eventLogger', function () {
-        it('should count XDconnection events', function () {
+    describe('prerequisites', () => {
+        it('browsers should not share cookies between sessions', () => {
+            let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
 
+            test.devices = initWithDevices(options)
+            test.devices = test.adapter.pairDevicesViaURL(test.devices, test.baseUrl)
+            return test.devices
+                .selectById('A', deviceA => deviceA
+                    // Set cookie and verify it's there
+                    .setCookie({name: 'test_cookieA', value: 'A'})
+                    .getCookie('test_cookieA').then(function (cookie) {
 
-            return initWithDevices({A: templates.devices.chrome(), B: templates.devices.chrome()}).then(function () {
-                return self.pairDevicesViaURL();
-            }).then(function () {
-                var deviceA = self.devices.select('A');
-                return deviceA
-                    .execute(self.adapter.getEventCounter)
-                    .then(function (ret) {
-                        assert.equal(ret.value.XDconnection, self.devicesCount() - 1);
+                        assert.notEqual(cookie, null)
+                        assert.equal(cookie.name, 'test_cookieA')
+                        assert.equal(cookie.value, 'A')
                     })
-                    .then(() => self.devices.end());
-            });
-        });
-    });
+                )
+                .selectById('B', deviceB => deviceB
+                    // Set another cookie and verify it's there
+                    .setCookie({name: 'test_cookieB', value: 'B'})
+                    .getCookie('test_cookieB').then(cookie => {
+                        assert.notEqual(cookie, null)
+                        assert.equal(cookie.name, 'test_cookieB')
+                        assert.equal(cookie.value, 'B')
+                    })
+                    // Verify the cookie from the other browser is not here
+                    .getCookie('test_cookieA').then(cookie => {
+                        assert.equal(cookie, null)
+                    })
+                )
+        })
 
-    it('should not share cookies across browser sessions', function () {
+        it('browsers should not share local storage between sessions', () => {
+            let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
 
-        return initWithDevices({A: templates.devices.chrome(), B: templates.devices.chrome()}).then(function () {
-            return self.pairDevicesViaURL();
-        }).then(function () {
-            var deviceA = self.devices.select('A');
-            var deviceB = self.devices.select('B');
+            test.devices = initWithDevices(options)
+            test.devices = test.adapter.pairDevicesViaURL(test.devices, test.baseUrl)
+            return test.devices
+                .selectById('A', deviceA => deviceA
+                    // Set local storage item and verify it's there
+                    .execute(() => localStorage.setItem('test_storageA', 'A'))
+                    .execute(() => localStorage.getItem('test_storageA')).then(ret => assert.equal(ret.value, 'A'))
+                )
+                .selectById('B', deviceB => deviceB
+                    // Verify the item from the other browser is not here
+                    .execute(() => localStorage.getItem('test_storageA')).then(ret =>assert.equal(ret.value, null))
+                )
+                .end()
+        })
+    })
 
-            return deviceA
-                .url(this.baseUrl)
-                .then(function () {
-                    return deviceB.url(self.baseUrl);
-                })
-                .setCookie({name: 'test_cookieA', value: 'A'})
-                .getCookie('test_cookieA').then(function (cookie) {
+    describe('should show the selected image on the other devices', () => {
 
-                    assert.notEqual(cookie, null);
-                    assert.equal(cookie.name, 'test_cookieA');
-                    assert.equal(cookie.value, 'A');
-
-                    return deviceB
-                        .setCookie({name: 'test_cookieB', value: 'B'})
-                        .getCookie('test_cookieB').then(function (cookie) {
-                            assert.notEqual(cookie, null);
-                            assert.equal(cookie.name, 'test_cookieB');
-                            assert.equal(cookie.value, 'B');
-                        })
-                        .getCookie('test_cookieA').then(function (cookie) {
-                            assert.equal(cookie, null);
-                        });
-                });
-        });
-    });
-
-    it('should not share local storage across browser sessions', function () {
-        var getItem = function (key) {
-            return localStorage.getItem(key);
-        };
-
-        var setItem = function (key, value) {
-            localStorage.setItem(key, value);
-        };
-
-        return initWithDevices({A: templates.devices.chrome(), B: templates.devices.chrome()}).then(function () {
-            return self.pairDevicesViaURL();
-        }).then(function () {
-            var deviceA = self.devices.select('A');
-            var deviceB = self.devices.select('B');
-
-            return deviceA
-                .url(self.baseUrl)
-                .then(function () {
-                    return deviceB.url(self.baseUrl);
-                })
-                .execute(setItem, 'test_storageA', 'A')
-                .execute(getItem, 'test_storageA').then(function (ret) {
-                    assert.equal(ret.value, 'A');
-
-                    return deviceB.execute(getItem, 'test_storageA').then(function (ret) {
-                        return assert.equal(ret.value, null);
-                    });
-                })
-                .then(() => self.devices.end());
-        });
-    });
-
-    describe('should show the selected image on the other devices', function () {
-
-        setups.forEach(function(setup) {
+        setups.forEach(setup => {
 
             // Assemble setup name
-            var setupName = Object.keys(setup.devices).map(key => setup.devices[key].name).join(', ');
+            let setupName = Object.keys(setup.devices).map(key => setup.devices[key].name).join(', ')
 
             it('on ' + setupName, function () {
+                let imageUrlA
+                let urlA
+                let allButA
 
-                var test = this.test;
-
-                var imageUrlA;
-
-                return initWithDevices(setup.devices)
-                    .then(function () {
-                        return self.pairDevicesViaURL();
+                test.devices = initWithDevices(setup.devices)
+                test.devices = test.adapter.pairDevicesViaURL(test.devices, test.baseUrl)
+                return test.devices
+                    .name(setupName)
+                    .checkpoint('load app')
+                    .selectById('A', deviceA => deviceA
+                        .waitForVisible('h2.gallery-overview', test.async_timeout)
+                        .click('//*[text()="Bike Tours"]')
+                        .waitForVisible('#gallery img:nth-of-type(1)', test.async_timeout)
+                        .checkpoint('select album')
+                        .click('#gallery img:nth-of-type(1)')
+                        .waitForVisible('#image img', test.async_timeout)
+                        .scroll('#image img')
+                        .checkpoint('click thumbnail')
+                        .getAttribute('#image img', 'src').then(src => {
+                            imageUrlA = src;
+                        })
+                        .getUrl().then(function (url) {
+                            urlA = url
+                        })
+                    )
+                    .then(() => allButA = Object.keys(test.deviceOptions).filter(function (deviceId) {
+                        return deviceId != 'A';
+                    }))
+                    .selectById(() => allButA, otherDevices => otherDevices
+                        .waitForVisible('#image img', test.async_timeout)
+                        .checkpoint('click thumbnail')
+                        .getAttribute('#image img', 'src')
+                    )
+                    .then(function() {
+                        let srcs = arguments
+                        Object.keys(srcs).forEach(key => {
+                            var src = srcs[key]
+                            assert.equal(src, imageUrlA)
+                        })
                     })
-                    .then(function () {
-                        var deviceA = self.devices.select('A');
-
-                        return deviceA.waitForVisible('h2.gallery-overview', self.async_timeout)
-                            .click('//*[text()="Bike Tours"]')
-                            .waitForVisible('#gallery img:nth-of-type(1)', self.async_timeout)
-                            .click('#gallery img:nth-of-type(1)')
-                            .waitForVisible('#image img', self.async_timeout)
-                            .scroll(0, 10000)
-                            .getAttribute('#image img', 'src').then(function (src) {
-                                imageUrlA = src;
-                            }).getUrl().then(function (url) {
-
-                                // For all browsers but A
-                                var allButA = Object.keys(self.deviceOptions).filter(function (deviceId) {
-                                    return deviceId != 'A';
-                                });
-
-                                return utility.multiAction(self.devices, allButA, function (device) {
-                                    return device.waitForVisible('#image img', self.async_timeout);
-                                }).then(function () {
-                                    return utility.multiAction(self.devices, allButA, function (device) {
-                                        return device.getAttribute('#image img', 'src');
-                                    });
-                                }).then(function (srcs) {
-                                    Object.keys(srcs).forEach(function (key) {
-                                        var src = srcs[key];
-                                        assert.equal(src, imageUrlA);
-                                    });
-
-                                    return utility.multiAction(self.devices, allButA, function (device) {
-                                        return device.saveScreenshot(screenshotPath(test, device));
-                                    });
-                                });
-                            }).saveScreenshot(screenshotPath(test, deviceA));
-                    })
-                    .then(() => self.devices.end());
-            });
-        });
-    });
-});
+                    .checkpoint('end')
+                    .end()
+            })
+        })
+    })
+})
