@@ -70,6 +70,7 @@ describe('XD-MVC Gallery @large', function () {
                 )
                 .then(() => console.log('shared url'))
                 // Assert connection event
+                // TODO wait until B is initialized
                 .execute(test.adapter.getEventCounter)
                 .then(function (retA) {
                     console.log(retA.value)
