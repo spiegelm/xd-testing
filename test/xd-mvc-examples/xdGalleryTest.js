@@ -38,14 +38,14 @@ describe('XD-MVC Gallery @large', function () {
     test.timeout(180 * 1000)
     test.async_timeout = utility.waitforTimeout = 30 * 1000
 
+    /**
+     * @type {WebdriverIO.Client}
+     */
     test.devices = {}
     test.baseUrl = "http://localhost:8082/gallery.html"
 
     // Bind function to this reference
     test.adapter = require('../../lib/adapter/xdmvc')
-    test.pairDevicesViaURL = test.adapter.pairDevicesViaURL.bind(test)
-    test.pairDevicesViaXDMVC = test.adapter.pairDevicesViaXDMVC.bind(test)
-    test.devicesCount = test.adapter.devicesCount.bind(test)
     var initWithDevices = utility.initWithDevices.bind(this)
 
     describe('eventLogger', () => {
