@@ -2,7 +2,8 @@
 
 var assert = require('chai').assert
 var utility = require('../../lib/utility')
-var templates = require('../../lib/templates')
+var xdTesting = require('../../lib/index')
+var templates = xdTesting.templates
 
 /**
  * @type {Q}
