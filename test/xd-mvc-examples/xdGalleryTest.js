@@ -26,11 +26,6 @@ function normalizeConfig(config) {
     });
 }
 
-
-var screenshotPath = function (test, device) {
-    return './screenshots/' + test.fullTitle() + ' - ' + device.options.id + ' ' + device.options.name + '.png';
-};
-
 var config = require(process.cwd() + '/xd-testing.json');
 normalizeConfig(config);
 var setups = config['setups'];
@@ -43,7 +38,6 @@ describe('XD-MVC Gallery @large', function () {
     test.timeout(180 * 1000)
     test.async_timeout = utility.waitforTimeout = 30 * 1000
 
-    test.deviceOptions = {}
     test.devices = {}
     test.baseUrl = "http://localhost:8082/gallery.html"
 
@@ -59,7 +53,6 @@ describe('XD-MVC Gallery @large', function () {
             let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
 
             let loadedUrlA
-
             return test.devices = xdTesting.multiremote(options).init()
                 .url(test.baseUrl)
                 .execute(test.adapter.injectEventLogger)
@@ -188,9 +181,10 @@ describe('XD-MVC Gallery @large', function () {
                             urlA = url
                         })
                     )
-                    .then(() => allButA = Object.keys(test.deviceOptions).filter(function (deviceId) {
-                        return deviceId != 'A';
-                    }))
+                    .getDeviceIds().then(ret => {
+                        let deviceIds = ret.value
+                        allButA = deviceIds.filter(deviceId => deviceId != 'A')
+                    })
                     .selectById(() => allButA, otherDevices => otherDevices
                         .waitForVisible('#image img', test.async_timeout)
                         .checkpoint('click thumbnail')
