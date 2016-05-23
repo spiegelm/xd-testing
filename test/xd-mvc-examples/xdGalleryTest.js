@@ -82,17 +82,19 @@ describe('XD-MVC Gallery @large', function () {
 
     it('should pair two devices via url', () => {
         let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+        let deviceCount
 
         test.devices = initWithDevices(options)
         test.devices = test.adapter.pairDevicesViaURL(test.devices, test.baseUrl)
         return test.devices
             .then(() => console.log('paired'))
+            .getCount().then(count => deviceCount = count)
             .selectById('A', device => device
                 .then(() => console.log('get event counter..'))
                 .execute(test.adapter.getEventCounter)
                 .then(ret => {
                     console.log('got event counter', ret.value)
-                    assert.equal(ret.value.XDconnection, test.devicesCount() - 1)
+                    assert.equal(ret.value.XDconnection, deviceCount - 1)
                 })
             )
             .end()
