@@ -1,34 +1,16 @@
 "use strict";
 
+/**
+ * @type {Chai.Assert}
+ */
 var assert = require('chai').assert
 var utility = require('../../lib/utility')
 var xdTesting = require('../../lib/index')
 var templates = xdTesting.templates
-
 /**
  * @type {Q}
  */
 var q = require('q');
-
-/**
- * Resolve templates
- * @param config
- */
-function normalizeConfig(config) {
-    config['setups'].forEach(setup => {
-        Object.keys(setup.devices).forEach(id => {
-            var deviceConfig = setup.devices[id];
-            if (typeof deviceConfig == "string" && templates.devices[deviceConfig]) {
-                // Replace template reference
-                setup.devices[id] = templates.devices[deviceConfig]();
-            }
-        })
-    });
-}
-
-var config = require(process.cwd() + '/xd-testing.json');
-normalizeConfig(config);
-var setups = config['setups'];
 
 
 describe('XD-MVC Gallery @large', function () {
@@ -130,6 +112,7 @@ describe('XD-MVC Gallery @large', function () {
                         assert.equal(cookie, null)
                     })
                 )
+                .end()
         })
 
         it('browsers should not share local storage between sessions', () => {
@@ -153,7 +136,7 @@ describe('XD-MVC Gallery @large', function () {
 
     describe('should show the selected image on the other devices', () => {
 
-        setups.forEach(setup => {
+        xdTesting.loadSetups().forEach(setup => {
 
             // Assemble setup name
             let setupName = Object.keys(setup.devices).map(key => setup.devices[key].name).join(', ')

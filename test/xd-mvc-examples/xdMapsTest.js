@@ -7,31 +7,10 @@ var assert = require('chai').assert
 var utility = require('../../lib/utility')
 var xdTesting = require('../../lib/index')
 var templates = xdTesting.templates
-
 /**
  * @type {Q}
  */
 var q = require('q');
-
-/**
- * Resolve templates
- * @param config
- */
-function normalizeConfig(config) {
-    config['setups'].forEach(setup => {
-        Object.keys(setup.devices).forEach(id => {
-            var deviceConfig = setup.devices[id];
-            if (typeof deviceConfig == "string" && templates.devices[deviceConfig]) {
-                // Replace template reference
-                setup.devices[id] = templates.devices[deviceConfig]();
-            }
-        })
-    });
-}
-
-var config = require(process.cwd() + '/xd-testing.json');
-normalizeConfig(config);
-var setups = config['setups'];
 
 
 describe('XD-MVC Maps @large', function() {
@@ -111,7 +90,7 @@ describe('XD-MVC Maps @large', function() {
 
     describe('should sync the map center on mirrored devices', function () {
 
-        setups.forEach(function (setup) {
+        xdTesting.loadSetups().forEach(function (setup) {
 
             // Assemble setup name
             var setupName = Object.keys(setup.devices).map(key => setup.devices[key].name).join(', ');
@@ -120,7 +99,7 @@ describe('XD-MVC Maps @large', function() {
 
                 let deviceIds
                 let allButA
-                let lastXDSyncCounts = {}
+                let lastXDSyncCounts
 
                 let devices = initWithDevices(setup.devices)
                     .url(test.baseUrl)
@@ -139,6 +118,7 @@ describe('XD-MVC Maps @large', function() {
                         )
                         .then(function() {
                             // Store last sync counter
+                            lastXDSyncCounts = {}
                             Object.keys(arguments).map(key => arguments[key])
                                 .forEach(val => lastXDSyncCounts[val.id] = val.XDsync)
                             console.log('lastXDSyncCounts', lastXDSyncCounts)
