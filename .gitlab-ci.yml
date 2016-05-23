@@ -1,3 +1,7 @@
+stages:
+  - test
+  - cleanup
+
 before_script:
   - echo "Starting tests..."
 
@@ -17,11 +21,22 @@ before_script:
 #  allow_failure: true
 
 test_windows:
+  stage: test
   script:
     - git config --global http.sslVerify false
     - call scripts\kill_applications.bat
     - call npm install # https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/issues/1025
     - bash scripts/setup_windows.sh
     - call scripts\test.bat
+  tags:
+    - windows
+
+cleanup:
+  stage: cleanup
+  when: always
+  allow_failure: true  script:
+    - call npm install rimraf
+    - call scripts\kill_applications.bat
+    - call node_modules\.bin\rimraf testapp\XD-MVC
   tags:
     - windows
