@@ -1,5 +1,8 @@
 "use strict"
 
+/**
+ * @type {Chai.Assert} assert
+ */
 var assert = require('chai').assert
 var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates')
@@ -55,6 +58,40 @@ describe('MultiDevice - forEach @medium', function () {
             })
             .then(() => queue += '3')
             .then(() => assert.equal(queue, '01223'))
+    })
+
+    describe('should return callback values as objects', () => {
+        it('when using a callback function, allow access to arguments object', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            return xdTesting.multiremote(options)
+                .forEach(device => device.options.id)
+                .then(function(val1, val2) {
+                    assert.deepEqual(Object.keys(arguments), ['0', '1'])
+                    assert.deepEqual(Object.keys(arguments).map(key => arguments[key]), ['A', 'B'])
+                    // No idea why this doesn't work:
+                    //assert.deepEqual(arguments, {'0': 'A', '1': 'B'})
+                    assert.equal(val1, 'A')
+                    assert.equal(val2, 'B')
+                })
+        })
+
+        it('when using a arrow function, address', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            return xdTesting.multiremote(options)
+                .forEach(device => device.options.id)
+                .then((val1, val2) => {
+                    assert.equal(val1, 'A')
+                    assert.equal(val2, 'B')
+                })
+        })
     })
 
     it('should wrap callback in promise', function() {
