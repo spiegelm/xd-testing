@@ -4,6 +4,9 @@
  * @type {Chai.Assert}
  */
 var assert = require('chai').assert
+/**
+ * @deprecated
+ */
 var utility = require('../../lib/utility')
 var xdTesting = require('../../lib/index')
 var templates = xdTesting.templates
