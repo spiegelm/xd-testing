@@ -34,7 +34,8 @@ test_windows:
 cleanup:
   stage: cleanup
   when: always
-  allow_failure: true  script:
+  allow_failure: true
+  script:
     - call npm install rimraf
     - call scripts\kill_applications.bat
     - call node_modules\.bin\rimraf testapp\XD-MVC
