@@ -52,7 +52,7 @@ describe('XD-MVC Maps @large', function () {
                 .click('#menu-button')
                 .waitUntil(
                     // Wait until a device shows up in list
-                    device => device
+                    () => device
                         .isVisible('//*[@id="availableDeviceList"]//*[@class="id"]')
                         // If list does not contain device, refresh list and keep waiting
                         .then(isVisible => isVisible || device.click('#showDevices').then(() => false)),
@@ -62,7 +62,7 @@ describe('XD-MVC Maps @large', function () {
                 .click('//*[@id="availableDeviceList"]//*[@class="id"]')
                 .waitUntil(
                     // Wait for connection event
-                    device => device
+                    () => device
                         .execute(test.adapter.getEventCounter).then(function (ret) {
                             return ret.value.XDconnection == 1;
                         }),
