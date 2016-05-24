@@ -58,6 +58,21 @@ describe('MultiDevice - selectById', function () {
                 )
         })
 
+        it.skip('IDEA: could return callback result to complementCallback', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            return xdTesting.multiremote(options)
+                .selectById('A',
+                    selectedDevices => selectedDevices
+                        .then(() => 'X'),
+                    otherDevices => otherDevices
+                        .then(value => assert.equal(value, 'X'))
+                )
+        })
+
         it('should respect promise chain', () => {
             var options = {
                 A: templates.devices.chrome(),
