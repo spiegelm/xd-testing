@@ -10,21 +10,10 @@ describe('MultiDevice - selectById', function () {
 
     test.baseUrl = "http://localhost:8090/"
 
-    beforeEach(() => {
-        test.devices = {}
-    })
-
-    afterEach(function () {
-        // Close browsers before completing a test
-        if (test.devices && test.devices.endAll) {
-            return test.devices.endAll()
-        }
-    })
-
     it('should act on the specified devices @large', function () {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()}
 
-        return test.devices = xdTesting.multiremote(options)
+        return xdTesting.multiremote(options)
             .init()
             .url(test.baseUrl)
             .selectById(['B', 'C'], selectedDevices => selectedDevices
@@ -44,7 +33,8 @@ describe('MultiDevice - selectById', function () {
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '-')))
                 .click('#button')
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '1')))
-            ).then(() => test.devices.select('A')
+            )
+            .selectById('A', device => device
                 .getText('#counter').then(textA => assert.equal(textA, '-'))
             )
     })
@@ -53,7 +43,7 @@ describe('MultiDevice - selectById', function () {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()}
 
         var queue = ''
-        return test.devices = xdTesting.multiremote(options)
+        return xdTesting.multiremote(options)
             .then(() => queue += '0')
             .selectById(['B', 'C'], selectedDevices => {
                 queue += '1'
@@ -73,7 +63,7 @@ describe('MultiDevice - selectById', function () {
             C: templates.devices.nexus4()
         }
 
-        return test.devices = xdTesting.multiremote(options)
+        return xdTesting.multiremote(options)
             .selectById(['B', 'C'], selectedDevices => selectedDevices
                 .then(() => {
                     assert.property(selectedDevices, 'options')
@@ -124,7 +114,7 @@ describe('MultiDevice - selectById', function () {
         }
 
         let queue = ''
-        return test.devices = xdTesting.multiremote(options)
+        return xdTesting.multiremote(options)
             .selectById(['A', 'B', 'C'], allDevices => allDevices
                 .then(() => queue += '0')
                 .selectById(['B', 'C'], devicesBC => devicesBC
