@@ -4,10 +4,6 @@
  * @type {Chai.Assert}
  */
 var assert = require('chai').assert
-/**
- * @deprecated
- */
-var utility = require('../../lib/utility')
 var xdTesting = require('../../lib/index')
 var templates = xdTesting.templates
 /**
@@ -21,24 +17,18 @@ describe('XD-MVC Gallery @large', function () {
 
     // Set test timeout
     test.timeout(180 * 1000)
-    test.async_timeout = utility.waitforTimeout = 30 * 1000
-
-    /**
-     * @type {WebdriverIO.Client}
-     */
-    test.devices = {}
+    test.async_timeout = xdTesting.waitForTimeout = 30 * 1000
     test.baseUrl = "http://localhost:8082/gallery.html"
 
     // Bind function to this reference
     test.adapter = require('../../lib/adapter/xdmvc')
-    var initWithDevices = utility.initWithDevices.bind(this)
 
     describe('eventLogger', () => {
         it('should count XDconnection events', () => {
             let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
 
             let loadedUrlA
-            return test.devices = xdTesting.multiremote(options).init()
+            return xdTesting.multiremote(options).init()
                 .url(test.baseUrl)
                 .execute(test.adapter.injectEventLogger)
                 .execute(test.adapter.getEventCounter)
@@ -69,9 +59,9 @@ describe('XD-MVC Gallery @large', function () {
         let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
         let deviceCount
 
-        test.devices = initWithDevices(options)
-        test.devices = test.adapter.pairDevicesViaURL(test.devices, test.baseUrl)
-        return test.devices
+        let devices = xdTesting.multiremote(options).init()
+        devices = test.adapter.pairDevicesViaURL(devices, test.baseUrl)
+        return devices
             .then(() => console.log('paired'))
             .getCount().then(count => deviceCount = count)
             .selectById('A', device => device
@@ -89,9 +79,9 @@ describe('XD-MVC Gallery @large', function () {
         it('browsers should not share cookies between sessions', () => {
             let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
 
-            test.devices = initWithDevices(options)
-            test.devices = test.adapter.pairDevicesViaURL(test.devices, test.baseUrl)
-            return test.devices
+            let devices = xdTesting.multiremote(options).init()
+            devices = test.adapter.pairDevicesViaURL(devices, test.baseUrl)
+            return devices
                 .selectById('A', deviceA => deviceA
                     // Set cookie and verify it's there
                     .setCookie({name: 'test_cookieA', value: 'A'})
@@ -121,9 +111,9 @@ describe('XD-MVC Gallery @large', function () {
         it('browsers should not share local storage between sessions', () => {
             let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
 
-            test.devices = initWithDevices(options)
-            test.devices = test.adapter.pairDevicesViaURL(test.devices, test.baseUrl)
-            return test.devices
+            let devices = xdTesting.multiremote(options).init()
+            devices = test.adapter.pairDevicesViaURL(devices, test.baseUrl)
+            return devices
                 .selectById('A', deviceA => deviceA
                     // Set local storage item and verify it's there
                     .execute(() => localStorage.setItem('test_storageA', 'A'))
@@ -149,9 +139,9 @@ describe('XD-MVC Gallery @large', function () {
                 let urlA
                 let allButA
 
-                test.devices = initWithDevices(setup.devices)
-                test.devices = test.adapter.pairDevicesViaURL(test.devices, test.baseUrl)
-                return test.devices
+                let devices = xdTesting.multiremote(options).init()
+                devices = test.adapter.pairDevicesViaURL(devices, test.baseUrl)
+                return devices
                     .name(setupName)
                     .checkpoint('load app')
                     .selectById('A', deviceA => deviceA

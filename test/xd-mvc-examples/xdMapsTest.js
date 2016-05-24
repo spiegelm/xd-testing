@@ -4,10 +4,6 @@
  * @type {Chai.Assert}
  */
 var assert = require('chai').assert
-/**
- * @deprecated
- */
-var utility = require('../../lib/utility')
 var xdTesting = require('../../lib/index')
 var templates = xdTesting.templates
 /**
@@ -21,23 +17,17 @@ describe('XD-MVC Maps @large', function() {
 
     // Set test timeout
     test.timeout(180 * 1000);
-    test.async_timeout = utility.waitforTimeout = 30 * 1000;
+    test.async_timeout = xdTesting.waitForTimeout = 30 * 1000;
     test.pauseTime = 5 * 1000;
-
-    /**
-     * @type {WebdriverIO.Client}
-     */
     test.baseUrl = "http://localhost:8080/maps.html";
 
     // Bind function to this reference
     test.adapter = require('../../lib/adapter/xdmvc');
-    var initWithDevices = utility.initWithDevices.bind(test);
-
 
     it('should pair via XDmvc.connectTo', function () {
         let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
 
-        let devices = initWithDevices(options)
+        let devices = xdTesting.multiremote(options).init()
             .url(test.baseUrl)
         devices = test.adapter.pairDevicesViaXDMVC(devices)
         return devices
@@ -83,7 +73,7 @@ describe('XD-MVC Maps @large', function() {
     it('should pair via GUI', function () {
         let options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
 
-        let devices = initWithDevices(options)
+        let devices = xdTesting.multiremote(options).init()
             .url(test.baseUrl)
 
         return pairTwoDevicesViaMapsGui(devices)
@@ -104,7 +94,7 @@ describe('XD-MVC Maps @large', function() {
                 let allButA
                 let lastXDSyncCounts
 
-                let devices = initWithDevices(setup.devices)
+                let devices = xdTesting.multiremote(setup.devices).init()
                     .url(test.baseUrl)
                     .name(setupName)
                 return test.adapter.pairDevicesViaXDMVC(devices)
