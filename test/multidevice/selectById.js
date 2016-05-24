@@ -145,13 +145,37 @@ describe('MultiDevice - selectById', function () {
         }
 
         return xdTesting.multiremote(options)
-            .selectById('Z', () => {})
+            .selectById(['Z'], () => {})
             .then(result => {
                 throw new Error('Promise was unexpectedly fulfilled. Result: ' + result)
             }, error => {
                 assert.instanceOf(error, Error)
                 assert.equal(error.message, 'browser "Z" is not defined')
             })
+    })
+
+    it('should accept an array of ids @medium', () => {
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options)
+            .selectById(['A', 'B'], selectedDevices => selectedDevices
+                .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['A', 'B']))
+            )
+    })
+
+    it('should accept a single id @medium', () => {
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options)
+            .selectById('A', selectedDevices => selectedDevices
+                .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['A']))
+            )
     })
 
     it('should support nested usage @medium', function() {
