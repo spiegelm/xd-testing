@@ -29,12 +29,10 @@ describe('XD-MVC Maps @large', function () {
         devices = test.adapter.pairDevicesViaXDMVC(devices)
         return devices
             .selectById('A', deviceA => deviceA
-                .then(() => console.log('get connected devices'))
                 .execute(function () {
                     return XDmvc.getConnectedDevices().length
                 })
                 .then(ret => assert.equal(ret.value, 1))
-                .then(() => console.log('connected devices'))
             )
             .end()
     })
@@ -111,7 +109,6 @@ describe('XD-MVC Maps @large', function () {
                                 lastXDSyncCounts = {}
                                 Object.keys(arguments).map(key => arguments[key])
                                     .forEach(val => lastXDSyncCounts[val.id] = val.XDsync)
-                                console.log('lastXDSyncCounts', lastXDSyncCounts)
                             })
                     )
                     .selectById('A',
