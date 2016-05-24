@@ -131,7 +131,8 @@ describe('XD-MVC Gallery @large', function () {
         xdTesting.loadSetups().forEach(setup => {
 
             // Assemble setup name
-            let setupName = Object.keys(setup.devices).map(key => setup.devices[key].name).join(', ')
+            let options = setup.devices
+            let setupName = Object.keys(options).map(key => options[key].name).join(', ')
 
             it('on ' + setupName, function () {
                 let imageUrlA
