@@ -22,7 +22,10 @@ describe('XD-MVC Gallery @large', function () {
 
     describe('eventLogger', () => {
         it('should count XDconnection events', () => {
-            let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+            let options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
 
             let loadedUrlA
             return xdTesting.multiremote(options).init()
@@ -30,17 +33,14 @@ describe('XD-MVC Gallery @large', function () {
                 .execute(test.adapter.injectEventLogger)
                 .execute(test.adapter.getEventCounter)
                 .then(function (retA) {
-                    console.log(retA.value)
                     assert.equal(retA.value.XDconnection, 0)
                 })
                 // Share url from A to B
-                .then(() => console.log('share url from A to B'))
                 .getUrl().then(urlA => loadedUrlA = urlA)
                 .selectById('B', B => B
                     .url(loadedUrlA)
                     .execute(test.adapter.injectEventLogger)
                 )
-                .then(() => console.log('shared url'))
                 // Assert connection event
                 .selectById('A', A => A
                     .waitUntil(() => A
@@ -49,39 +49,39 @@ describe('XD-MVC Gallery @large', function () {
                             return retA.value.XDconnection === 1
                         })
                     )
+                    .execute(test.adapter.getEventCounter)
+                    .then(function (ret) {
+                        assert.equal(ret.value.XDconnection, 1)
+                    })
                 )
-                .execute(test.adapter.getEventCounter)
-                .then(function (retA) {
-                    console.log(retA.value)
-                    assert.equal(retA.value.XDconnection, 1)
-                })
                 .end()
         })
     })
 
     it('should pair two devices via url', () => {
-        let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+        let options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
         let deviceCount
 
         let devices = xdTesting.multiremote(options).init()
         devices = test.adapter.pairDevicesViaURL(devices, test.baseUrl)
         return devices
-            .then(() => console.log('paired'))
             .getCount().then(count => deviceCount = count)
-            .selectById('A', device => device
-                .then(() => console.log('get event counter..'))
+            .selectById('A', deviceA => deviceA
                 .execute(test.adapter.getEventCounter)
-                .then(ret => {
-                    console.log('got event counter', ret.value)
-                    assert.equal(ret.value.XDconnection, deviceCount - 1)
-                })
+                .then(ret => assert.equal(ret.value.XDconnection, deviceCount - 1))
             )
             .end()
     });
 
     describe('prerequisites', () => {
         it('browsers should not share cookies between sessions', () => {
-            let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+            let options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
 
             let devices = xdTesting.multiremote(options).init()
             devices = test.adapter.pairDevicesViaURL(devices, test.baseUrl)
