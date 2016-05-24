@@ -86,8 +86,7 @@ describe('XD-MVC Gallery @large', function () {
                 .selectById('A', deviceA => deviceA
                     // Set cookie and verify it's there
                     .setCookie({name: 'test_cookieA', value: 'A'})
-                    .getCookie('test_cookieA')
-                    .then(cookie => {
+                    .getCookie('test_cookieA').then(cookie => {
                         assert.notEqual(cookie, null)
                         assert.equal(cookie.name, 'test_cookieA')
                         assert.equal(cookie.value, 'A')
@@ -102,8 +101,7 @@ describe('XD-MVC Gallery @large', function () {
                         assert.equal(cookie.value, 'B')
                     })
                     // Verify the cookie from the other browser is not here
-                    .getCookie('test_cookieA')
-                    .then(cookie => {
+                    .getCookie('test_cookieA').then(cookie => {
                         assert.equal(cookie, null)
                     })
                 )
