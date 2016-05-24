@@ -63,15 +63,12 @@ describe('XD-MVC Gallery @large', function () {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
         }
-        let deviceCount
-
         let devices = xdTesting.multiremote(options).init()
         devices = test.adapter.pairDevicesViaURL(devices, test.baseUrl)
         return devices
-            .getCount().then(count => deviceCount = count)
             .selectById('A', deviceA => deviceA
                 .execute(test.adapter.getEventCounter)
-                .then(ret => assert.equal(ret.value.XDconnection, deviceCount - 1))
+                .then(ret => assert.equal(ret.value.XDconnection, 1))
             )
             .end()
     });
