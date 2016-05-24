@@ -170,7 +170,7 @@ describe('MultiDevice - selectById', function () {
             C: templates.devices.nexus10()
         }
 
-        let commandHistoryFilter = element => ['screenshot', 'saveScreenshot', 'setImplicitDeviceSelection'].indexOf(element.name) === -1
+        let commandHistoryFilter = element => ['screenshot', 'saveScreenshot', 'setImplicitDeviceSelection', 'windowHandleSize'].indexOf(element.name) === -1
 
         return test.devices = xdTesting.multiremote(options)
             .init() // 1 command
