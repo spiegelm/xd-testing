@@ -17,7 +17,6 @@ describe('XD-MVC Maps @large', function () {
 
     // Set test timeout
     test.timeout(180 * 1000)
-    test.async_timeout = xdTesting.waitForTimeout = 30 * 1000
     test.pauseTime = 5 * 1000
     test.baseUrl = "http://localhost:8080/maps.html"
     test.adapter = require('../../lib/adapter/xdmvc')
@@ -50,23 +49,19 @@ describe('XD-MVC Maps @large', function () {
                 // Pair any device with any other device
                 .execute(test.adapter.injectEventLogger)
                 .click('#menu-button')
-                .waitUntil(
+                .waitUntil(() => device
                     // Wait until a device shows up in list
-                    () => device
-                        .isVisible('//*[@id="availableDeviceList"]//*[@class="id"]')
+                    .isVisible('//*[@id="availableDeviceList"]//*[@class="id"]')
                         // If list does not contain device, refresh list and keep waiting
-                        .then(isVisible => isVisible || device.click('#showDevices').then(() => false)),
-                    test.async_timeout
+                        .then(isVisible => isVisible || device.click('#showDevices').then(() => false))
                 )
                 // Click on device id
                 .click('//*[@id="availableDeviceList"]//*[@class="id"]')
-                .waitUntil(
+                .waitUntil(() => device
                     // Wait for connection event
-                    () => device
-                        .execute(test.adapter.getEventCounter).then(function (ret) {
-                            return ret.value.XDconnection == 1;
-                        }),
-                    test.async_timeout
+                    .execute(test.adapter.getEventCounter).then(function (ret) {
+                        return ret.value.XDconnection == 1;
+                    })
                 )
             )
     }
@@ -131,7 +126,7 @@ describe('XD-MVC Maps @large', function () {
                             .waitUntil(() => device
                                 .execute(function (lastSyncCounter) {
                                     return eventLogger.eventCounter.XDsync > lastSyncCounter
-                                }, lastXDSyncCounts[device.options.id]), test.async_timeout
+                                }, lastXDSyncCounts[device.options.id])
                             )
                             .checkpoint('wait for synchronisation')
                             .execute(function (id) {

@@ -17,7 +17,6 @@ describe('XD-MVC Gallery @large', function () {
 
     // Set test timeout
     test.timeout(180 * 1000)
-    test.async_timeout = xdTesting.waitForTimeout = 30 * 1000
     test.baseUrl = "http://localhost:8082/gallery.html"
     test.adapter = require('../../lib/adapter/xdmvc')
 
@@ -152,12 +151,12 @@ describe('XD-MVC Gallery @large', function () {
                     .name(setupName)
                     .checkpoint('load app')
                     .selectById('A', deviceA => deviceA
-                        .waitForVisible('h2.gallery-overview', test.async_timeout)
+                        .waitForVisible('h2.gallery-overview')
                         .click('//*[text()="Bike Tours"]')
-                        .waitForVisible('#gallery img:nth-of-type(1)', test.async_timeout)
+                        .waitForVisible('#gallery img:nth-of-type(1)')
                         .checkpoint('select album')
                         .click('#gallery img:nth-of-type(1)')
-                        .waitForVisible('#image img', test.async_timeout)
+                        .waitForVisible('#image img')
                         .scroll('#image img')
                         .checkpoint('click thumbnail')
                         .getAttribute('#image img', 'src').then(src => {
@@ -172,7 +171,7 @@ describe('XD-MVC Gallery @large', function () {
                         allButA = deviceIds.filter(deviceId => deviceId != 'A')
                     })
                     .selectById(() => allButA, otherDevices => otherDevices
-                        .waitForVisible('#image img', test.async_timeout)
+                        .waitForVisible('#image img')
                         .checkpoint('click thumbnail')
                         .getAttribute('#image img', 'src')
                     )
