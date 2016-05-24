@@ -50,9 +50,9 @@ describe('XD-MVC Maps @large', function () {
                 .execute(test.adapter.injectEventLogger)
                 .click('#menu-button')
                 .waitUntil(() => device
-                    // Wait until a device shows up in list
+                    // Wait until an other device shows up in list
                     .isVisible('//*[@id="availableDeviceList"]//*[@class="id"]')
-                        // If list does not contain device, refresh list and keep waiting
+                        // If list does not contain other devices, refresh list and keep waiting
                         .then(isVisible => isVisible || device.click('#showDevices').then(() => false))
                 )
                 // Click on device id
@@ -87,8 +87,6 @@ describe('XD-MVC Maps @large', function () {
 
             it('on ' + setupName, function () {
 
-                let deviceIds
-                let allButA
                 let lastXDSyncCounts
 
                 let devices = xdTesting.multiremote(setup.devices).init()
@@ -96,55 +94,57 @@ describe('XD-MVC Maps @large', function () {
                     .name(setupName)
                 return test.adapter.pairDevicesViaXDMVC(devices)
                     .checkpoint('paired')
-                    .getDeviceIds().then(ret => deviceIds = ret.value)
-                    .then(() => allButA = deviceIds.filter(id => id != 'A'))
-                    .selectById(() => allButA, devices => devices
-                        .forEach(device => device
-                            .execute(function () {
-                                return eventLogger.eventCounter.XDsync;
-                            }).then(ret => {
-                                return {id: device.options.id, XDsync: ret.value}
-                            })
-                        )
-                        .then(function() {
-                            // Store last sync counter
-                            lastXDSyncCounts = {}
-                            Object.keys(arguments).map(key => arguments[key])
-                                .forEach(val => lastXDSyncCounts[val.id] = val.XDsync)
-                            console.log('lastXDSyncCounts', lastXDSyncCounts)
-                        })
-                    )
-                    .selectById('A', deviceA => deviceA
-                        .execute(function () {
-                            map.setCenter({lat: 47.3783569289, lng: 8.5487177968})
-                        })
-                        // TODO Wait until map tiles are loaded?
-                        .checkpoint('set map center')
-                    )
-                    .selectById(() => allButA, otherDevices => otherDevices
-                        .forEach(device => device
-                            .waitUntil(() => device
-                                .execute(function (lastSyncCounter) {
-                                    return eventLogger.eventCounter.XDsync > lastSyncCounter
-                                }, lastXDSyncCounts[device.options.id])
+                    .selectById('A',
+                        // Omit callback for A
+                        () => {},
+                        // Use the complement selection
+                        allButA => allButA
+                            .forEach(device => device
+                                .execute(function () {
+                                    return eventLogger.eventCounter.XDsync;
+                                }).then(ret => {
+                                    return {id: device.options.id, XDsync: ret.value}
+                                })
                             )
-                            .checkpoint('wait for synchronisation')
-                            .execute(function (id) {
-                                return {
-                                    id: id,
-                                    XDsync: eventLogger.eventCounter.XDsync,
-                                    map_lat: map.getCenter().lat(),
-                                    map_lng: map.getCenter().lng()
-                                };
-                            }, device.options.id)
-                            .then(ret => {
-                                let value = ret.value
-                                assert.isAbove(value.XDsync, lastXDSyncCounts[value.id], 'Number of syncs has not increased.')
-                                assert.approximately(value.map_lat, 47.3783569289, 0.0000000001)
-                                assert.approximately(value.map_lng, 8.5487177968, 0.0000000001)
+                            .then(function() {
+                                // Store last sync counter
+                                lastXDSyncCounts = {}
+                                Object.keys(arguments).map(key => arguments[key])
+                                    .forEach(val => lastXDSyncCounts[val.id] = val.XDsync)
+                                console.log('lastXDSyncCounts', lastXDSyncCounts)
+                            })
+                    )
+                    .selectById('A',
+                        deviceA => deviceA
+                            .execute(function () {
+                                map.setCenter({lat: 47.3783569289, lng: 8.5487177968})
                             })
                             // TODO Wait until map tiles are loaded?
-                        )
+                            .checkpoint('set map center'),
+                        allButA => allButA
+                            .forEach(device => device
+                                .waitUntil(() => device
+                                    .execute(function (lastSyncCounter) {
+                                        return eventLogger.eventCounter.XDsync > lastSyncCounter
+                                    }, lastXDSyncCounts[device.options.id])
+                                )
+                                .checkpoint('wait for synchronisation')
+                                .execute(function (id) {
+                                    return {
+                                        id: id,
+                                        XDsync: eventLogger.eventCounter.XDsync,
+                                        map_lat: map.getCenter().lat(),
+                                        map_lng: map.getCenter().lng()
+                                    };
+                                }, device.options.id)
+                                .then(ret => {
+                                    let value = ret.value
+                                    assert.isAbove(value.XDsync, lastXDSyncCounts[value.id], 'Number of syncs has not increased.')
+                                    assert.approximately(value.map_lat, 47.3783569289, 0.0000000001)
+                                    assert.approximately(value.map_lng, 8.5487177968, 0.0000000001)
+                                })
+                                // TODO Wait until map tiles are loaded?
+                            )
                     )
                     .checkpoint('sync')
                     .end()
