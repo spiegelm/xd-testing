@@ -1,5 +1,8 @@
 "use strict"
 
+/**
+ * @type {Chai.Assert}
+ */
 var assert = require('chai').assert
 var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates')
@@ -26,7 +29,7 @@ describe('MultiDevice - selectById', function () {
     it('should not act on other devices @large', function () {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()}
 
-        return test.devices = xdTesting.multiremote(options)
+        return xdTesting.multiremote(options)
             .init()
             .url(test.baseUrl)
             .selectById(['B', 'C'], selectedDevices => selectedDevices
@@ -37,6 +40,51 @@ describe('MultiDevice - selectById', function () {
             .selectById('A', device => device
                 .getText('#counter').then(textA => assert.equal(textA, '-'))
             )
+    })
+
+    describe('with complementCallback', () => {
+        it('should call the complementCallback on the complementary selection', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            return xdTesting.multiremote(options)
+                .selectById('A',
+                    selectedDevices => selectedDevices
+                        .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['A'])),
+                    otherDevices => otherDevices
+                        .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['B']))
+                )
+        })
+
+        it('should respect the promise chain', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            let queue = '0'
+            return xdTesting.multiremote(options)
+                .then(() => queue += '1')
+                .selectById('A',
+                    selectedDevices => {
+                        queue += '2'
+                        return selectedDevices
+                            .then(() => queue += '3')
+                            .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['A']))
+                            .then(() => queue += '4')
+                    }, otherDevices => {
+                        queue += '5'
+                        return otherDevices
+                            .then(() => queue += '6')
+                            .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['B']))
+                            .then(() => queue += '7')
+                    }
+                )
+                .then(() => queue += '8')
+                .then(() => assert.equal(queue, '012345678'))
+        })
     })
 
     it('should execute promises callback @medium', function() {
@@ -212,7 +260,7 @@ describe('MultiDevice - selectById', function () {
             .end()
     })
 
-    describe('when no callback is given', () => {
+    describe('without callback', () => {
 
         it('should return device selection', () => {
             let options = {
