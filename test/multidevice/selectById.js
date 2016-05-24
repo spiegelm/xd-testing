@@ -58,7 +58,7 @@ describe('MultiDevice - selectById', function () {
                 )
         })
 
-        it('should respect the promise chain', () => {
+        it('should respect promise chain', () => {
             var options = {
                 A: templates.devices.chrome(),
                 B: templates.devices.chrome()
@@ -73,21 +73,32 @@ describe('MultiDevice - selectById', function () {
                         return selectedDevices
                             .then(() => queue += '3')
                             .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['A']))
-                            .then(() => queue += '4')
-                    }, otherDevices => {
-                        queue += '5'
+                            .then(() => {
+                                var defer = q.defer()
+                                defer.resolve()
+                                return defer.promise.delay(1000).then(() => queue += '4')
+                            })
+                            .then(() => queue += '5')
+                    },
+                    otherDevices => {
+                        queue += '6'
                         return otherDevices
-                            .then(() => queue += '6')
-                            .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['B']))
                             .then(() => queue += '7')
+                            .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['B']))
+                            .then(() => {
+                                var defer = q.defer()
+                                defer.resolve()
+                                return defer.promise.delay(1000).then(() => queue += '8')
+                            })
+                            .then(() => queue += '9')
                     }
                 )
-                .then(() => queue += '8')
-                .then(() => assert.equal(queue, '012345678'))
+                .then(() => queue += 'A')
+                .then(() => assert.equal(queue, '0123456789A'))
         })
     })
 
-    it('should execute promises callback @medium', function() {
+    it('should respect promise chain @medium', function() {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()}
 
         var queue = ''
@@ -95,12 +106,17 @@ describe('MultiDevice - selectById', function () {
             .then(() => queue += '0')
             .selectById(['B', 'C'], selectedDevices => {
                 queue += '1'
-                return selectedDevices.then(() => {
-                    queue += '2'
-                })
+                return selectedDevices
+                    .then(() => queue += '2')
+                    .then(() => {
+                        var defer = q.defer()
+                        defer.resolve()
+                        return defer.promise.delay(1000).then(() => queue += '3')
+                    })
+                    .then(() => queue += '4')
             })
-            .then(() => queue += '3')
-            .then(() => assert.equal(queue, '0123'))
+            .then(() => queue += '5')
+            .then(() => assert.equal(queue, '012345'))
             .end()
     })
 
