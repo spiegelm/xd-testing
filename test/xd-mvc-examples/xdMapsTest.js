@@ -9,20 +9,18 @@ var templates = xdTesting.templates
 /**
  * @type {Q}
  */
-var q = require('q');
+var q = require('q')
 
 
-describe('XD-MVC Maps @large', function() {
+describe('XD-MVC Maps @large', function () {
     var test = this;
 
     // Set test timeout
-    test.timeout(180 * 1000);
-    test.async_timeout = xdTesting.waitForTimeout = 30 * 1000;
-    test.pauseTime = 5 * 1000;
-    test.baseUrl = "http://localhost:8080/maps.html";
-
-    // Bind function to this reference
-    test.adapter = require('../../lib/adapter/xdmvc');
+    test.timeout(180 * 1000)
+    test.async_timeout = xdTesting.waitForTimeout = 30 * 1000
+    test.pauseTime = 5 * 1000
+    test.baseUrl = "http://localhost:8080/maps.html"
+    test.adapter = require('../../lib/adapter/xdmvc')
 
     it('should pair via XDmvc.connectTo', function () {
         let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
@@ -34,13 +32,13 @@ describe('XD-MVC Maps @large', function() {
             .selectById('A', deviceA => deviceA
                 .then(() => console.log('get connected devices'))
                 .execute(function () {
-                    return XDmvc.getConnectedDevices().length;
+                    return XDmvc.getConnectedDevices().length
                 })
                 .then(ret => assert.equal(ret.value, 1))
                 .then(() => console.log('connected devices'))
             )
             .end()
-    });
+    })
 
     /**
      * @param {WebdriverIO.Client} devices
@@ -52,33 +50,37 @@ describe('XD-MVC Maps @large', function() {
                 // Pair any device with any other device
                 .execute(test.adapter.injectEventLogger)
                 .click('#menu-button')
-                .waitUntil(() => {
+                .waitUntil(
                     // Wait until a device shows up in list
-                    return device.isVisible('//*[@id="availableDeviceList"]//*[@class="id"]')
+                    device => device
+                        .isVisible('//*[@id="availableDeviceList"]//*[@class="id"]')
                         // If list does not contain device, refresh list and keep waiting
-                        .then(isVisible => isVisible || device.click('#showDevices').then(() => false));
-                }, test.async_timeout)
+                        .then(isVisible => isVisible || device.click('#showDevices').then(() => false)),
+                    test.async_timeout
+                )
                 // Click on device id
                 .click('//*[@id="availableDeviceList"]//*[@class="id"]')
-                .waitUntil(function () {
+                .waitUntil(
                     // Wait for connection event
-                    return device.execute(test.adapter.getEventCounter).then(function (ret) {
-                        return ret.value.XDconnection == 1;
-                    });
-                }, test.async_timeout)
+                    device => device
+                        .execute(test.adapter.getEventCounter).then(function (ret) {
+                            return ret.value.XDconnection == 1;
+                        }),
+                    test.async_timeout
+                )
             )
     }
 
 
     it('should pair via GUI', function () {
-        let options = {A: templates.devices.chrome(), B: templates.devices.chrome()};
+        let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
 
         let devices = xdTesting.multiremote(options).init()
             .url(test.baseUrl)
 
         return pairTwoDevicesViaMapsGui(devices)
             .end()
-    });
+    })
 
 
     describe('should sync the map center on mirrored devices', function () {
@@ -86,7 +88,7 @@ describe('XD-MVC Maps @large', function() {
         xdTesting.loadSetups().forEach(function (setup) {
 
             // Assemble setup name
-            var setupName = Object.keys(setup.devices).map(key => setup.devices[key].name).join(', ');
+            var setupName = Object.keys(setup.devices).map(key => setup.devices[key].name).join(', ')
 
             it('on ' + setupName, function () {
 
@@ -109,7 +111,7 @@ describe('XD-MVC Maps @large', function() {
                                 return {id: device.options.id, XDsync: ret.value}
                             })
                         )
-                        .then(function() {
+                        .then(() => {
                             // Store last sync counter
                             lastXDSyncCounts = {}
                             Object.keys(arguments).map(key => arguments[key])
@@ -119,7 +121,7 @@ describe('XD-MVC Maps @large', function() {
                     )
                     .selectById('A', deviceA => deviceA
                         .execute(function () {
-                            map.setCenter({lat: 47.3783569289, lng: 8.5487177968});
+                            map.setCenter({lat: 47.3783569289, lng: 8.5487177968})
                         })
                         // TODO Wait until map tiles are loaded?
                         .checkpoint('set map center')
@@ -128,7 +130,7 @@ describe('XD-MVC Maps @large', function() {
                         .forEach(device => device
                             .waitUntil(() => device
                                 .execute(function (lastSyncCounter) {
-                                    return eventLogger.eventCounter.XDsync > lastSyncCounter;
+                                    return eventLogger.eventCounter.XDsync > lastSyncCounter
                                 }, lastXDSyncCounts[device.options.id]), test.async_timeout
                             )
                             .checkpoint('wait for synchronisation')
@@ -142,17 +144,16 @@ describe('XD-MVC Maps @large', function() {
                             }, device.options.id)
                             .then(ret => {
                                 let value = ret.value
-                                assert.isAbove(value.XDsync, lastXDSyncCounts[value.id], 'Number of syncs has not increased.');
+                                assert.isAbove(value.XDsync, lastXDSyncCounts[value.id], 'Number of syncs has not increased.')
                                 assert.approximately(value.map_lat, 47.3783569289, 0.0000000001)
-                                assert.approximately(value.map_lng, 8.5487177968, 0.0000000001);
+                                assert.approximately(value.map_lng, 8.5487177968, 0.0000000001)
                             })
                             // TODO Wait until map tiles are loaded?
                         )
                     )
                     .checkpoint('sync')
                     .end()
-            });
-        });
-    });
-
-});
+            })
+        })
+    })
+})

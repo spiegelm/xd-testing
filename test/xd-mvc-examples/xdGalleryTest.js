@@ -9,7 +9,7 @@ var templates = xdTesting.templates
 /**
  * @type {Q}
  */
-var q = require('q');
+var q = require('q')
 
 
 describe('XD-MVC Gallery @large', function () {
@@ -19,8 +19,6 @@ describe('XD-MVC Gallery @large', function () {
     test.timeout(180 * 1000)
     test.async_timeout = xdTesting.waitForTimeout = 30 * 1000
     test.baseUrl = "http://localhost:8082/gallery.html"
-
-    // Bind function to this reference
     test.adapter = require('../../lib/adapter/xdmvc')
 
     describe('eventLogger', () => {
@@ -85,8 +83,8 @@ describe('XD-MVC Gallery @large', function () {
                 .selectById('A', deviceA => deviceA
                     // Set cookie and verify it's there
                     .setCookie({name: 'test_cookieA', value: 'A'})
-                    .getCookie('test_cookieA').then(function (cookie) {
-
+                    .getCookie('test_cookieA')
+                    .then(cookie => {
                         assert.notEqual(cookie, null)
                         assert.equal(cookie.name, 'test_cookieA')
                         assert.equal(cookie.value, 'A')
@@ -101,7 +99,8 @@ describe('XD-MVC Gallery @large', function () {
                         assert.equal(cookie.value, 'B')
                     })
                     // Verify the cookie from the other browser is not here
-                    .getCookie('test_cookieA').then(cookie => {
+                    .getCookie('test_cookieA')
+                    .then(cookie => {
                         assert.equal(cookie, null)
                     })
                 )
@@ -169,7 +168,7 @@ describe('XD-MVC Gallery @large', function () {
                         .checkpoint('click thumbnail')
                         .getAttribute('#image img', 'src')
                     )
-                    .then(function() {
+                    .then(function () {
                         let srcs = arguments
                         Object.keys(srcs).forEach(key => {
                             var src = srcs[key]
