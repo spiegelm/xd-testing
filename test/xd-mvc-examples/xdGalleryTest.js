@@ -159,12 +159,8 @@ describe('XD-MVC Gallery @large', function () {
                         .waitForVisible('#image img')
                         .scroll('#image img')
                         .checkpoint('click thumbnail')
-                        .getAttribute('#image img', 'src').then(src => {
-                            imageUrlA = src;
-                        })
-                        .getUrl().then(function (url) {
-                            urlA = url
-                        })
+                        .getAttribute('#image img', 'src').then(src => imageUrlA = src)
+                        .getUrl().then(url => urlA = url)
                     )
                     .getDeviceIds().then(ret => {
                         let deviceIds = ret.value
