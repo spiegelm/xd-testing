@@ -111,7 +111,7 @@ describe('XD-MVC Maps @large', function () {
                                 return {id: device.options.id, XDsync: ret.value}
                             })
                         )
-                        .then(() => {
+                        .then(function() {
                             // Store last sync counter
                             lastXDSyncCounts = {}
                             Object.keys(arguments).map(key => arguments[key])
