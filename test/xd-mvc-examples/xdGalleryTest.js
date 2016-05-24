@@ -142,42 +142,36 @@ describe('XD-MVC Gallery @large', function () {
 
             it('on ' + setupName, function () {
                 let imageUrlA
-                let urlA
-                let allButA
 
                 let devices = xdTesting.multiremote(options).init()
                 devices = test.adapter.pairDevicesViaURL(devices, test.baseUrl)
                 return devices
                     .name(setupName)
                     .checkpoint('load app')
-                    .selectById('A', deviceA => deviceA
-                        .waitForVisible('h2.gallery-overview')
-                        .click('//*[text()="Bike Tours"]')
-                        .waitForVisible('#gallery img:nth-of-type(1)')
-                        .checkpoint('select album')
-                        .click('#gallery img:nth-of-type(1)')
-                        .waitForVisible('#image img')
-                        .scroll('#image img')
-                        .checkpoint('click thumbnail')
-                        .getAttribute('#image img', 'src').then(src => imageUrlA = src)
-                        .getUrl().then(url => urlA = url)
+                    .selectById('A',
+                        deviceA => deviceA
+                            .waitForVisible('h2.gallery-overview')
+                            .click('//*[text()="Bike Tours"]')
+                            .waitForVisible('#gallery img:nth-of-type(1)')
+                            .checkpoint('select album')
+                            .click('#gallery img:nth-of-type(1)')
+                            .waitForVisible('#image img')
+                            .scroll('#image img')
+                            .checkpoint('click thumbnail')
+                            .getAttribute('#image img', 'src')
+                            .then(src => imageUrlA = src),
+                        otherDevices => otherDevices
+                            .waitForVisible('#image img')
+                            .checkpoint('click thumbnail')
+                            .getAttribute('#image img', 'src')
+                            .then(function () {
+                                let srcs = arguments
+                                Object.keys(srcs).forEach(key => {
+                                    var src = srcs[key]
+                                    assert.equal(src, imageUrlA)
+                                })
+                            })
                     )
-                    .getDeviceIds().then(ret => {
-                        let deviceIds = ret.value
-                        allButA = deviceIds.filter(deviceId => deviceId != 'A')
-                    })
-                    .selectById(() => allButA, otherDevices => otherDevices
-                        .waitForVisible('#image img')
-                        .checkpoint('click thumbnail')
-                        .getAttribute('#image img', 'src')
-                    )
-                    .then(function () {
-                        let srcs = arguments
-                        Object.keys(srcs).forEach(key => {
-                            var src = srcs[key]
-                            assert.equal(src, imageUrlA)
-                        })
-                    })
                     .checkpoint('end')
                     .end()
             })
