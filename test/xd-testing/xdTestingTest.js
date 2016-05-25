@@ -49,23 +49,74 @@ describe('xdTesting @large', function() {
 
     describe('app framework integration', () => {
 
-        describe('for XD-MVC', () => {
-            //// Set base url
+        before(() => {
             xdTesting.baseUrl = 'http://localhost/'
+        })
+
+        it('should load xdTesting.baseUrl after init', () => {
+            let options = {
+                A: templates.devices.chrome()
+            }
+
+            return xdTesting.multiremote(options).init()
+                .getUrl().then(url => assert.equal(url, xdTesting.baseUrl))
+                .end()
+        })
+
+        describe('for XD-MVC', () => {
 
             // Define a custom adapter
-            xdTesting.app = xdTesting.adapter.xdmvc
+            xdTesting.appFramework = xdTesting.adapter.xdmvc
 
-            it('should load xdTesting.baseUrl after init', () => {
+            it('app property has devices', () => {
                 let options = {
                     A: templates.devices.chrome()
                 }
 
-                // Enable app specific commands
-                xdTesting.app = xdTesting.adapter.xdmvc()
+                let devices = xdTesting.multiremote(options)
+                let app = devices
+                    .app()
 
+                console.log('app', app)
+                assert.property(app, 'devices')
+                assert.isDefined(app.devices)
+
+                return devices.end()
+            })
+
+            it('app property should have getEventCounter', () => {
+                let options = {
+                    A: templates.devices.chrome()
+                }
+
+                let devices = xdTesting.multiremote(options)
+                let app = devices
+                    .app()
+
+                console.log('app', app)
+                assert.property(app, 'getEventCounter')
+                assert.instanceOf(app.getEventCounter, Function)
+
+                return devices.end()
+            })
+
+            it.skip('should get the event counter after loading a url', () => {
+                let options = {
+                    A: templates.devices.chrome()
+                }
                 return xdTesting.multiremote(options).init()
-                    .getUrl().then(url => assert.equal(url, xdTesting.baseUrl))
+                    // TODO load a XD-MVC app
+                    .app().injectEventLogger()
+                    .app().getEventCounter().then(counter => {
+                        assert.property(counter, 'XDdisconnection')
+                        assert.property(counter, 'XDconnection')
+                        assert.property(counter, 'XDdevice')
+                        assert.property(counter, 'XDroles')
+                        assert.property(counter, 'XDsync')
+                        assert.property(counter, 'XDserverReady')
+                        assert.property(counter, 'XDothersRolesChanged')
+                    })
+                    .end()
 
                     /**
                      * App property?
