@@ -89,7 +89,9 @@ describe('xdTesting', function() {
         describe('for XD-MVC', () => {
 
             // Define a custom adapter
-            xdTesting.appFramework = xdTesting.adapter.xdmvc
+            beforeEach(() => {
+                xdTesting.appFramework = xdTesting.adapter.xdmvc
+            })
 
             it('app property has devices @medium', () => {
                 let options = {
@@ -275,6 +277,28 @@ describe('xdTesting', function() {
 
                     return waitFor
                         .then(() => assert.equal(queue, '012349'))
+                        .end()
+                })
+            })
+
+            describe('hooks', () => {
+                it('should inject event logger after loading url', () => {
+                    let options = {
+                        A: templates.devices.chrome()
+                    }
+
+                    xdTesting.reset()
+                    xdTesting.appFramework = xdTesting.adapter.xdmvc
+
+                    return xdTesting.multiremote(options).init()
+                        .url(test.fixture.xd_gallery.url)
+                        .execute(function() {
+                            return window.eventLogger;
+                        })
+                        .then(ret => assert.isDefined(ret))
+                        .app().getEventCounter().then(counter => {
+                            assert.isDefined(counter)
+                        })
                         .end()
                 })
             })
