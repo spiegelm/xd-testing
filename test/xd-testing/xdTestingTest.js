@@ -7,6 +7,7 @@ var assert = require('chai').assert
 var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates')
 var Flow = require('../../lib/flow/flow')
+var q = require('q')
 
 describe('xdTesting', function() {
 
@@ -199,6 +200,44 @@ describe('xdTesting', function() {
                         .end()
                 })
             })
+
+            describe('waitForEvent', () => {
+                it('should wait for the next event of the given type', () => {
+                    let options = {
+                        A: templates.devices.chrome()
+                    }
+
+                    let queue = ''
+                    let lastCounter
+                    let devices = xdTesting.multiremote(options).init()
+                        .url(test.fixture.xd_gallery.url)
+                        .app().injectEventLogger()
+                        .app().getEventCounter()
+                        .then(counter => lastCounter = counter)
+                        .then(() => queue += '0')
+                        // Init a custom event counter
+                        .execute(function() {
+                            window.eventLogger.eventCounter['customEvent'] = 0
+                        })
+                        .then(() => queue += '1')
+
+                    let waitFor = devices
+                        .then(() => queue += '2')
+                        .app().waitForEvent('customEvent')
+                        .then(() => queue += '9')
+                        .end()
+
+                    let trigger = devices
+                        .then(() => q.delay(1000))
+                        .then(() => queue += '3')
+                        .execute(function() {
+                            window.eventLogger.eventCounter['customEvent'] = 1
+                        })
+                        .then(() => queue += '4')
+
+                    return waitFor
+                        .then(() => assert.equal(queue, '012349'))
+                })
         })
 
     })
