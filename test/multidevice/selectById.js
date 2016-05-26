@@ -11,8 +11,14 @@ var q = require('q')
 describe('MultiDevice - selectById', function () {
     var test = this
 
-    xdTesting.reset()
-    test.baseUrl = "http://localhost:8090/"
+    // Config
+    beforeEach(() => {
+        xdTesting.reset()
+        test.baseUrl = "http://localhost:8090/"
+    })
+
+    // Reset config
+    afterEach(xdTesting.reset)
 
     it('should act on the specified devices @large', function () {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()}
@@ -266,6 +272,7 @@ describe('MultiDevice - selectById', function () {
 
         let commandHistoryFilter = element => ['screenshot', 'saveScreenshot', 'setImplicitDeviceSelection', 'windowHandleSize'].indexOf(element.name) === -1
 
+        xdTesting.baseUrl = null
         return test.devices = xdTesting.multiremote(options)
             .init() // 1 command
             .url(test.baseUrl) // 1 command

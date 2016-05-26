@@ -21,6 +21,10 @@ describe('xdTesting', function() {
         }
     }
 
+    // Reset config
+    beforeEach(xdTesting.reset)
+    afterEach(xdTesting.reset)
+
     describe('command arguments @large', function () {
         it('are part of a step\'s command name', function () {
             let scenario = {A: templates.devices.chrome()}
@@ -57,11 +61,6 @@ describe('xdTesting', function() {
 
 
     describe('app framework integration', () => {
-
-        beforeEach(() => {
-            // Reset config
-            xdTesting.baseUrl = null
-        })
 
         it('should load xdTesting.baseUrl after init @large', () => {
             let options = {
