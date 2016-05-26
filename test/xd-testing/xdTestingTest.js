@@ -10,13 +10,21 @@ var Flow = require('../../lib/flow/flow')
 
 describe('xdTesting', function() {
 
-    let baseUrl = 'http://localhost:8090/'
+    let test = this
+    test.fixture = {
+        xd_gallery: {
+            url: 'http://localhost:8082/gallery.html'
+        },
+        basic_app: {
+            url: 'http://localhost:8090/'
+        }
+    }
 
     describe('command arguments @large', function () {
         it('are part of a step\'s command name', function () {
             let scenario = {A: templates.devices.chrome()}
             return xdTesting.multiremote(scenario).init()
-                .url(baseUrl)
+                .url(test.fixture.basic_app.url)
                 .click('#button')
                 .checkpoint('check')
                 .getFlow().then(flow => {
@@ -33,7 +41,7 @@ describe('xdTesting', function() {
         it('returns the flow object', function () {
             let scenario = {A: templates.devices.chrome()}
             return xdTesting.multiremote(scenario).init()
-                .url(baseUrl)
+                .url(test.fixture.basic_app.url)
                 .click('#button')
                 .checkpoint('end')
                 .getFlow().then(flow => {
@@ -113,13 +121,12 @@ describe('xdTesting', function() {
                 return devices.end()
             })
 
-            it('should get the event counter after loading a url @large', () => {
+            it('should support getting the event counter @large', () => {
                 let options = {
                     A: templates.devices.chrome()
                 }
-                xdTesting.baseUrl = "http://localhost:8082/gallery.html"
                 return xdTesting.multiremote(options).init()
-                     //TODO load a XD-MVC app
+                    .url(test.fixture.xd_gallery.url)
                     .app().injectEventLogger()
                     .app().getEventCounter().then(counter => {
                         assert.property(counter, 'XDdisconnection')
