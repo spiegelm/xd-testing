@@ -121,7 +121,7 @@ describe('xdTesting', function() {
                 return devices.end()
             })
 
-            it('should support getting the event counter @large', () => {
+            it('should get the event counter @large', () => {
                 let options = {
                     A: templates.devices.chrome()
                 }
@@ -163,6 +163,23 @@ describe('xdTesting', function() {
                 //.app.addCommand('pairDevicesViaGUI', function() {
                 //    return this.click(...)
                 //})
+            })
+
+            describe('pairDevicesViaUrl', () => {
+                it('should pair a device with a other device', () => {
+                    let options = {
+                        A: templates.devices.chrome(),
+                        B: templates.devices.chrome()
+                    }
+                    let urlA
+                    return xdTesting.multiremote(options).init()
+                        .app().pairDevicesViaURL(test.fixture.xd_gallery.url)
+                        .getUrl().then((urlA, urlB) => {
+                            assert.include(urlA, test.fixture.xd_gallery.url)
+                            assert.strictEqual(urlA, urlB)
+                        })
+                        .end()
+                })
             })
         })
 
