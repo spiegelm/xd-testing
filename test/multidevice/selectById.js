@@ -377,7 +377,7 @@ describe('MultiDevice - selectById', function () {
                 .then(() => queue.push('6'))
 
             return devices
-                .then(() => q.all(A, B))
+                .then(() => q.all([A, B]))
                 .then(() => assert.equal(queue.sort().join(''), '0123456'))
         })
     })
