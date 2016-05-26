@@ -181,6 +181,24 @@ describe('xdTesting', function() {
                         .end()
                 })
             })
+
+            describe('pairDevicesViaXDMVC', () => {
+                it('should pair a device with a other device', () => {
+                    let options = {
+                        A: templates.devices.chrome(),
+                        B: templates.devices.chrome()
+                    }
+                    let urlA
+                    return xdTesting.multiremote(options).init()
+                        .url(test.fixture.xd_gallery.url)
+                        .app().pairDevicesViaXDMVC()
+                        .app().getEventCounter().then((counterA, counterB) => {
+                            assert.equal(counterA['XDconnection'], 1)
+                            assert.equal(counterB['XDconnection'], 1)
+                        })
+                        .end()
+                })
+            })
         })
 
     })
