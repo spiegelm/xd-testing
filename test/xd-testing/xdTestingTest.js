@@ -167,7 +167,7 @@ describe('xdTesting', function() {
                 //})
             })
 
-            describe('pairDevicesViaUrl', () => {
+            describe('pairDevicesViaUrl @large', () => {
                 it('should pair a device with a other device', () => {
                     let options = {
                         A: templates.devices.chrome(),
@@ -184,7 +184,7 @@ describe('xdTesting', function() {
                 })
             })
 
-            describe('pairDevicesViaXDMVC', () => {
+            describe('pairDevicesViaXDMVC @large', () => {
                 it('should pair a device with a other device', () => {
                     let options = {
                         A: templates.devices.chrome(),
@@ -202,7 +202,7 @@ describe('xdTesting', function() {
                 })
             })
 
-            describe('waitForConnectedDevices', () => {
+            describe('waitForConnectedDevices @large', () => {
                 it('for 0 connected devices should return immediately', () => {
                     let options = {
                         A: templates.devices.chrome()
@@ -241,7 +241,7 @@ describe('xdTesting', function() {
                 })
             })
 
-            describe('waitForEvent', () => {
+            describe('waitForEvent @large', () => {
                 it('should wait for the next event of the given type', () => {
                     let options = {
                         A: templates.devices.chrome()
