@@ -17,9 +17,8 @@ describe('XD-MVC Gallery @large', function () {
 
     // Set test timeout
     test.timeout(180 * 1000)
-    test.baseUrl = "http://localhost:8082/gallery.html"
-    test.adapter = require('../../lib/adapter/xdmvc')
 
+    test.baseUrl = "http://localhost:8082/gallery.html"
     xdTesting.appFramework = xdTesting.adapter.xdmvc
 
     describe('eventLogger', () => {
