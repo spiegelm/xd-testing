@@ -66,6 +66,18 @@ describe('xdTesting', function() {
                 .end()
         })
 
+        it('should not load xdTesting.baseUrl if it\'s not set @large', () => {
+            let options = {
+                A: templates.devices.chrome()
+            }
+
+            xdTesting.baseUrl = null
+
+            return xdTesting.multiremote(options).init()
+                .getUrl().then(url => assert.equal(url, 'data:,'))
+                .end()
+        })
+
         describe('for XD-MVC', () => {
 
             // Define a custom adapter
