@@ -248,12 +248,12 @@ describe('xdTesting', function() {
                     let waitFor = devices
                         .then(() => queue += '1')
                         .app().waitForConnectedDevices(1)
+                        .then(() => queue += '3')
 
                     let trigger = devices
                         .then(() => q.delay(1000))
                         .then(() => queue += '2')
                         .app().pairDevicesViaXDMVC()
-                        .then(() => queue += '3')
 
                     return waitFor
                         .then(() => assert.equal(queue, '0123'))
@@ -293,10 +293,9 @@ describe('xdTesting', function() {
                         .execute(function() {
                             window.eventLogger.eventCounter['customEvent'] = 1
                         })
-                        .then(() => queue += '4')
 
                     return waitFor
-                        .then(() => assert.equal(queue, '012349'))
+                        .then(() => assert.equal(queue, '01239'))
                         .end()
                 })
             })
