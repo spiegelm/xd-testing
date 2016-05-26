@@ -27,7 +27,7 @@ describe('XD-MVC Gallery @large', function () {
     afterEach(xdTesting.reset)
 
     describe('eventLogger', () => {
-        it('should count XDconnection events', () => {
+        it('should increase XDconnection event count after pairing', () => {
             let options = {
                 A: templates.devices.chrome(),
                 B: templates.devices.chrome()
@@ -36,23 +36,16 @@ describe('XD-MVC Gallery @large', function () {
             let loadedUrlA
             return xdTesting.multiremote(options).init()
                 .url(test.baseUrl)
-                .app().injectEventLogger()
                 .app().getEventCounter()
                 .then(counterA => assert.equal(counterA['XDconnection'], 0))
                 // Share url from A to B
                 .getUrl().then(urlA => loadedUrlA = urlA)
                 .selectById('B', B => B
                     .url(loadedUrlA)
-                    .app().injectEventLogger()
                 )
                 // Assert connection event
                 .selectById('A', A => A
-                    .waitUntil(() => A
-                        .app().getEventCounter()
-                        .then(counter => counter['XDconnection'] === 1)
-                    )
-                    .app().getEventCounter()
-                    .then(counter => assert.equal(counter['XDconnection'], 1))
+                    .app().waitForEventCount('XDconnection', 1)
                 )
                 .end()
         })
@@ -65,10 +58,11 @@ describe('XD-MVC Gallery @large', function () {
         }
         return xdTesting.multiremote(options).init()
             .app().pairDevicesViaURL(test.baseUrl)
-            .selectById('A', deviceA => deviceA
-                .app().getEventCounter()
-                .then(counter => assert.equal(counter['XDconnection'], 1))
-            )
+            .app().getConnectedDeviceCount()
+            .then((countA, countB) => {
+                assert.equal(countA, 2)
+                assert.equal(countA, 2)
+            })
             .end()
     });
 
