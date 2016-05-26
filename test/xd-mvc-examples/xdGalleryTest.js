@@ -72,58 +72,6 @@ describe('XD-MVC Gallery @large', function () {
             .end()
     });
 
-    describe('prerequisites', () => {
-        it('browsers should not share cookies between sessions', () => {
-            let options = {
-                A: templates.devices.chrome(),
-                B: templates.devices.chrome()
-            }
-
-            let devices = xdTesting.multiremote(options).init()
-                .app().pairDevicesViaURL(test.baseUrl)
-                .selectById('A', deviceA => deviceA
-                    // Set cookie and verify it's there
-                    .setCookie({name: 'test_cookieA', value: 'A'})
-                    .getCookie('test_cookieA').then(cookie => {
-                        assert.notEqual(cookie, null)
-                        assert.equal(cookie.name, 'test_cookieA')
-                        assert.equal(cookie.value, 'A')
-                    })
-                )
-                .selectById('B', deviceB => deviceB
-                    // Set another cookie and verify it's there
-                    .setCookie({name: 'test_cookieB', value: 'B'})
-                    .getCookie('test_cookieB').then(cookie => {
-                        assert.notEqual(cookie, null)
-                        assert.equal(cookie.name, 'test_cookieB')
-                        assert.equal(cookie.value, 'B')
-                    })
-                    // Verify the cookie from the other browser is not here
-                    .getCookie('test_cookieA').then(cookie => {
-                        assert.equal(cookie, null)
-                    })
-                )
-                .end()
-        })
-
-        it('browsers should not share local storage between sessions', () => {
-            let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
-
-            let devices = xdTesting.multiremote(options).init()
-                .app().pairDevicesViaURL(test.baseUrl)
-                .selectById('A', deviceA => deviceA
-                    // Set local storage item and verify it's there
-                    .execute(() => localStorage.setItem('test_storageA', 'A'))
-                    .execute(() => localStorage.getItem('test_storageA')).then(ret => assert.equal(ret.value, 'A'))
-                )
-                .selectById('B', deviceB => deviceB
-                    // Verify the item from the other browser is not here
-                    .execute(() => localStorage.getItem('test_storageA')).then(ret =>assert.equal(ret.value, null))
-                )
-                .end()
-        })
-    })
-
     describe('should show the selected image on the other devices', () => {
 
         xdTesting.loadSetups().forEach(setup => {
