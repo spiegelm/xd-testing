@@ -25,6 +25,26 @@ describe('xdTesting', function() {
     beforeEach(xdTesting.reset)
     afterEach(xdTesting.reset)
 
+    describe('#reset', () => {
+        it('should set baseUrl to null', () => {
+            xdTesting.baseUrl = 'http://localhost/'
+            xdTesting.reset()
+            assert.equal(xdTesting.baseUrl, null)
+        })
+
+        it('should set appFramework to null', () => {
+            xdTesting.appFramework = xdTesting.adapter.xdmvc
+            xdTesting.reset()
+            assert.equal(xdTesting.appFramework, null)
+        })
+
+        it('should set waitForTimeout to 60s', () => {
+            xdTesting.waitForTimeout = 0
+            xdTesting.reset()
+            assert.equal(xdTesting.waitForTimeout, 60 * 1000)
+        })
+    })
+
     describe('command arguments @large', function () {
         it('are part of a step\'s command name', function () {
             let scenario = {A: templates.devices.chrome()}
