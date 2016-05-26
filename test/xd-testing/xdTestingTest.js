@@ -243,12 +243,12 @@ describe('xdTesting', function() {
             })
 
             describe('pairDevicesViaXDMVC @large', () => {
-                it('should pair a device with a other device', () => {
+                it('should pair a device with an other device', () => {
                     let options = {
                         A: templates.devices.chrome(),
                         B: templates.devices.chrome()
                     }
-                    let urlA
+
                     return xdTesting.multiremote(options).init()
                         .url(test.fixture.xd_gallery.url)
                         .app().pairDevicesViaXDMVC()
