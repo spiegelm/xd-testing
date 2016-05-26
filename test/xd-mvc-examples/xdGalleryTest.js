@@ -60,8 +60,8 @@ describe('XD-MVC Gallery @large', function () {
             .app().pairDevicesViaURL(test.baseUrl)
             .app().getConnectedDeviceCount()
             .then((countA, countB) => {
-                assert.equal(countA, 2)
-                assert.equal(countA, 2)
+                assert.equal(countA, 1)
+                assert.equal(countB, 1)
             })
             .end()
     });
