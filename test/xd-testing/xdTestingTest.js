@@ -300,6 +300,49 @@ describe('xdTesting', function() {
                 })
             })
 
+            describe('waitForEventCount @large', () => {
+                it('should wait for the amount of events', () => {
+                    let options = {
+                        A: templates.devices.chrome()
+                    }
+
+                    let queue = ''
+                    let devices = xdTesting.multiremote(options).init()
+                        .url(test.fixture.xd_gallery.url)
+                        .app().injectEventLogger()
+                        .then(() => queue += '0')
+                        // Init a custom event counter
+                        .execute(function() {
+                            window.eventLogger.eventCounter['customEvent'] = 0
+                        })
+                        .then(() => queue += '1')
+
+                    let waitFor = devices
+                        .then(() => queue += '2')
+                        .app().waitForEventCount('customEvent', 1)
+                        .then(() => queue += '4')
+                        .app().waitForEventCount('customEvent', 2)
+                        .then(() => queue += '9')
+                        .end()
+
+                    let trigger = devices
+                        .then(() => q.delay(1000))
+                        .then(() => queue += '3')
+                        .execute(function() {
+                            window.eventLogger.eventCounter['customEvent'] = 1
+                        })
+                        .then(() => q.delay(1000))
+                        .then(() => queue += '5')
+                        .execute(function() {
+                            window.eventLogger.eventCounter['customEvent'] = 2
+                        })
+
+                    return waitFor
+                        .then(() => assert.equal(queue, '0123459'))
+                        .end()
+                })
+            })
+
             describe('hooks', () => {
                 it('should inject event logger after loading url', () => {
                     let options = {
