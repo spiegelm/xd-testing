@@ -18,16 +18,41 @@ describe('XD-MVC Maps @large', function () {
     // Set test timeout
     test.timeout(180 * 1000)
     test.pauseTime = 5 * 1000
-    test.baseUrl = "http://localhost:8080/maps.html"
-    test.adapter = require('../../lib/adapter/xdmvc')
+
+    xdTesting.baseUrl = "http://localhost:8080/maps.html"
+    xdTesting.appFramework = xdTesting.adapter.xdmvc
+
+    /**
+     * @returns {WebdriverIO.Client}
+     */
+    xdTesting.appFramework.prototype.pairTwoDevicesViaMapsGui = function() {
+        return this.devices
+            .selectAny(device => {
+                device = device
+                    // Pair any device with any other device
+                    .app().injectEventLogger()
+                    .click('#menu-button')
+                    .waitUntil(() => device
+                        // Wait until an other device shows up in list
+                        .isVisible('//*[@id="availableDeviceList"]//*[@class="id"]')
+                        // If list does not contain other devices, refresh list and keep waiting
+                        .then(isVisible => isVisible || device.click('#showDevices').then(() => false))
+                    )
+                    // Click on device id
+                    .click('//*[@id="availableDeviceList"]//*[@class="id"]')
+
+                return device
+                    .waitUntil(() => device
+                    // Wait for connection event
+                        .app().getEventCounter().then(counter => counter['XDconnection'] === 1))
+            })
+    }
 
     it('should pair via XDmvc.connectTo', function () {
         let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
 
         let devices = xdTesting.multiremote(options).init()
-            .url(test.baseUrl)
-        devices = test.adapter.pairDevicesViaXDMVC(devices)
-        return devices
+            .app().pairDevicesViaXDMVC()
             .selectById('A', deviceA => deviceA
                 .execute(function () {
                     return XDmvc.getConnectedDevices().length
@@ -37,41 +62,13 @@ describe('XD-MVC Maps @large', function () {
             .end()
     })
 
-    /**
-     * @param {WebdriverIO.Client} devices
-     * @returns {WebdriverIO.Client}
-     */
-    var pairTwoDevicesViaMapsGui = devices => {
-        return devices
-            .selectAny(device => device
-                // Pair any device with any other device
-                .execute(test.adapter.injectEventLogger)
-                .click('#menu-button')
-                .waitUntil(() => device
-                    // Wait until an other device shows up in list
-                    .isVisible('//*[@id="availableDeviceList"]//*[@class="id"]')
-                        // If list does not contain other devices, refresh list and keep waiting
-                        .then(isVisible => isVisible || device.click('#showDevices').then(() => false))
-                )
-                // Click on device id
-                .click('//*[@id="availableDeviceList"]//*[@class="id"]')
-                .waitUntil(() => device
-                    // Wait for connection event
-                    .execute(test.adapter.getEventCounter).then(function (ret) {
-                        return ret.value.XDconnection == 1;
-                    })
-                )
-            )
-    }
-
 
     it('should pair via GUI', function () {
         let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
 
-        let devices = xdTesting.multiremote(options).init()
+        return xdTesting.multiremote(options).init()
             .url(test.baseUrl)
-
-        return pairTwoDevicesViaMapsGui(devices)
+            .app().pairTwoDevicesViaMapsGui()
             .end()
     })
 
@@ -87,10 +84,10 @@ describe('XD-MVC Maps @large', function () {
 
                 let lastXDSyncCounts
 
-                let devices = xdTesting.multiremote(setup.devices).init()
+                return xdTesting.multiremote(setup.devices).init()
                     .url(test.baseUrl)
                     .name(setupName)
-                return test.adapter.pairDevicesViaXDMVC(devices)
+                    .app().pairDevicesViaXDMVC()
                     .checkpoint('paired')
                     .selectById('A',
                         // Omit callback for A
