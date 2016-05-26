@@ -142,7 +142,7 @@ describe('xdTesting', function() {
                 A: templates.devices.chrome()
             }
 
-            xdTesting.baseUrl = 'http://localhost/'
+            xdTesting.baseUrl = test.fixture.basic_app.url
 
             return xdTesting.multiremote(options).init()
                 .getUrl().then(url => assert.equal(url, xdTesting.baseUrl))
