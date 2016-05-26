@@ -42,9 +42,8 @@ describe('XD-MVC Maps @large', function () {
                     )
                     // Click on device id
                     .click('//*[@id="availableDeviceList"]//*[@class="id"]')
-                    .waitUntil(() => device
-                    // Wait for connection event
-                        .app().getEventCounter().then(counter => counter['XDconnection'] === 1))
+                    // Wait for connection
+                    .app().waitForConnectedDeviceCount(1)
                 )
         }
 
@@ -53,22 +52,23 @@ describe('XD-MVC Maps @large', function () {
     afterEach(xdTesting.reset)
 
     it('should pair via XDmvc.connectTo', function () {
-        let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+        let options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
 
         return xdTesting.multiremote(options).init()
             .app().pairDevicesViaXDMVC()
-            .selectById('A', deviceA => deviceA
-                .execute(function () {
-                    return XDmvc.getConnectedDevices().length
-                })
-                .then(ret => assert.equal(ret.value, 1))
-            )
+            .app().waitForConnectedDeviceCount(1)
             .end()
     })
 
 
     it('should pair via GUI', function () {
-        let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
+        let options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
 
         return xdTesting.multiremote(options).init()
             .url(test.baseUrl)
