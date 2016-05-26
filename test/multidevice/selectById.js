@@ -21,7 +21,11 @@ describe('MultiDevice - selectById', function () {
     afterEach(xdTesting.reset)
 
     it('should act on the specified devices @large', function () {
-        var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()}
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome(),
+            C: templates.devices.chrome()
+        }
 
         return xdTesting.multiremote(options)
             .init()
@@ -31,10 +35,15 @@ describe('MultiDevice - selectById', function () {
                 .click('#button')
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '1')))
             )
+            .end()
     })
 
     it('should not act on other devices @large', function () {
-        var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()}
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome(),
+            C: templates.devices.chrome()
+        }
 
         return xdTesting.multiremote(options)
             .init()
@@ -47,6 +56,7 @@ describe('MultiDevice - selectById', function () {
             .selectById('A', device => device
                 .getText('#counter').then(textA => assert.equal(textA, '-'))
             )
+            .end()
     })
 
     describe('with complementCallback', () => {
