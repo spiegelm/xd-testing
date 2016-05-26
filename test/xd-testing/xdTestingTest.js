@@ -8,11 +8,11 @@ var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates')
 var Flow = require('../../lib/flow/flow')
 
-describe('xdTesting @large', function() {
+describe('xdTesting', function() {
 
     let baseUrl = 'http://localhost:8090/'
 
-    describe('command arguments', function () {
+    describe('command arguments @large', function () {
         it('are part of a step\'s command name', function () {
             let scenario = {A: templates.devices.chrome()}
             return xdTesting.multiremote(scenario).init()
@@ -29,7 +29,7 @@ describe('xdTesting @large', function() {
         })
     })
 
-    describe('#getFlow', function () {
+    describe('#getFlow @large', function () {
         it('returns the flow object', function () {
             let scenario = {A: templates.devices.chrome()}
             return xdTesting.multiremote(scenario).init()
@@ -49,14 +49,17 @@ describe('xdTesting @large', function() {
 
     describe('app framework integration', () => {
 
-        before(() => {
-            xdTesting.baseUrl = 'http://localhost/'
+        beforeEach(() => {
+            // Reset config
+            xdTesting.baseUrl = null
         })
 
-        it('should load xdTesting.baseUrl after init', () => {
+        it('should load xdTesting.baseUrl after init @large', () => {
             let options = {
                 A: templates.devices.chrome()
             }
+
+            xdTesting.baseUrl = 'http://localhost/'
 
             return xdTesting.multiremote(options).init()
                 .getUrl().then(url => assert.equal(url, xdTesting.baseUrl))
@@ -68,7 +71,7 @@ describe('xdTesting @large', function() {
             // Define a custom adapter
             xdTesting.appFramework = xdTesting.adapter.xdmvc
 
-            it('app property has devices', () => {
+            it('app property has devices @medium', () => {
                 let options = {
                     A: templates.devices.chrome()
                 }
@@ -84,7 +87,7 @@ describe('xdTesting @large', function() {
                 return devices.end()
             })
 
-            it('app property should have getEventCounter', () => {
+            it('app property should have getEventCounter @medium', () => {
                 let options = {
                     A: templates.devices.chrome()
                 }
@@ -100,12 +103,13 @@ describe('xdTesting @large', function() {
                 return devices.end()
             })
 
-            it.skip('should get the event counter after loading a url', () => {
+            it('should get the event counter after loading a url @large', () => {
                 let options = {
                     A: templates.devices.chrome()
                 }
+                xdTesting.baseUrl = "http://localhost:8082/gallery.html"
                 return xdTesting.multiremote(options).init()
-                    // TODO load a XD-MVC app
+                     //TODO load a XD-MVC app
                     .app().injectEventLogger()
                     .app().getEventCounter().then(counter => {
                         assert.property(counter, 'XDdisconnection')
@@ -115,6 +119,14 @@ describe('xdTesting @large', function() {
                         assert.property(counter, 'XDsync')
                         assert.property(counter, 'XDserverReady')
                         assert.property(counter, 'XDothersRolesChanged')
+
+                        assert.typeOf(counter['XDdisconnection'], 'number')
+                        assert.typeOf(counter['XDconnection'], 'number')
+                        assert.typeOf(counter['XDdevice'], 'number')
+                        assert.typeOf(counter['XDroles'], 'number')
+                        assert.typeOf(counter['XDsync'], 'number')
+                        assert.typeOf(counter['XDserverReady'], 'number')
+                        assert.typeOf(counter['XDothersRolesChanged'], 'number')
                     })
                     .end()
 
