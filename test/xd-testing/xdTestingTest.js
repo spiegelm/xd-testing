@@ -238,6 +238,7 @@ describe('xdTesting', function() {
                     return waitFor
                         .then(() => assert.equal(queue, '012349'))
                 })
+            })
         })
 
     })
