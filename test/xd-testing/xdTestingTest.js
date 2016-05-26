@@ -223,23 +223,6 @@ describe('xdTesting', function() {
                         assert.typeOf(counter['XDothersRolesChanged'], 'number')
                     })
                     .end()
-
-                    /**
-                     * App property?
-                     */
-
-                    //// Pair devices via url
-                    //.app.pairDevicesViaUrl()
-                    // Get event counter
-                    //.app.getEventCounter().then(counter => assert.equal(counter.XDconnection == 1))
-                // Wait for the next event of a type
-                //.app.waitForEvent('XDconnection')
-                //// Wait until the event type counter equals a value
-                //.app.waitForEventCount('XDconnection', 2)
-                //// Custom command
-                //.app.addCommand('pairDevicesViaGUI', function() {
-                //    return this.click(...)
-                //})
             })
 
             describe('pairDevicesViaUrl @large', () => {
