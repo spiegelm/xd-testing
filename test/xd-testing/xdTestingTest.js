@@ -277,19 +277,49 @@ describe('xdTesting', function() {
                 })
             })
 
-            describe('waitForConnectedDevices @large', () => {
-                it('for 0 connected devices should return immediately', () => {
+            describe('getConnectedDeviceCount', () => {
+                it('for 1 device should return 0', () => {
                     let options = {
                         A: templates.devices.chrome()
                     }
 
                     return xdTesting.multiremote(options).init()
                         .url(test.fixture.xd_gallery.url)
-                        .app().waitForConnectedDevices(0)
+                        .app().getConnectedDeviceCount()
+                        .then(count => assert.equal(count, 0))
                         .end()
                 })
 
-                it('for 1 connected devices should return after connection', () => {
+                it('for 2 connected devices should return 1', () => {
+                    let options = {
+                        A: templates.devices.chrome(),
+                        B: templates.devices.chrome()
+                    }
+
+                    return xdTesting.multiremote(options).init()
+                        .app().pairDevicesViaURL(test.fixture.xd_gallery.url)
+                        .app().getConnectedDeviceCount()
+                        .then((countA, countB) => {
+                            assert.equal(countA, 1)
+                            assert.equal(countB, 1)
+                        })
+                        .end()
+                })
+            })
+
+            describe('waitForConnectedDeviceCount @large', () => {
+                it('for 0 connected devices should resolve immediately', () => {
+                    let options = {
+                        A: templates.devices.chrome()
+                    }
+
+                    return xdTesting.multiremote(options).init()
+                        .url(test.fixture.xd_gallery.url)
+                        .app().waitForConnectedDeviceCount(0)
+                        .end()
+                })
+
+                it('for 1 connected devices should solve after connection', () => {
                     let options = {
                         A: templates.devices.chrome(),
                         B: templates.devices.chrome()
@@ -302,7 +332,7 @@ describe('xdTesting', function() {
 
                     let waitFor = devices
                         .then(() => queue += '1')
-                        .app().waitForConnectedDevices(1)
+                        .app().waitForConnectedDeviceCount(1)
                         .then(() => queue += '3')
 
                     let trigger = devices
