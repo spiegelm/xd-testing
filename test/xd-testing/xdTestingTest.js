@@ -201,6 +201,45 @@ describe('xdTesting', function() {
                 })
             })
 
+            describe('waitForConnectedDevices', () => {
+                it('for 0 connected devices should return immediately', () => {
+                    let options = {
+                        A: templates.devices.chrome()
+                    }
+
+                    return xdTesting.multiremote(options).init()
+                        .url(test.fixture.xd_gallery.url)
+                        .app().waitForConnectedDevices(0)
+                        .end()
+                })
+
+                it('for 1 connected devices should return after connection', () => {
+                    let options = {
+                        A: templates.devices.chrome(),
+                        B: templates.devices.chrome()
+                    }
+
+                    let queue = ''
+                    let devices = xdTesting.multiremote(options).init()
+                        .url(test.fixture.xd_gallery.url)
+                        .then(() => queue += '0')
+
+                    let waitFor = devices
+                        .then(() => queue += '1')
+                        .app().waitForConnectedDevices(1)
+
+                    let trigger = devices
+                        .then(() => q.delay(1000))
+                        .then(() => queue += '2')
+                        .app().pairDevicesViaXDMVC()
+                        .then(() => queue += '3')
+
+                    return waitFor
+                        .then(() => assert.equal(queue, '0123'))
+                        .end()
+                })
+            })
+
             describe('waitForEvent', () => {
                 it('should wait for the next event of the given type', () => {
                     let options = {
@@ -237,6 +276,7 @@ describe('xdTesting', function() {
 
                     return waitFor
                         .then(() => assert.equal(queue, '012349'))
+                        .end()
                 })
             })
         })
