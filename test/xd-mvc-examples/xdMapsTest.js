@@ -28,20 +28,21 @@ describe('XD-MVC Maps @large', function () {
     xdTesting.appFramework.prototype.pairTwoDevicesViaMapsGui = function() {
         return this.devices
             .selectAny(device => {
-                device = device
+                return device
                     // Pair any device with any other device
                     .app().injectEventLogger()
                     .click('#menu-button')
-                    .waitUntil(() => device
-                        // Wait until an other device shows up in list
-                        .isVisible('//*[@id="availableDeviceList"]//*[@class="id"]')
-                        // If list does not contain other devices, refresh list and keep waiting
-                        .then(isVisible => isVisible || device.click('#showDevices').then(() => false))
-                    )
+                    .waitUntil(() => {
+                        return device
+                            // Wait until an other device shows up in list
+                            .isVisible('//*[@id="availableDeviceList"]//*[@class="id"]')
+                            // If list does not contain other devices, refresh list and keep waiting
+                            .then(isVisible => isVisible || device.click('#showDevices').then(() => {
+                                return false
+                            }))
+                    })
                     // Click on device id
                     .click('//*[@id="availableDeviceList"]//*[@class="id"]')
-
-                return device
                     .waitUntil(() => device
                     // Wait for connection event
                         .app().getEventCounter().then(counter => counter['XDconnection'] === 1))
@@ -51,7 +52,7 @@ describe('XD-MVC Maps @large', function () {
     it('should pair via XDmvc.connectTo', function () {
         let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
 
-        let devices = xdTesting.multiremote(options).init()
+        return xdTesting.multiremote(options).init()
             .app().pairDevicesViaXDMVC()
             .selectById('A', deviceA => deviceA
                 .execute(function () {
