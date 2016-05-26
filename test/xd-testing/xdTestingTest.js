@@ -80,7 +80,6 @@ describe('xdTesting', function() {
                 let app = devices
                     .app()
 
-                console.log('app', app)
                 assert.property(app, 'devices')
                 assert.isDefined(app.devices)
 
@@ -96,7 +95,6 @@ describe('xdTesting', function() {
                 let app = devices
                     .app()
 
-                console.log('app', app)
                 assert.property(app, 'getEventCounter')
                 assert.instanceOf(app.getEventCounter, Function)
 
