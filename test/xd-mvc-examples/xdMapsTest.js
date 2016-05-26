@@ -13,13 +13,13 @@ var q = require('q')
 
 
 describe('XD-MVC Maps @large', function () {
-    var test = this;
+    var test = this
+
+    // Set test timeout
+    test.timeout(180 * 1000)
+    test.pauseTime = 5 * 1000
 
     beforeEach(() => {
-        // Set test timeout
-        test.timeout(180 * 1000)
-        test.pauseTime = 5 * 1000
-
         xdTesting.reset()
         xdTesting.baseUrl = "http://localhost:8080/maps.html"
         xdTesting.appFramework = xdTesting.adapter.xdmvc

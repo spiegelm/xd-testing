@@ -15,11 +15,11 @@ var q = require('q')
 describe('XD-MVC Gallery @large', function () {
     var test = this
 
-    beforeEach(() => {
-        // Set test timeout
-        test.timeout(180 * 1000)
+    // Set test timeout
+    test.timeout(180 * 1000)
+    test.baseUrl = "http://localhost:8082/gallery.html"
 
-        test.baseUrl = "http://localhost:8082/gallery.html"
+    beforeEach(() => {
         xdTesting.reset()
         xdTesting.appFramework = xdTesting.adapter.xdmvc
     })
