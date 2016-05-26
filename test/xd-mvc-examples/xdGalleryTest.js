@@ -20,6 +20,8 @@ describe('XD-MVC Gallery @large', function () {
     test.baseUrl = "http://localhost:8082/gallery.html"
     test.adapter = require('../../lib/adapter/xdmvc')
 
+    xdTesting.appFramework = xdTesting.adapter.xdmvc
+
     describe('eventLogger', () => {
         it('should count XDconnection events', () => {
             let options = {
@@ -30,29 +32,23 @@ describe('XD-MVC Gallery @large', function () {
             let loadedUrlA
             return xdTesting.multiremote(options).init()
                 .url(test.baseUrl)
-                .execute(test.adapter.injectEventLogger)
-                .execute(test.adapter.getEventCounter)
-                .then(function (retA) {
-                    assert.equal(retA.value.XDconnection, 0)
-                })
+                .app().injectEventLogger()
+                .app().getEventCounter()
+                .then(counterA => assert.equal(counterA['XDconnection'], 0))
                 // Share url from A to B
                 .getUrl().then(urlA => loadedUrlA = urlA)
                 .selectById('B', B => B
                     .url(loadedUrlA)
-                    .execute(test.adapter.injectEventLogger)
+                    .app().injectEventLogger()
                 )
                 // Assert connection event
                 .selectById('A', A => A
                     .waitUntil(() => A
-                        .execute(test.adapter.getEventCounter)
-                        .then(function (retA) {
-                            return retA.value.XDconnection === 1
-                        })
+                        .app().getEventCounter()
+                        .then(counter => counter['XDconnection'] === 1)
                     )
-                    .execute(test.adapter.getEventCounter)
-                    .then(function (ret) {
-                        assert.equal(ret.value.XDconnection, 1)
-                    })
+                    .app().getEventCounter()
+                    .then(counter => assert.equal(counter['XDconnection'], 1))
                 )
                 .end()
         })
@@ -63,12 +59,11 @@ describe('XD-MVC Gallery @large', function () {
             A: templates.devices.chrome(),
             B: templates.devices.chrome()
         }
-        let devices = xdTesting.multiremote(options).init()
-        devices = test.adapter.pairDevicesViaURL(devices, test.baseUrl)
-        return devices
+        return xdTesting.multiremote(options).init()
+            .app().pairDevicesViaURL(test.baseUrl)
             .selectById('A', deviceA => deviceA
-                .execute(test.adapter.getEventCounter)
-                .then(ret => assert.equal(ret.value.XDconnection, 1))
+                .app().getEventCounter()
+                .then(counter => assert.equal(counter['XDconnection'], 1))
             )
             .end()
     });
@@ -81,8 +76,7 @@ describe('XD-MVC Gallery @large', function () {
             }
 
             let devices = xdTesting.multiremote(options).init()
-            devices = test.adapter.pairDevicesViaURL(devices, test.baseUrl)
-            return devices
+                .app().pairDevicesViaURL(test.baseUrl)
                 .selectById('A', deviceA => deviceA
                     // Set cookie and verify it's there
                     .setCookie({name: 'test_cookieA', value: 'A'})
@@ -112,8 +106,7 @@ describe('XD-MVC Gallery @large', function () {
             let options = {A: templates.devices.chrome(), B: templates.devices.chrome()}
 
             let devices = xdTesting.multiremote(options).init()
-            devices = test.adapter.pairDevicesViaURL(devices, test.baseUrl)
-            return devices
+                .app().pairDevicesViaURL(test.baseUrl)
                 .selectById('A', deviceA => deviceA
                     // Set local storage item and verify it's there
                     .execute(() => localStorage.setItem('test_storageA', 'A'))
@@ -138,9 +131,8 @@ describe('XD-MVC Gallery @large', function () {
             it('on ' + setupName, function () {
                 let imageUrlA
 
-                let devices = xdTesting.multiremote(options).init()
-                devices = test.adapter.pairDevicesViaURL(devices, test.baseUrl)
-                return devices
+                return xdTesting.multiremote(options).init()
+                    .app().pairDevicesViaURL(test.baseUrl)
                     .name(setupName)
                     .checkpoint('load app')
                     .selectById('A',
