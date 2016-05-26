@@ -27,26 +27,22 @@ describe('XD-MVC Maps @large', function () {
      */
     xdTesting.appFramework.prototype.pairTwoDevicesViaMapsGui = function() {
         return this.devices
-            .selectAny(device => {
-                return device
-                    // Pair any device with any other device
-                    .app().injectEventLogger()
-                    .click('#menu-button')
-                    .waitUntil(() => {
-                        return device
-                            // Wait until an other device shows up in list
-                            .isVisible('//*[@id="availableDeviceList"]//*[@class="id"]')
-                            // If list does not contain other devices, refresh list and keep waiting
-                            .then(isVisible => isVisible || device.click('#showDevices').then(() => {
-                                return false
-                            }))
-                    })
-                    // Click on device id
-                    .click('//*[@id="availableDeviceList"]//*[@class="id"]')
-                    .waitUntil(() => device
-                    // Wait for connection event
-                        .app().getEventCounter().then(counter => counter['XDconnection'] === 1))
-            })
+            .selectAny(device => device
+                // Pair any device with any other device
+                .app().injectEventLogger()
+                .click('#menu-button')
+                .waitUntil(() => device
+                    // Wait until an other device shows up in list
+                    .isVisible('//*[@id="availableDeviceList"]//*[@class="id"]')
+                    // If list does not contain other devices, refresh list and keep waiting
+                    .then(isVisible => isVisible || device.click('#showDevices').then(() => false))
+                )
+                // Click on device id
+                .click('//*[@id="availableDeviceList"]//*[@class="id"]')
+                .waitUntil(() => device
+                // Wait for connection event
+                    .app().getEventCounter().then(counter => counter['XDconnection'] === 1))
+            )
     }
 
     it('should pair via XDmvc.connectTo', function () {
