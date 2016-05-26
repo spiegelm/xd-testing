@@ -19,7 +19,10 @@ describe('XD-MVC Gallery @large', function () {
     test.timeout(180 * 1000)
 
     test.baseUrl = "http://localhost:8082/gallery.html"
+    xdTesting.reset()
     xdTesting.appFramework = xdTesting.adapter.xdmvc
+
+    after(() => xdTesting.reset())
 
     describe('eventLogger', () => {
         it('should count XDconnection events', () => {

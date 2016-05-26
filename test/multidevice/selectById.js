@@ -11,6 +11,7 @@ var q = require('q')
 describe('MultiDevice - selectById', function () {
     var test = this
 
+    xdTesting.reset()
     test.baseUrl = "http://localhost:8090/"
 
     it('should act on the specified devices @large', function () {

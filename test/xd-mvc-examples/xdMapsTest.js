@@ -19,8 +19,11 @@ describe('XD-MVC Maps @large', function () {
     test.timeout(180 * 1000)
     test.pauseTime = 5 * 1000
 
+    xdTesting.reset()
     xdTesting.baseUrl = "http://localhost:8080/maps.html"
     xdTesting.appFramework = xdTesting.adapter.xdmvc
+
+    after(() => xdTesting.reset())
 
     /**
      * @returns {WebdriverIO.Client}
