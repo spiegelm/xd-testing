@@ -6,9 +6,7 @@
   "main": "lib/index.js",
   "scripts": {
     "postinstall": "./node_modules/.bin/bower install",
-    "pretest": "npm run cleanup",
-    "test": "./node_modules/.bin/mocha --recursive test/",
-    "cleanup": "rm -rf screenshots/*"
+    "test": "./node_modules/.bin/mocha --recursive test/"
   },
   "dependencies": {
     "bower": "^1.7.7",
