@@ -22,7 +22,10 @@ describe('xdTesting', function() {
     }
 
     // Reset config
-    beforeEach(xdTesting.reset)
+    beforeEach(function() {
+        this.timeout(180 * 1000)
+        xdTesting.reset()
+    })
     afterEach(xdTesting.reset)
 
     describe('prerequisites @large', () => {
