@@ -1,5 +1,8 @@
 "use strict"
 
+/**
+ * @type {Chai.Assert}
+ */
 var assert = require('chai').assert
 var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates')
@@ -8,23 +11,23 @@ var q = require('q')
 describe('MultiDevice - selectById', function () {
     var test = this
 
-    test.baseUrl = "http://localhost:8090/"
-
+    // Config
     beforeEach(() => {
-        test.devices = {}
+        xdTesting.reset()
+        test.baseUrl = "http://localhost:8090/"
     })
 
-    afterEach(function () {
-        // Close browsers before completing a test
-        if (test.devices && test.devices.endAll) {
-            return test.devices.endAll()
-        }
-    })
+    // Reset config
+    afterEach(xdTesting.reset)
 
     it('should act on the specified devices @large', function () {
-        var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()}
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome(),
+            C: templates.devices.chrome()
+        }
 
-        return test.devices = xdTesting.multiremote(options)
+        return xdTesting.multiremote(options)
             .init()
             .url(test.baseUrl)
             .selectById(['B', 'C'], selectedDevices => selectedDevices
@@ -32,37 +35,120 @@ describe('MultiDevice - selectById', function () {
                 .click('#button')
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '1')))
             )
+            .end()
     })
 
     it('should not act on other devices @large', function () {
-        var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()}
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome(),
+            C: templates.devices.chrome()
+        }
 
-        return test.devices = xdTesting.multiremote(options)
+        return xdTesting.multiremote(options)
             .init()
             .url(test.baseUrl)
             .selectById(['B', 'C'], selectedDevices => selectedDevices
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '-')))
                 .click('#button')
                 .getText('#counter').then((textB, textC) => [textB, textC].forEach(text => assert.equal(text, '1')))
-            ).then(() => test.devices.select('A')
+            )
+            .selectById('A', device => device
                 .getText('#counter').then(textA => assert.equal(textA, '-'))
             )
+            .end()
     })
 
-    it('should execute promises callback @medium', function() {
+    describe('with complementCallback', () => {
+        it('should call the complementCallback on the complementary selection', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            return xdTesting.multiremote(options)
+                .selectById('A',
+                    selectedDevices => selectedDevices
+                        .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['A'])),
+                    otherDevices => otherDevices
+                        .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['B']))
+                )
+        })
+
+        it.skip('IDEA: could return callback result to complementCallback', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            return xdTesting.multiremote(options)
+                .selectById('A',
+                    selectedDevices => selectedDevices
+                        .then(() => 'X'),
+                    otherDevices => otherDevices
+                        .then(value => assert.equal(value, 'X'))
+                )
+        })
+
+        it('should respect promise chain', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            let queue = '0'
+            return xdTesting.multiremote(options)
+                .then(() => queue += '1')
+                .selectById('A',
+                    selectedDevices => {
+                        queue += '2'
+                        return selectedDevices
+                            .then(() => queue += '3')
+                            .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['A']))
+                            .then(() => {
+                                var defer = q.defer()
+                                defer.resolve()
+                                return defer.promise.delay(1000).then(() => queue += '4')
+                            })
+                            .then(() => queue += '5')
+                    },
+                    otherDevices => {
+                        queue += '6'
+                        return otherDevices
+                            .then(() => queue += '7')
+                            .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['B']))
+                            .then(() => {
+                                var defer = q.defer()
+                                defer.resolve()
+                                return defer.promise.delay(1000).then(() => queue += '8')
+                            })
+                            .then(() => queue += '9')
+                    }
+                )
+                .then(() => queue += 'A')
+                .then(() => assert.equal(queue, '0123456789A'))
+        })
+    })
+
+    it('should respect promise chain @medium', function() {
         var options = {A: templates.devices.chrome(), B: templates.devices.chrome(), C: templates.devices.chrome()}
 
         var queue = ''
-        return test.devices = xdTesting.multiremote(options)
+        return xdTesting.multiremote(options)
             .then(() => queue += '0')
             .selectById(['B', 'C'], selectedDevices => {
                 queue += '1'
-                return selectedDevices.then(() => {
-                    queue += '2'
-                })
+                return selectedDevices
+                    .then(() => queue += '2')
+                    .then(() => {
+                        var defer = q.defer()
+                        defer.resolve()
+                        return defer.promise.delay(1000).then(() => queue += '3')
+                    })
+                    .then(() => queue += '4')
             })
-            .then(() => queue += '3')
-            .then(() => assert.equal(queue, '0123'))
+            .then(() => queue += '5')
+            .then(() => assert.equal(queue, '012345'))
             .end()
     })
 
@@ -73,7 +159,7 @@ describe('MultiDevice - selectById', function () {
             C: templates.devices.nexus4()
         }
 
-        return test.devices = xdTesting.multiremote(options)
+        return xdTesting.multiremote(options)
             .selectById(['B', 'C'], selectedDevices => selectedDevices
                 .then(() => {
                     assert.property(selectedDevices, 'options')
@@ -107,13 +193,37 @@ describe('MultiDevice - selectById', function () {
         }
 
         return xdTesting.multiremote(options)
-            .selectById('Z', () => {})
+            .selectById(['Z'], () => {})
             .then(result => {
                 throw new Error('Promise was unexpectedly fulfilled. Result: ' + result)
             }, error => {
                 assert.instanceOf(error, Error)
                 assert.equal(error.message, 'browser "Z" is not defined')
             })
+    })
+
+    it('should accept an array of ids @medium', () => {
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options)
+            .selectById(['A', 'B'], selectedDevices => selectedDevices
+                .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['A', 'B']))
+            )
+    })
+
+    it('should accept a single id @medium', () => {
+        var options = {
+            A: templates.devices.chrome(),
+            B: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options)
+            .selectById('A', selectedDevices => selectedDevices
+                .getDeviceIds().then(ret => assert.deepEqual(ret.value, ['A']))
+            )
     })
 
     it('should support nested usage @medium', function() {
@@ -124,7 +234,7 @@ describe('MultiDevice - selectById', function () {
         }
 
         let queue = ''
-        return test.devices = xdTesting.multiremote(options)
+        return xdTesting.multiremote(options)
             .selectById(['A', 'B', 'C'], allDevices => allDevices
                 .then(() => queue += '0')
                 .selectById(['B', 'C'], devicesBC => devicesBC
@@ -170,8 +280,9 @@ describe('MultiDevice - selectById', function () {
             C: templates.devices.nexus10()
         }
 
-        let commandHistoryFilter = element => ['screenshot', 'saveScreenshot', 'setImplicitDeviceSelection'].indexOf(element.name) === -1
+        let commandHistoryFilter = element => ['screenshot', 'saveScreenshot', 'setImplicitDeviceSelection', 'windowHandleSize'].indexOf(element.name) === -1
 
+        xdTesting.baseUrl = null
         return test.devices = xdTesting.multiremote(options)
             .init() // 1 command
             .url(test.baseUrl) // 1 command
@@ -222,7 +333,7 @@ describe('MultiDevice - selectById', function () {
             .end()
     })
 
-    describe('when no callback is given', () => {
+    describe('without callback', () => {
 
         it('should return device selection', () => {
             let options = {
@@ -284,7 +395,7 @@ describe('MultiDevice - selectById', function () {
                 .then(() => queue.push('6'))
 
             return devices
-                .then(() => q.all(A, B))
+                .then(() => q.all([A, B]))
                 .then(() => assert.equal(queue.sort().join(''), '0123456'))
         })
     })

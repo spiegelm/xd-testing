@@ -1,22 +1,18 @@
-# XD-Test-gallery
+# xd-testing
 
-Analyse existing tools for automated testing of web applications, starting with those mentioned in this proposal.
+A web application testing library optimized for cross-device application.
 
-Unit under testing: gallery-polymer from XD-MCD/Examples/Gallery
+xd-testing is based on [WebdriverIO](http://webdriver.io/) and uses the Selenium browser automation stack.
 
-## Selenium server + webdriver.io
+## Usage
 
-WebdriverIO: WebDriver implementation. Selenium 2.0 javascript bindings for nodejs
+Install xd-testing via npm:
 
-    # Ensure gallery-polymer.js is up and running at http://me.local:8082/gallery.html
-    # Adjust the URL via the variable baseUrl in test_webdriver_io.js
-    
-    # Start the selenium server
-    npm install
-    chmod +x start_selenium.sh
-    ./start_selenium.sh
-    
-    # In a different terminal:
-    npm install
-    node test_webdriver_io.js
+    npm install --save git+ssh://git@eday.inf.ethz.ch:spiegelm/xd-testing.git#refactor-examples
+
+To run the tests these packages are also required:
+
+    npm install --save selenium-standalone mocha
+
+You can also use any other test runner but mocha is recommended.
 
