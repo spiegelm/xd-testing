@@ -10,20 +10,34 @@ img {
     display: block;
 }
 
-/*.flows {*/
-    /*display: flex;*/
-    /*flex-direction: row*/
-/*}*/
+.flows {
+    display: flex;
+    flex-direction: row;
+}
+
+.grid-container {
+    flex: 1 1 auto;
+    display: block;
+    overflow-y: auto;
+    height: 800px;
+    word-break: break-all;
+}
 
 .grid {
-    /*flex: 1 1 auto;*/
     display: table;
     border-collapse: collapse;
-    max-width: 100%;
+}
+
+.grid:not(:first-child) {
+    border-left: 1px solid black;
 }
 
 .header-devices {
     display: table-row;
+}
+
+.header-devices:first-child, .checkpoint-row:first-child {
+    word-break: normal;
 }
 
 .header-device {

@@ -24,46 +24,48 @@
     </div>
 {{/messages}}
 
-<div class="flows" style="">
+<div class="flows">
 {{#flows}}
-    <div class="grid" style="flex: 1 1 auto">
-        <div class="header-devices">
-            {{#devices.length}}
-                <div class="header-device">
-                    Devices
-                </div>
-                {{#devices}}
+    <div class="grid-container" style="max-width: {{{grid-max-width}}}">
+        <div class="grid">
+            <div class="header-devices">
+                {{#devices.length}}
                     <div class="header-device">
-                        {{#deviceOptions}}
-                            <h2><span title="ID: {{id}}">{{name}}</span> {{{device-icon}}}</h2>
-                        {{/deviceOptions}}
+                        Devices
                     </div>
-                {{/devices}}
-            {{/devices.length}}
-        </div>
-        {{#grid}}
-            {{#.}}
-                <div class="checkpoint-row">
-                    <span class="checkpoint-name">{{name}}</span><!--{{name}}-->
-                    {{#checkpoints}}
-                        {{#.}}
-                            <div class="checkpoint">
-                                <div class="checkpoint-title"><h2>Checkpoint #{{id}}: {{name}}</h2></div>
-                                <div class="steps">
-                                    {{#steps}}
-                                        <div class="step device{{deviceId}}" id="step{{stepId}}">
-                                        <span class="commands">{{#commands}}<span
-                                                class="command">{{.}}</span>{{/commands}}</span>
-                                            {{#img}}{{imageBase64}}{{/img}}
-                                        </div>
-                                    {{/steps}}
+                    {{#devices}}
+                        <div class="header-device">
+                            {{#deviceOptions}}
+                                <h2><span title="ID: {{id}}">{{name}}</span> {{{device-icon}}}</h2>
+                            {{/deviceOptions}}
+                        </div>
+                    {{/devices}}
+                {{/devices.length}}
+            </div>
+            {{#grid}}
+                {{#.}}
+                    <div class="checkpoint-row">
+                        <span class="checkpoint-name">{{name}}</span><!--{{name}}-->
+                        {{#checkpoints}}
+                            {{#.}}
+                                <div class="checkpoint">
+                                    <div class="checkpoint-title"><h2>Checkpoint #{{id}}: {{name}}</h2></div>
+                                    <div class="steps">
+                                        {{#steps}}
+                                            <div class="step device{{deviceId}}" id="step{{stepId}}">
+                                            <span class="commands">{{#commands}}<span
+                                                    class="command">{{.}}</span>{{/commands}}</span>
+                                                {{#img}}{{imageBase64}}{{/img}}
+                                            </div>
+                                        {{/steps}}
+                                    </div>
                                 </div>
-                            </div>
-                        {{/.}}
-                    {{/checkpoints}}
-                </div>
-            {{/.}}
-        {{/grid}}
+                            {{/.}}
+                        {{/checkpoints}}
+                    </div>
+                {{/.}}
+            {{/grid}}
+        </div>
     </div>
 {{/flows}}
 </div>
