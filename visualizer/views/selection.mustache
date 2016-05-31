@@ -1,9 +1,9 @@
 <div class="flow-selection">
-    {{^allFiles}}There are no flow files. To visualize your flow files put them in <code>{{flowDirectory}}</code>{{/allFiles}}
+    {{^allFiles}}<p>There are no flow files. To visualize your flow files put them in <code>{{flowDirectory}}</code></p>{{/allFiles}}
     {{#allFiles.length}}
         <div style="display: flex; flex-direction: row;">
             <div style="flex: 1 1 auto">
-                Your flow files:
+                <p>Your flow files:</p>
                 <ul>
                     {{#allFiles}}
                         <li><a href="?files[]={{.}}">{{.}}</a></li>
@@ -12,7 +12,7 @@
             </div>
 
             <div style="flex: 1 1 auto">
-                Compare with:
+                <p>Compare with:</p>
                 <ul>
                     <li><a href="?files[]={{file}}">none</a></li>
                     {{#allFiles}}
