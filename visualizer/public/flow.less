@@ -1,83 +1,83 @@
-img {
-    border: 1px solid grey;
-}
-
-.header {
-    font-weight: bold;
-}
-
-.step .commands, .step .command {
-    display: block;
-}
-
-.flows {
-    display: flex;
-    flex-direction: row;
-}
-
-.grid-container {
-    flex: 1 1 auto;
-    display: block;
-    overflow-y: auto;
-    height: 800px;
-    word-break: break-all;
-}
-
-.grid {
-    display: table;
-    border-collapse: collapse;
-}
-
-.grid:not(:first-child) {
-    border-left: 1px solid black;
-}
-
-.header-devices {
-    display: table-row;
-}
-
-.header-devices:first-child, .checkpoint-row:first-child {
-    word-break: normal;
-}
-
-.header-device {
-    display: table-cell;
-}
-
-.checkpoint-row {
-    display: table-row;
-    border: 1px solid black;
-    border-width: 1px 0;
-}
-
-.checkpoint-name, .header-device:first-of-type {
-    display: table-cell;
-    padding: 0 10px;
-}
-
-.checkpoint-name {
-    cursor: pointer;
-}
-
-.checkpoint {
-    display: table-cell;
-    vertical-align: top;
+tr {
+  display: table-row;
 }
 
 /* All cells */
-.header-device, .checkpoint {
-    padding: 10px 5px;    
+td {
+  display: table-cell;
+  padding: 10px 5px;
 }
 
-.checkpoint-title {
-    display: none;
+.header {
+  font-weight: bold;
 }
 
-.device {
-    display: table-cell;
-    padding: 10px;
+.flows {
+  display: flex;
+  flex-direction: row;
 }
 
-.step img {
-    max-width: 100%;
+.grid-container {
+  flex: 1 1 auto;
+  display: block;
+  overflow-y: auto;
+  height: 800px;
+  word-break: break-all;
+}
+
+.grid {
+  display: table;
+  border-collapse: collapse;
+}
+
+.grid:not(:first-child) {
+  border-left: 1px solid black;
+}
+
+.header-devices {
+  &:extend(tr);
+
+  .header-device {
+    &:extend(td);
+
+    &:first-child {
+      word-break: normal;
+    }
+  }
+}
+
+.checkpoint-row {
+  &:extend(tr);
+
+  border: 1px solid black;
+  border-right-width: 0;
+  border-left-width: 0;
+
+  .checkpoint-name {
+    cursor: pointer;
+    word-break: normal;
+  }
+
+  .checkpoint, .checkpoint-name {
+    &:extend(td);
+  }
+
+  .checkpoint {
+    vertical-align: top;
+
+    .checkpoint-title {
+      display: none;
+    }
+
+    .step {
+      img {
+        border: 1px solid grey;
+        max-width: 100%;
+      }
+
+      .commands, .command {
+        display: block;
+      }
+    }
+  }
 }
