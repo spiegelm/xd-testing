@@ -98,7 +98,7 @@ app.get('/', function (req, res) {
 });
 
 app.use('/public', express.static(path.join(__dirname, '/public')))
-app.use('/bower_components', express.static(path.join(__dirname, '/../bower_components')))
+app.use('/bower_components', express.static(path.join(__dirname, '/bower_components')))
 
 app.listen(3000, function () {
     console.log('Listening on port 3000.')
