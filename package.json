@@ -18,7 +18,6 @@
     "mustache": "^2.2.1",
     "q": "^1.4.1",
     "selenium-standalone": "^4.8.0",
-    "selenium-webdriver": "^2.48.2",
     "webdriverio": "^3.4.0",
     "yargs": "^3.32.0"
   },
