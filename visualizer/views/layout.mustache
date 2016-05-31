@@ -48,7 +48,7 @@
             {{#grid}}
                 {{#.}}
                     <div class="checkpoint-row">
-                        <span class="checkpoint-name">{{name}}</span><!--{{name}}-->
+                        <span class="checkpoint-name" onclick="scrollToCheckpoint('{{name}}')">{{name}}</span>
                         {{#checkpoints}}
                             {{#.}}
                                 <div class="checkpoint">

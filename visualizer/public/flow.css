@@ -55,6 +55,10 @@ img {
     padding: 0 10px;
 }
 
+.checkpoint-name {
+    cursor: pointer;
+}
+
 .checkpoint {
     display: table-cell;
     vertical-align: top;
