@@ -28,7 +28,8 @@ app.get('/', function (req, res) {
     // Load templates
     let template = fs.readFileSync(path.join(__dirname, 'views/layout.mustache'), 'utf-8')
     let partials = {
-        'flow_selection': fs.readFileSync(path.join(__dirname, 'views/selection.mustache'), 'utf-8')
+        'flow_selection': fs.readFileSync(path.join(__dirname, 'views/selection.mustache'), 'utf-8'),
+        'checkpoint_selection': fs.readFileSync(path.join(__dirname, 'views/checkpoint_selection.mustache'), 'utf-8')
     }
 
     let view = {
@@ -37,6 +38,7 @@ app.get('/', function (req, res) {
         'flowDirectory': FLOW_DIRECTORY,
         'messages': [],
         'flows': [],
+        'checkpoints': [],
         'json': function() {
             return function(json, render) {
                 return "JSON: " + render(json)
@@ -88,12 +90,25 @@ app.get('/', function (req, res) {
                 devices: flow.deviceArray(),
                 grid: flow.grid()
             })
+
+            view.checkpoints = view.checkpoints.concat(flow.checkpoints().map(c => c.name))
         })
     )).then(() => {
+        view.checkpoints = view.checkpoints.filter((value, index, self) => {
+            // Is the first value in the array
+            return self.indexOf(value) === index
+        })
+        console.log('view.checkpoints', view.checkpoints)
+
         // Render template
         let html = Mustache.render(template, view, partials)
 
         res.send(html)
+    }).catch(err => {
+        let message = "An error occured. " + err.message
+        console.log(message)
+        view.messages.push(message)
+        res.status(500)
     })
 });
 

@@ -1,0 +1,10 @@
+<div class="checkpoint-selection">
+    {{^checkpoints}}There are no checkpoints.{{/checkpoints}}
+    {{#checkpoints.length}}
+        <ul>
+            {{#checkpoints}}
+                <li><a href="{{.}}">{{.}}</a></li>
+            {{/checkpoints}}
+        </ul>
+    {{/checkpoints.length}}
+</div>
