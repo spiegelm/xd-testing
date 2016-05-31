@@ -1,7 +1,7 @@
 <div class="checkpoint-selection">
     {{^checkpoints}}There are no checkpoints.{{/checkpoints}}
     {{#checkpoints.length}}
-        <p>Checkpoints</p>
+        <p>Checkpoints:</p>
         <ul>
             {{#checkpoints}}
                 <li><a href="javascript:scrollToCheckpoint('{{.}}')">{{.}}</a></li>
