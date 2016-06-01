@@ -94,11 +94,11 @@ app.get('/', function (req, res) {
             view.checkpoints = view.checkpoints.concat(flow.checkpoints().map(c => c.name))
         })
     )).then(() => {
+        // Filter duplicates
         view.checkpoints = view.checkpoints.filter((value, index, self) => {
             // Is the first value in the array
             return self.indexOf(value) === index
         })
-        console.log('view.checkpoints', view.checkpoints)
 
         // Render template
         let html = Mustache.render(template, view, partials)
