@@ -146,6 +146,27 @@ describe('Flow @small', function () {
         })
     })
 
+    describe('#setName', function () {
+        it('should set the name', function() {
+            let FlowName = 'FlowName'
+            assert.equal(FlowName, new Flow().setName(FlowName).name)
+        })
+
+        it('should deny non-string values', function() {
+            assert.throws(() => {
+                new Flow().setName(undefined)
+            }, TypeError)
+
+            assert.throws(() => {
+                new Flow().setName(null)
+            }, TypeError)
+
+            assert.throws(() => {
+                new Flow().setName(1)
+            }, TypeError)
+        })
+    })
+
     describe('#addDevice', function () {
         it('adds the device to the devices array')
             //, function () {
