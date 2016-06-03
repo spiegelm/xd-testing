@@ -27,5 +27,9 @@
   "devDependencies": {},
   "engines": {
     "node": "~4.2.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://eday.inf.ethz.ch/spiegelm/xd-testing"
   }
 }
