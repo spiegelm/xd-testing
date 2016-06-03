@@ -4,6 +4,9 @@
   "description": "",
   "author": "Michael Spiegel <spiagl.m@gmail.com>",
   "main": "lib/index.js",
+  "bin": {
+    "xd-testing-visualizer": "./visualizer/app.js"
+  },
   "scripts": {
     "postinstall": "./node_modules/.bin/bower install",
     "test": "./node_modules/.bin/mocha --recursive test/"
