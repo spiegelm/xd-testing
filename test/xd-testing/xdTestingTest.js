@@ -112,9 +112,17 @@ describe('xdTesting', function() {
                 .checkpoint('check')
                 .getFlow().then(flow => {
                     let steps = flow.steps()
-                    let stepCommandNames = steps.map(step => step.commands)
-                        .filter(commands => commands.length > 0)
-                    assert.lengthOf(stepCommandNames, 3)
+                    let commandNames = steps
+                        .map(step => step.commands)
+                        .reduce((previous, current) => previous.concat(current), [])
+                        .filter(commandName => commandName.length > 0)
+                    let url = commandNames.filter(name => name.startsWith('url'))
+                    let click = commandNames.filter(name => name.startsWith('click'))
+
+                    assert.deepEqual(
+                        [url, click],
+                        [["url('" + test.fixture.basic_app.url + "')"], ["click('#button')"]]
+                    )
                 })
                 .end()
         })
