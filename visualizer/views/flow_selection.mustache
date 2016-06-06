@@ -2,7 +2,7 @@
     {{^allFiles}}<p>There are no flow files. To visualize your flow files put them in <code>{{flowDirectory}}</code></p>{{/allFiles}}
     {{#allFiles.length}}
         <div>
-            <p>Your flow files:</p>
+            <p><i class="fa fa-folder-o" title="{{flowDirectory}}"></i> Select a flow file:</p>
             <ul>
                 <li><a href="/">none</a></li>
                 {{#allFiles}}
