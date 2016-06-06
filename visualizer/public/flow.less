@@ -9,20 +9,31 @@ td {
 }
 
 .header {
-  font-weight: bold;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: #333;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
 }
 
 .flows {
   display: flex;
   flex-direction: row;
-}
 
-.grid-container {
-  flex: 1 1 auto;
-  display: block;
-  overflow-y: auto;
-  height: 800px;
-  word-break: break-all;
+  .grid-container {
+    flex: 1 1 auto;
+    display: block;
+    word-break: break-all;
+  }
+
+  &.flow-multiple .grid-container {
+    height: 800px;
+    overflow-y: auto;
+  }
 }
 
 .grid {

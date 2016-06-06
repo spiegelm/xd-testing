@@ -39,10 +39,8 @@ app.get('/', function (req, res) {
         'messages': [],
         'flows': [],
         'checkpoints': [],
-        'json': function() {
-            return function(json, render) {
-                return "JSON: " + render(json)
-            }
+        'flow-cardinality-class': function() {
+            return this.flows.length === 1 ? 'flow-single' : 'flow-multiple'
         },
         'img': function() {
             return function(value, render) {
