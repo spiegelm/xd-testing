@@ -8,6 +8,15 @@ td {
   padding: 10px 5px;
 }
 
+label {
+  font-weight: normal;
+
+  & input[type="checkbox"] {
+    margin-right: 5px;
+    vertical-align: top;
+  }
+}
+
 .header {
   font-size: 36px;
   font-weight: 500;
@@ -17,6 +26,19 @@ td {
 
   &:hover {
     text-decoration: none;
+  }
+}
+
+.options {
+  .checkpoint-selection {
+    float: left;
+    margin-right: 3em;
+  }
+
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
   }
 }
 

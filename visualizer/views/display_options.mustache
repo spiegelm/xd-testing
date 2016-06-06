@@ -1,11 +1,19 @@
-<div class="checkpoint-selection">
-    {{^checkpoints}}There are no checkpoints.{{/checkpoints}}
-    {{#checkpoints.length}}
-        <p>Checkpoints:</p>
-        <ul>
-            {{#checkpoints}}
-                <li><a href="javascript:scrollToCheckpoint('{{.}}')">{{.}}</a></li>
-            {{/checkpoints}}
-        </ul>
-    {{/checkpoints.length}}
+<div class="options">
+
+    <div class="checkpoint-selection">
+        {{^checkpoints}}<p>There are no checkpoints.</p>{{/checkpoints}}
+        {{#checkpoints.length}}
+            <p>Checkpoints:</p>
+            <ul>
+                {{#checkpoints}}
+                    <li><a href="javascript:scrollToCheckpoint('{{.}}')">{{.}}</a></li>
+                {{/checkpoints}}
+            </ul>
+        {{/checkpoints.length}}
+    </div>
+
+    <div class="options-grid">
+        <p>Options:</p>
+        <label><input type="checkbox" id="show-commands" checked="checked">Show commands</label>
+    </div>
 </div>

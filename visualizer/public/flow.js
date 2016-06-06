@@ -10,3 +10,18 @@ function scrollToCheckpoint(checkpointName) {
         checkpoint = elements.iterateNext()
     }
 }
+
+function showCommands(visiblity) {
+    if (visiblity) {
+        $('.step .command').show()
+    } else {
+        $('.step .command').hide()
+    }
+}
+
+$(function () {
+    var input = $('input#show-commands')
+    input.on('change', function () {
+        showCommands(this.checked)
+    })
+})
