@@ -1,0 +1,24 @@
+<div class="flow-selection">
+    {{^allFiles}}<p>There are no flow files. To visualize your flow files put them in <code>{{flowDirectory}}</code></p>{{/allFiles}}
+    {{#allFiles.length}}
+        <div>
+            <p>Your flow files:</p>
+            <ul>
+                <li><a href="/">none</a></li>
+                {{#allFiles}}
+                    <li><a href="?files[]={{.}}">{{.}}</a></li>
+                {{/allFiles}}
+            </ul>
+        </div>
+
+        <div>
+            <p>Compare with:</p>
+            <ul>
+                <li><a href="?files[]={{file}}">none</a></li>
+                {{#allFiles}}
+                    <li><a href="?files[]={{file}}&files[]={{.}}">{{.}}</a></li>
+                {{/allFiles}}
+            </ul>
+        </div>
+    {{/allFiles.length}}
+</div>

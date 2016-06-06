@@ -28,7 +28,7 @@ app.get('/', function (req, res) {
     // Load templates
     let template = fs.readFileSync(path.join(__dirname, 'views/layout.mustache'), 'utf-8')
     let partials = {
-        'flow_selection': fs.readFileSync(path.join(__dirname, 'views/selection.mustache'), 'utf-8'),
+        'flow_selection': fs.readFileSync(path.join(__dirname, 'views/flow_selection.mustache'), 'utf-8'),
         'display_options': fs.readFileSync(path.join(__dirname, 'views/display_options.mustache'), 'utf-8')
     }
 
