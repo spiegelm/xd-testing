@@ -8,7 +8,7 @@ xd-testing is based on [WebdriverIO](http://webdriver.io/) and uses the Selenium
 
 Install xd-testing via npm:
 
-    npm install --save git+ssh://git@eday.inf.ethz.ch:spiegelm/xd-testing.git#refactor-examples
+    npm install --save git+ssh://git@eday.inf.ethz.ch:spiegelm/xd-testing.git
 
 To run the tests these packages are also required:
 
