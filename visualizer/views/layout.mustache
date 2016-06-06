@@ -40,7 +40,7 @@
                     {{#devices}}
                         <div class="header-device">
                             {{#deviceOptions}}
-                                <h2><span title="ID: {{id}}">{{name}}</span> {{{device-icon}}}</h2>
+                                <h2 title="{{device-title}}">{{id}} {{#type}}{{/type}}{{{device-icon}}}</h2>
                             {{/deviceOptions}}
                         </div>
                     {{/devices}}

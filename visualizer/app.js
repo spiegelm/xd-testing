@@ -32,6 +32,11 @@ app.get('/', function (req, res) {
         'display_options': fs.readFileSync(path.join(__dirname, 'views/display_options.mustache'), 'utf-8')
     }
 
+    let iconType = {
+        'phone': 'Mobile',
+        'tablet': 'Tablet',
+        'desktop': 'Desktop'
+    }
     let view = {
         'file': selectedFiles[0],
         'allFiles': allFiles,
@@ -49,28 +54,22 @@ app.get('/', function (req, res) {
                 return length > 0 ? ('<img src="data:image/png;base64,' + rendered + '">') : ''
             }
         },
-        'device-icon': function() {
-            let iconType = {
-                'phone': 'mobile',
-                'tablet': 'tablet',
-                'desktop': 'desktop'
-            }
+        'device-title': function() {
             let faType = iconType[this.type]
             let screenSize = null
             if (this.width && this.height) {
                 screenSize = this.width + "x" + this.height
             }
 
-            if (faType) {
-                let capitalizeFirstLetter = string => string[0].toUpperCase() + string.slice(1)
-                let title = Mustache.render("{{type}}{{#screenSize}}, {{.}}{{/screenSize}}", {
-                    'type': capitalizeFirstLetter(faType),
-                    'screenSize': screenSize
-                })
-                return '<i class="fa fa-' + faType + '" aria-hidden="true" title="' + title + '"></i>'
-            } else {
-                return ''
-            }
+            let title = this.name
+            title += faType ? ', ' + faType : ''
+            title += screenSize ? ', ' + screenSize : ''
+
+            return title
+        },
+        'device-icon': function() {
+            let faType = iconType[this.type]
+            return faType ? '<i class="fa fa-' + faType.toLowerCase() + '" aria-hidden="true"></i>' : ''
         }
     }
 
