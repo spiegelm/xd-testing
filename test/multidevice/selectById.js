@@ -59,7 +59,7 @@ describe('MultiDevice - selectById', function () {
             .end()
     })
 
-    describe('with complementCallback', () => {
+    describe('with complementCallback @medium', () => {
         it('should call the complementCallback on the complementary selection', () => {
             var options = {
                 A: templates.devices.chrome(),

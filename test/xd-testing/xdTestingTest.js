@@ -83,7 +83,7 @@ describe('xdTesting', function() {
         })
     })
 
-    describe('#reset', () => {
+    describe('#reset @medium', () => {
         it('should set baseUrl to null', () => {
             xdTesting.baseUrl = 'http://localhost/'
             xdTesting.reset()
@@ -271,7 +271,7 @@ describe('xdTesting', function() {
                 })
             })
 
-            describe('getConnectedDeviceCount', () => {
+            describe('getConnectedDeviceCount @large', () => {
                 it('for 1 device should return 0', () => {
                     let options = {
                         A: templates.devices.chrome()
@@ -421,7 +421,7 @@ describe('xdTesting', function() {
             })
 
             describe('hooks', () => {
-                it('should inject event logger after loading url', () => {
+                it('should inject event logger after loading url @large', () => {
                     let options = {
                         A: templates.devices.chrome()
                     }

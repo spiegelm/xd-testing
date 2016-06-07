@@ -8,7 +8,7 @@ var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates')
 var q = require('q')
 
-describe('MultiDevice - getDeviceIds', () => {
+describe('MultiDevice - getDeviceIds @medium', () => {
     it('should return an array of ids', () => {
         let options = {
             A: templates.devices.chrome(),

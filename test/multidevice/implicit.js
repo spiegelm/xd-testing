@@ -137,8 +137,8 @@ describe('MultiDevice - implicit', function () {
     })
 
 
-    describe('should select matching devices', () => {
-        it('for element related commands @large', () => {
+    describe('should select matching devices @large', () => {
+        it('for element related commands', () => {
             var options = {
                 A: templates.devices.chrome(),
                 B: templates.devices.chrome()
@@ -204,7 +204,7 @@ describe('MultiDevice - implicit', function () {
     })
 
     describe('should select all devices', () => {
-        it('for optional element related commands without provided selector', () => {
+        it('for optional element related commands without provided selector @large', () => {
             var options = {
                 A: templates.devices.nexus4(),
                 B: templates.devices.nexus4()
