@@ -1,6 +1,6 @@
 {
   "name": "xd-testing",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "",
   "author": "Michael Spiegel <spiagl.m@gmail.com>",
   "main": "lib/index.js",
@@ -8,7 +8,8 @@
     "xd-testing-visualizer": "./visualizer/app.js"
   },
   "scripts": {
-    "postinstall": "./node_modules/.bin/bower install",
+    "postinstall": "./node_modules/.bin/bower install && npm run less",
+    "less": "./node_modules/.bin/lessc visualizer/public/flow.less visualizer/public/flow.css",
     "test": "./node_modules/.bin/mocha --recursive test/"
   },
   "dependencies": {
@@ -16,6 +17,8 @@
     "chai": "^3.5.0",
     "chromedriver": "^2.20.0",
     "express": "^4.13.4",
+    "fs-promise": "^0.5.0",
+    "less": "^2.7.1",
     "mkdirp": "^0.5.1",
     "mocha": "^2.4.5",
     "mustache": "^2.2.1",
