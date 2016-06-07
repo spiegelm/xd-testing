@@ -7,6 +7,7 @@ function scrollToCheckpoint(checkpointName) {
     var checkpoint = elements.iterateNext()
     while (checkpoint) {
         checkpoint.scrollIntoView();
+        $(checkpoint).closest('.checkpoint-row').effect('highlight', {}, 1000)
         checkpoint = elements.iterateNext()
     }
 }
