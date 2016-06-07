@@ -191,7 +191,7 @@ describe('xdTesting', function() {
                 assert.property(app, 'devices')
                 assert.isDefined(app.devices)
 
-                return devices.end()
+                return devices
             })
 
             it('app property should have getEventCounter @medium', () => {
@@ -206,7 +206,7 @@ describe('xdTesting', function() {
                 assert.property(app, 'getEventCounter')
                 assert.instanceOf(app.getEventCounter, Function)
 
-                return devices.end()
+                return devices
             })
 
             it('should get the event counter @large', () => {
@@ -364,7 +364,6 @@ describe('xdTesting', function() {
                         .then(() => queue += '2')
                         .app().waitForEvent('customEvent')
                         .then(() => queue += '9')
-                        .end()
 
                     let trigger = devices
                         .then(() => q.delay(1000))
@@ -402,7 +401,6 @@ describe('xdTesting', function() {
                         .then(() => queue += '4')
                         .app().waitForEventCount('customEvent', 2)
                         .then(() => queue += '9')
-                        .end()
 
                     let trigger = devices
                         .then(() => q.delay(1000))

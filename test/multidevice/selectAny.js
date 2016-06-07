@@ -17,7 +17,6 @@ describe('MultiDevice - selectAny', function () {
             .selectAny(device => device
                 .getCount().then(count => assert.equal(count, 1))
             )
-            .end()
     })
 
     it('should execute promises callback @medium', function () {
@@ -37,7 +36,6 @@ describe('MultiDevice - selectAny', function () {
             })
             .then(() => queue += '3')
             .then(() => assert.equal(queue, '0123'))
-            .end()
     })
 
 })

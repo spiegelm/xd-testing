@@ -11,13 +11,6 @@ describe('MultiDevice - selectBySize', function () {
     test.devices = {};
     test.baseUrl = "http://localhost:8090/";
 
-    afterEach(function () {
-        // Close browsers before completing a test
-        if (test.devices && test.devices.endAll) {
-            return test.devices.endAll();
-        }
-    });
-
     it('should only act on the specified devices @large', function () {
         var options = {
             A: templates.devices.nexus4(),
@@ -54,7 +47,6 @@ describe('MultiDevice - selectBySize', function () {
             })
             .then(() => queue += '3')
             .then(() => assert.equal(queue, '0123'))
-            .end()
     });
 
     it('should adapt options to selection @medium', function() {
@@ -75,7 +67,6 @@ describe('MultiDevice - selectBySize', function () {
                     assert.deepEqual(selectedDevices.options.C, options.C)
                 })
             )
-            .end()
     });
 
     it('should handle empty selections @medium', function() {

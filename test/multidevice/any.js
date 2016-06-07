@@ -21,7 +21,6 @@ describe('MultiDevice - any', function () {
         return xdTesting.multiremote(options)
             .getAddressingOptions()
             .then(addr => assert.equal(addr.any, false))
-            .end()
     })
 
     it('should set `any` device selection @medium', function () {
@@ -34,7 +33,6 @@ describe('MultiDevice - any', function () {
                 .getAddressingOptions()
                 .then(addr => assert.equal(addr.any, true))
             )
-            .end()
     })
 
     it('should imply the implicit selection context @medium', () => {
@@ -49,7 +47,6 @@ describe('MultiDevice - any', function () {
                 .getAddressingOptions().then(addr => assert.equal(addr.any, true))
                 .getAddressingOptions().then(addr => assert.equal(addr.implicit, true))
             )
-            .end()
 
     })
 
@@ -66,7 +63,6 @@ describe('MultiDevice - any', function () {
                 .forEach(device => counter++)
             )
             .then(() => assert.equal(counter, 1, "Failed asserting that callback was called exactly once"))
-            .end()
     })
 
     it('.getCount should return 1 @medium', function () {
@@ -79,7 +75,6 @@ describe('MultiDevice - any', function () {
             .any(devices => devices
                 .getCount().then(count => assert.equal(count, 1, "Failed asserting that getCount returns 1"))
             )
-            .end()
     })
 
     it('should select a single matching device for each command with element selector @large', function () {
@@ -119,7 +114,6 @@ describe('MultiDevice - any', function () {
             })
             .then(() => queue += '3')
             .then(() => assert.equal(queue, '0123'))
-            .end()
     })
 
     it('should return the any selection context when no callback argument is given @medium', () => {
@@ -131,6 +125,5 @@ describe('MultiDevice - any', function () {
             .getAddressingOptions().then(addr => assert.equal(addr.any, false))
             .any()
             .getAddressingOptions().then(addr => assert.equal(addr.any, true))
-            .end()
     })
 })

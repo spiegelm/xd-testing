@@ -10,13 +10,6 @@ describe('MultiDevice - selectByType', function () {
     test.devices = {};
     test.baseUrl = "http://localhost:8090/";
 
-    afterEach(function () {
-        // Close browsers before completing a test
-        if (test.devices && test.devices.endAll) {
-            return test.devices.endAll();
-        }
-    });
-
     it('should only act on the specified devices @medium', function () {
         var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()}
 
@@ -43,7 +36,6 @@ describe('MultiDevice - selectByType', function () {
             })
             .then(() => queue += '3')
             .then(() => assert.equal(queue, '0123'))
-            .end();
     });
 
     it('should adapt options to selection @medium', function() {

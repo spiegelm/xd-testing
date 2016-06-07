@@ -63,7 +63,6 @@ describe('MultiDevice - implicit', function () {
         return xdTesting.multiremote(options)
             .getAddressingOptions()
             .then(addr => assert.equal(addr.implicit, false))
-            .end()
     })
 
     it('should set implicit device selection @medium', function () {
@@ -76,7 +75,6 @@ describe('MultiDevice - implicit', function () {
                 .getAddressingOptions()
                 .then(addr => assert.equal(addr.implicit, true))
             )
-            .end()
     })
 
     describe('.forEach callback @medium', () => {
@@ -106,7 +104,6 @@ describe('MultiDevice - implicit', function () {
             .implicit(devices => devices
                 .getCount().then(count => assert.strictEqual(count, undefined, "Failed asserting that getCount returns undefined."))
             )
-            .end()
     })
 
     it('should execute callback in order @medium', function () {
@@ -126,7 +123,6 @@ describe('MultiDevice - implicit', function () {
             })
             .then(() => queue += '3')
             .then(() => assert.equal(queue, '0123'))
-            .end()
     })
 
     it('should return the implicit selection context when no callback is given @medium', () => {
@@ -138,7 +134,6 @@ describe('MultiDevice - implicit', function () {
             .getAddressingOptions().then(addr => assert.equal(addr.implicit, false))
             .implicit()
             .getAddressingOptions().then(addr => assert.equal(addr.implicit, true))
-            .end()
     })
 
 
