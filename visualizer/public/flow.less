@@ -1,0 +1,122 @@
+tr {
+  display: table-row;
+}
+
+/* All cells */
+td {
+  display: table-cell;
+  padding: 10px 5px;
+}
+
+label {
+  font-weight: normal;
+
+  & input[type="checkbox"] {
+    margin-right: 5px;
+    vertical-align: top;
+  }
+}
+
+.header {
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.1;
+  color: #333;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.flow-selection {
+  display: flex;
+  flex-direction: row;
+
+  &> div {
+    flex: 1 1 auto;
+  }
+}
+
+.options {
+  .checkpoint-selection {
+    display: inline-block;
+    margin-right: 3em;
+  }
+
+  .options-grid {
+    display: inline-block;
+    vertical-align: top;
+  }
+}
+
+.flows {
+  display: flex;
+  flex-direction: row;
+
+  .grid-container {
+    flex: 1 1 auto;
+    display: block;
+    word-break: break-all;
+  }
+
+  &.flow-multiple .grid-container {
+    height: 800px;
+    overflow-y: auto;
+  }
+}
+
+.grid {
+  display: table;
+  border-collapse: collapse;
+}
+
+.grid:not(:first-child) {
+  border-left: 1px solid black;
+}
+
+.header-devices {
+  &:extend(tr);
+
+  word-break: normal;
+
+  .header-device {
+    &:extend(td);
+  }
+}
+
+.checkpoint-row {
+  &:extend(tr);
+
+  border: 1px solid black;
+  border-right-width: 0;
+  border-left-width: 0;
+
+  .checkpoint-name {
+    cursor: pointer;
+    word-break: normal;
+  }
+
+  .checkpoint, .checkpoint-name {
+    &:extend(td);
+  }
+
+  .checkpoint {
+    vertical-align: top;
+
+    .checkpoint-title {
+      display: none;
+    }
+
+    .step {
+      img {
+        border: 1px solid grey;
+        max-width: 100%;
+      }
+
+      .commands, .command {
+        display: block;
+      }
+    }
+  }
+}
