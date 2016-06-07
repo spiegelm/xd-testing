@@ -74,12 +74,6 @@ app.get('/', function (req, res) {
     }
 
     q.all(absoluteFileNames.map(fileName => fsp.access(fileName, fs.F_OK)
-        .catch(err => {
-            let message = "Error loading file. " + (err.path || "")
-            console.log(message)
-            view.messages.push(message)
-            res.status(404)
-        })
         .then(() => {
             let flow = Flow.load(fileName)
 
@@ -89,6 +83,11 @@ app.get('/', function (req, res) {
             })
 
             view.checkpoints = view.checkpoints.concat(flow.checkpoints().map(c => c.name))
+        }, err => {
+            let message = "Error loading file. " + (err.path || "")
+            console.log(message)
+            view.messages.push(message)
+            res.status(404)
         })
     )).then(() => {
         // Filter duplicates
