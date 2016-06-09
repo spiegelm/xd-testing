@@ -1,5 +1,8 @@
 "use strict"
 
+/**
+ * @type {Chai.Assert}
+ */
 var assert = require('chai').assert
 var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates')
@@ -94,6 +97,25 @@ describe('MultiDevice - any', function () {
                 .getText('#counter').then(text => clickCount += +(text === '-' ? 0 : text))
             )
             .then(() => assert.equal(1, clickCount, "Failed asserting that exactly one button was clicked"))
+            .end()
+    })
+
+    it('should fail if no device matches', () => {
+        var options = {
+            A: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options).init()
+            .url(urlWithButton(false))
+            .any(devices => devices
+                .click('#button')
+                .then(result => {
+                    throw new Error('Promise was unexpectedly fulfilled. Result: ' + result)
+                }, error => {
+                    assert.instanceOf(error, Error)
+                    assert.match(error.message, /Failed to select a device with visible element.*#button.*No such device/)
+                })
+            )
             .end()
     })
 
