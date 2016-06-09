@@ -265,4 +265,23 @@ describe('MultiDevice - implicit', function () {
         })
 
     })
+
+    it('should fail if no device matches', () => {
+        var options = {
+            A: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options).init()
+            .url(urlWithButton(false))
+            .implicit(devices => devices
+                .click('#button')
+                .then(result => {
+                    throw new Error('Promise was unexpectedly fulfilled. Result: ' + result)
+                }, error => {
+                    assert.instanceOf(error, Error)
+                    assert.match(error.message, /Failed to select a device with visible element.*#button.*No such device/)
+                })
+            )
+            .end()
+    })
 })
