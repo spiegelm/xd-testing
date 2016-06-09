@@ -15,7 +15,7 @@ cat maps.out || true
 cat selenium.out || true
 
 echo "Generate config file"
-./lib/generate-config.js
+./lib/generate-config.js --device nexus4
 
 # Run the tests
 echo "Run tests"
