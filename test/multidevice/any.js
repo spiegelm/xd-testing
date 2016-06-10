@@ -100,6 +100,29 @@ describe('MultiDevice - any', function () {
             .end()
     })
 
+    describe('wait commands', () => {
+        it('should only wait for the first device', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            return xdTesting.multiremote(options).init()
+                .selectById('A', device => device
+                    .url(urlWithButton(true))
+                    .isVisible(buttonSelector).then(visible => assert.isTrue(visible))
+                )
+                .selectById('B', device => device
+                    .url(urlWithButton(false))
+                    .isVisible(buttonSelector).then(visible => assert.isFalse(visible))
+                )
+                .any(devices => devices
+                    .waitForVisible(buttonSelector, 5000)
+                )
+                .end()
+        })
+    })
+
     it('should fail if no device matches', () => {
         var options = {
             A: templates.devices.chrome()
