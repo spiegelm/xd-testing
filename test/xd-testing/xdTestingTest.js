@@ -12,6 +12,7 @@ var q = require('q')
 describe('xdTesting', function() {
 
     let test = this
+    test.retries(3)
     test.fixture = {
         xd_gallery: {
             url: 'http://localhost:8082/gallery.html'
