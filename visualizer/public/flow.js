@@ -20,9 +20,14 @@ function showCommands(visiblity) {
     }
 }
 
+
 $(function () {
-    var input = $('input#show-commands')
-    input.on('change', function () {
-        showCommands(this.checked)
+    var updateView = function() {
+        var checked = $('input#show-commands')[0].checked
+        showCommands(checked)
+    }
+    $('input#show-commands').on('change', function() {
+        updateView()
     })
+    updateView()
 })
