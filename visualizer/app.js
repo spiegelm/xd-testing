@@ -17,7 +17,8 @@ app.get('/', function (req, res) {
     // Read files from query
     let selectedFiles = req.query['files'] || []
     // Make absolute file names
-    let absoluteFileNames = selectedFiles.map(file => path.join(FLOW_DIRECTORY, file) )
+    let absoluteFileName = file => path.join(FLOW_DIRECTORY, file)
+    let absoluteFileNames = selectedFiles.map(absoluteFileName)
 
 
     let allFiles = fs.readdirSync(FLOW_DIRECTORY)
@@ -39,13 +40,28 @@ app.get('/', function (req, res) {
     }
     let view = {
         'file': selectedFiles[0],
-        'allFiles': allFiles,
+        'allFiles': allFiles.map(file => {
+            console.log(absoluteFileName(file))
+            let flow = Flow.load(absoluteFileName(file))
+            return {
+                name: file,
+                flow: flow,
+                status: flow.checkpoints().find(checkpoint => checkpoint.name === 'ERROR') === undefined
+                    ? "" : "error"
+            }
+        }),
         'flowDirectory': FLOW_DIRECTORY,
         'messages': [],
         'flows': [],
         'checkpoints': [],
         'flow-cardinality-class': function() {
             return this.flows.length === 1 ? 'flow-single' : 'flow-multiple'
+        },
+        'flow-status-icon': function() {
+            let iconClass = {
+                'error': 'error fa fa-exclamation-triangle'
+            }[this.status]
+            return iconClass ? '<i class="' + iconClass + '"></i>' : ''
         },
         'img': function() {
             return function(value, render) {

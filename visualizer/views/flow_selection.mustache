@@ -6,7 +6,9 @@
             <ul>
                 <li><a href="/">none</a></li>
                 {{#allFiles}}
-                    <li><a href="?files[]={{.}}">{{.}}</a></li>
+                    <li><a href="?files[]={{name}}" title="{{name}}">
+                        {{flow.name}} {{{flow-status-icon}}}
+                    </a></li>
                 {{/allFiles}}
             </ul>
         </div>
@@ -16,7 +18,9 @@
             <ul>
                 <li><a href="?files[]={{file}}">none</a></li>
                 {{#allFiles}}
-                    <li><a href="?files[]={{file}}&files[]={{.}}">{{.}}</a></li>
+                    <li><a href="?files[]={{file}}&files[]={{name}}" title="{{name}}">
+                        {{flow.name}} {{{flow-status-icon}}}
+                    </a></li>
                 {{/allFiles}}
             </ul>
         </div>
