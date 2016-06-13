@@ -4,7 +4,6 @@ xd-testing.json
 *.log
 steps*.json
 flow*.json
-endAll.sh
 
 
 # Created by https://www.gitignore.io/api/intellij
