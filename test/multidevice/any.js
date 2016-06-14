@@ -117,7 +117,69 @@ describe('MultiDevice - any', function () {
                     .isVisible(buttonSelector).then(visible => assert.isFalse(visible))
                 )
                 .any(devices => devices
-                    .waitForVisible(buttonSelector, 5000)
+                    .waitForVisible(buttonSelector, 1000)
+                )
+                .end()
+        })
+
+        it('should support chaining', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            return xdTesting.multiremote(options).init()
+                .selectById('A', device => device
+                    .url(urlWithButton(true))
+                    .isVisible(buttonSelector).then(visible => assert.isTrue(visible))
+                )
+                .selectById('B', device => device
+                    .url(urlWithButton(false))
+                    .isVisible(buttonSelector).then(visible => assert.isFalse(visible))
+                )
+                .any(devices => devices
+                    .waitForVisible(buttonSelector, 1000)
+                    .waitForVisible(buttonSelector, 1000)
+                )
+                .end()
+        })
+
+        it('should fail if all devices timeout @large', () => {
+            var options = {
+                A: templates.devices.chrome()
+            }
+
+            let device = xdTesting.multiremote(options).init()
+            return device
+                .url(urlWithButton(false))
+                .any(devices => devices
+                    .waitForVisible(buttonSelector, 1000)
+                    .then(result => {
+                        throw new Error('Promise was unexpectedly fulfilled. Result: ' + result)
+                    }, err => {
+                        assert.instanceOf(err, Error)
+                        assert.match(err.message, /element.*still not visible/)
+                    })
+                )
+                .end()
+        })
+
+        it('should fail if all devices timeout @medium', () => {
+            var options = {
+                A: templates.devices.chrome()
+            }
+
+            let device = xdTesting.multiremote(options).init()
+            return device
+                .url(urlWithButton(false))
+                .any(devices => devices
+                    .waitForVisible(buttonSelector, 1000)
+                    .then(result => {
+                        throw new Error('Promise was unexpectedly fulfilled. Result: ' + result)
+                    }, err => {
+                        assert.instanceOf(err, Error)
+                        assert.match(err.message, /element.*still not visible/)
+                    })
                 )
                 .end()
         })
