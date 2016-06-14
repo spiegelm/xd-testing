@@ -2,9 +2,8 @@ node_modules/
 bower_components/
 xd-testing.json
 *.log
-steps*.json
 flow*.json
-endAll.sh
+nohup.out
 
 
 # Created by https://www.gitignore.io/api/intellij
