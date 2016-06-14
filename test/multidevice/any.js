@@ -100,7 +100,7 @@ describe('MultiDevice - any', function () {
             .end()
     })
 
-    describe('wait commands', () => {
+    describe.skip('wait commands', () => {
         it('should only wait for the first device', () => {
             var options = {
                 A: templates.devices.chrome(),
