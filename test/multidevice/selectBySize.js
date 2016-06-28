@@ -20,7 +20,7 @@ describe('MultiDevice - selectBySize', function () {
         return test.devices = xdTesting.multiremote(options)
             .init()
             .url(test.baseUrl)
-            .selectBySize(['small'], selectedDevices => selectedDevices
+            .selectBySize(['xsmall'], selectedDevices => selectedDevices
                 .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '-')))
                 .click('#button')
                 .getText('#counter').then((text1, text2) => [text1, text2].forEach(text => assert.equal(text, '1')))
@@ -31,15 +31,13 @@ describe('MultiDevice - selectBySize', function () {
 
     it('should execute promises callback @medium', function() {
         var options = {
-            A: templates.devices.nexus4(),
-            B: templates.devices.nexus4(),
-            C: templates.devices.nexus10()
+            A: templates.devices.nexus4()
         }
 
         let queue = ''
         return test.devices = xdTesting.multiremote(options)
             .then(() => queue += '0')
-            .selectBySize('small', function(selectedDevices) {
+            .selectBySize('xsmall', function(selectedDevices) {
                 queue += '1'
                 return selectedDevices.then(() => {
                     queue += '2'
@@ -52,25 +50,29 @@ describe('MultiDevice - selectBySize', function () {
     it('should adapt options to selection @medium', function() {
         var options = {
             A: templates.devices.nexus10(),
-            B: templates.devices.nexus4(),
-            C: templates.devices.nexus4()
+            xsmall1: templates.devices.nexus4(),
+            xsmall2: templates.devices.nexus4()
         }
 
         return test.devices = xdTesting.multiremote(options)
-            .selectBySize('small', selectedDevices => selectedDevices
+            .selectBySize('xsmall', selectedDevices => selectedDevices
                 .then(() => {
                     assert.property(selectedDevices, 'options');
                     assert.notProperty(selectedDevices.options, 'A');
-                    assert.property(selectedDevices.options, 'B');
-                    assert.property(selectedDevices.options, 'C');
-                    assert.deepEqual(selectedDevices.options.B, options.B)
-                    assert.deepEqual(selectedDevices.options.C, options.C)
+                    assert.property(selectedDevices.options, 'xsmall1');
+                    assert.property(selectedDevices.options, 'xsmall2');
+                    assert.deepEqual(selectedDevices.options.xsmall1, options.xsmall1)
+                    assert.deepEqual(selectedDevices.options.xsmall2, options.xsmall2)
                 })
             )
     });
 
     it('should handle empty selections @medium', function() {
-        var options = {A: templates.devices.nexus10(), B: templates.devices.nexus4(), C: templates.devices.nexus4()}
+        var options = {
+            A: templates.devices.nexus10(),
+            B: templates.devices.nexus4(),
+            C: templates.devices.nexus4()
+        }
 
         let queue = ''
         return test.devices = xdTesting.multiremote(options)
