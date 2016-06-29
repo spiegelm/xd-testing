@@ -1,6 +1,6 @@
 {
-  "name": "xd-test-gallery",
-  "version": "0.1.0",
+  "name": "xd-testing",
+  "version": "0.0.0",
   "description": "",
   "main": "test.js",
   "dependencies": {
