@@ -39,9 +39,8 @@ app.get('/', function (req, res) {
         'desktop': 'Desktop'
     }
     let view = {
-        'file': selectedFiles[0],
+        'selectedFile': selectedFiles[0],
         'allFiles': allFiles.map(file => {
-            console.log(absoluteFileName(file))
             let flow = Flow.load(absoluteFileName(file))
             return {
                 name: file,
@@ -54,6 +53,12 @@ app.get('/', function (req, res) {
         'messages': [],
         'flows': [],
         'checkpoints': [],
+        'selected-file-class': function() {
+            return this.name === selectedFiles[0] ? 'selected-file' : ''
+        },
+        'compared-file-class': function() {
+            return this.name === selectedFiles[1] ? 'selected-file' : ''
+        },
         'flow-cardinality-class': function() {
             return this.flows.length === 1 ? 'flow-single' : 'flow-multiple'
         },
@@ -91,6 +96,7 @@ app.get('/', function (req, res) {
 
     q.all(absoluteFileNames.map(fileName => fsp.access(fileName, fs.F_OK)
         .then(() => {
+            console.log("Flow.load(fileName)", fileName)
             let flow = Flow.load(fileName)
 
             view.flows.push({

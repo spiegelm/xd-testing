@@ -6,23 +6,25 @@
             <ul>
                 <li><a href="/">none</a></li>
                 {{#allFiles}}
-                    <li><a href="?files[]={{name}}" title="{{name}}">
+                    <li class="{{selected-file-class}}"><a href="?files[]={{name}}" title="{{name}}">
                         {{flow.name}} {{{flow-status-icon}}}
                     </a></li>
                 {{/allFiles}}
             </ul>
         </div>
 
-        <div>
-            <p>Compare with:</p>
-            <ul>
-                <li><a href="?files[]={{file}}">none</a></li>
-                {{#allFiles}}
-                    <li><a href="?files[]={{file}}&files[]={{name}}" title="{{name}}">
-                        {{flow.name}} {{{flow-status-icon}}}
-                    </a></li>
-                {{/allFiles}}
-            </ul>
-        </div>
+        {{#selectedFile}}
+            <div>
+                <p>Compare with:</p>
+                <ul>
+                    <li><a href="?files[]={{selectedFile}}">none</a></li>
+                    {{#allFiles}}
+                        <li class="{{compared-file-class}}"><a href="?files[]={{selectedFile}}&files[]={{name}}" title="{{name}}">
+                            {{flow.name}} {{{flow-status-icon}}}
+                        </a></li>
+                    {{/allFiles}}
+                </ul>
+            </div>
+        {{/selectedFile}}
     {{/allFiles.length}}
 </div>
