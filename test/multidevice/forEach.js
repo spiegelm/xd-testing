@@ -106,4 +106,20 @@ describe('MultiDevice - forEach @medium', function () {
             .then(() => queue += '3')
             .then(() => assert.equal(queue, '01223'))
     })
+
+    it('should ignore callbacks on empty device sets', function() {
+        var options = {
+        }
+
+        let runCallback = false
+        return xdTesting.multiremote(options)
+            .forEach(device => {
+                runCallback = true
+                throw new Error('Does should never be executed')
+            })
+            .then(() => q.delay(100))
+            .then(() => {
+                assert.isFalse(runCallback)
+            })
+    })
 })
