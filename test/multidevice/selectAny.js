@@ -58,4 +58,32 @@ describe('MultiDevice - selectAny', function () {
                 })
         })
     })
+
+    describe('on empty device selection', function() {
+
+        /**
+         * This throws the error as expected, but we cannot grab it. Skip the test until we found a solution.
+         */
+        it.skip('should throw an error on command execution', function() {
+            var scenario = {
+                A: templates.devices.chrome()
+            }
+
+            var queue = ''
+            return xdTesting.multiremote(scenario)
+                .then(() => queue += '0')
+                .selectByType('phone', phones => phones
+                    // Select any of none
+                    .selectAny(device => device
+                        .click('#button')
+                    )
+                    .then(result => {
+                        throw new Error('Promise was unexpectedly fulfilled. Result: ' + result)
+                    }, err => {
+                        assert.instanceOf(err, Error)
+                        assert.match(err.message, /not defined/)
+                    })
+                )
+        })
+    })
 })
