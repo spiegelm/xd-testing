@@ -11,6 +11,15 @@ describe('MultiDevice - selectBySize', function () {
     test.devices = {};
     test.baseUrl = "http://localhost:8090/";
 
+    test.fixture = {
+        basic_app: {
+            url: test.baseUrl,
+            buttonSelector: '#button',
+            counterSelector: '#counter'
+        }
+    }
+
+
     it('should only act on the specified devices @large', function () {
         var options = {
             A: templates.devices.nexus4(),
@@ -67,21 +76,41 @@ describe('MultiDevice - selectBySize', function () {
             )
     });
 
-    it('should handle empty selections @medium', function() {
-        var options = {
-            A: templates.devices.nexus10(),
-            B: templates.devices.nexus4(),
-            C: templates.devices.nexus4()
-        }
+    describe('empty selections', function() {
+        it('should execute promise chain @medium', function() {
+            var options = {
+                A: templates.devices.nexus10()
+            }
 
-        let queue = ''
-        return test.devices = xdTesting.multiremote(options)
-            .selectBySize('medium', selectedDevices => selectedDevices
-                .then(() => queue += '0')
-                .forEach((device, index) => queue += device.options.id)
-                .then(() => queue += '1')
-            ).then(() => {
-                assert.equal(queue, '01');
-            })
-    });
+            let queue = ''
+            return test.devices = xdTesting.multiremote(options)
+                .selectBySize('xsmall', selectedDevices => selectedDevices
+                    .then(() => queue += '0')
+                    .forEach((device, index) => queue += device.options.id)
+                    .then(() => queue += '1')
+                ).then(() => {
+                    assert.equal(queue, '01');
+                })
+        });
+
+        it('should ignore commands on empty selections @large', function() {
+            var options = {
+                A: templates.devices.nexus10()
+            }
+
+            let queue = ''
+            return test.devices = xdTesting.multiremote(options).init()
+                .url(test.fixture.basic_app.url)
+                .selectBySize('xsmall', selectedDevices => selectedDevices
+                    .then(() => queue += '0')
+                    // Perform click on no devices
+                    .click('#inexistantId')
+                    .then(() => queue += '1')
+                )
+                .then(() => {
+                    assert.equal(queue, '01');
+                })
+                .end()
+        });
+    })
 });
