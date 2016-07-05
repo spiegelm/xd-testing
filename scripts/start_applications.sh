@@ -29,6 +29,6 @@ nohup ./node_modules/.bin/http-server -p 8090 > testapp.log &
 # Start selenium server
 cd ${PROJECT_ROOT}
 echo "Start selenium sever"
-nohup ./start_selenium.sh > selenium.log 2>&1 &
+nohup ./scripts/start_selenium.sh > selenium.log 2>&1 &
 SELENIUM_PID=$!
 echo $SELENIUM_PID
