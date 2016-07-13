@@ -1,7 +1,7 @@
 {
   "name": "xd-testing",
   "version": "1.0.0",
-  "description": "",
+  "description": "A testing library for cross-device (XD) web applications",
   "author": "Michael Spiegel <spiagl.m@gmail.com>",
   "main": "lib/index.js",
   "bin": {

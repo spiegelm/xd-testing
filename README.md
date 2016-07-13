@@ -1,6 +1,6 @@
 # XD-Testing
 
-A web application testing library designed for cross-device (XD) applications.
+A testing library for cross-device (XD) web applications.
 Based on [WebdriverIO](http://webdriver.io/) and uses the [Selenium](http://www.seleniumhq.org/) browser automation stack.
 This project was developed at ETH Zurich by Michael Spiegel and supervised by Maria Husmann and Alfonso Murolo.
 
