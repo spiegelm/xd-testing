@@ -2,23 +2,31 @@
     {{^allFiles}}<p>There are no flow files. To visualize your flow files put them in <code>{{flowDirectory}}</code></p>{{/allFiles}}
     {{#allFiles.length}}
         <div>
-            <p><i class="fa fa-folder-o" title="{{flowDirectory}}"></i> Select a flow file:</p>
+            <p>Select a flow file from the flow directory
+                <code><i class="fa fa-folder-o" title="{{flowDirectory}}"></i> {{flowDirectory}}</code>
+            </p>
             <ul>
                 <li><a href="/">none</a></li>
                 {{#allFiles}}
-                    <li><a href="?files[]={{.}}">{{.}}</a></li>
+                    <li class="{{selected-file-class}}"><a href="?files[]={{name}}" title="{{name}}">
+                        {{flow.name}} {{{flow-status-icon}}}
+                    </a></li>
                 {{/allFiles}}
             </ul>
         </div>
 
-        <div>
-            <p>Compare with:</p>
-            <ul>
-                <li><a href="?files[]={{file}}">none</a></li>
-                {{#allFiles}}
-                    <li><a href="?files[]={{file}}&files[]={{.}}">{{.}}</a></li>
-                {{/allFiles}}
-            </ul>
-        </div>
+        {{#selectedFile}}
+            <div>
+                <p>Compare with:</p>
+                <ul>
+                    <li><a href="?files[]={{selectedFile}}">none</a></li>
+                    {{#allFiles}}
+                        <li class="{{compared-file-class}}"><a href="?files[]={{selectedFile}}&files[]={{name}}" title="{{name}}">
+                            {{flow.name}} {{{flow-status-icon}}}
+                        </a></li>
+                    {{/allFiles}}
+                </ul>
+            </div>
+        {{/selectedFile}}
     {{/allFiles.length}}
 </div>

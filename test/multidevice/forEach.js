@@ -52,9 +52,7 @@ describe('MultiDevice - forEach @medium', function () {
         return xdTesting.multiremote(options)
             .then(() => queue += '1' )
             .forEach(function (device, index) {
-                var defer = q.defer()
-                defer.resolve()
-                return defer.promise.delay(1000).then(() => queue += '2')
+                return q.delay(1000).then(() => queue += '2')
             })
             .then(() => queue += '3')
             .then(() => assert.equal(queue, '01223'))
@@ -107,5 +105,21 @@ describe('MultiDevice - forEach @medium', function () {
             })
             .then(() => queue += '3')
             .then(() => assert.equal(queue, '01223'))
+    })
+
+    it('should ignore callbacks on empty device sets', function() {
+        var options = {
+        }
+
+        let runCallback = false
+        return xdTesting.multiremote(options)
+            .forEach(device => {
+                runCallback = true
+                throw new Error('Does should never be executed')
+            })
+            .then(() => q.delay(100))
+            .then(() => {
+                assert.isFalse(runCallback)
+            })
     })
 })

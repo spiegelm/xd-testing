@@ -59,7 +59,7 @@ describe('MultiDevice - selectById', function () {
             .end()
     })
 
-    describe('with complementCallback', () => {
+    describe('with complementCallback @medium', () => {
         it('should call the complementCallback on the complementary selection', () => {
             var options = {
                 A: templates.devices.chrome(),
@@ -149,7 +149,6 @@ describe('MultiDevice - selectById', function () {
             })
             .then(() => queue += '5')
             .then(() => assert.equal(queue, '012345'))
-            .end()
     })
 
     it('should adapt options to selection @medium', function() {
@@ -182,7 +181,6 @@ describe('MultiDevice - selectById', function () {
             .selectById('A', device => device
                 .getAddressingOptions().then(addr => assert.equal(addr.implicit, false))
             )
-            .end()
     })
 
     it('should deny undefined ids @medium', function() {
@@ -330,10 +328,9 @@ describe('MultiDevice - selectById', function () {
                 .getCount()
                 .then(count => assert.equal(count, 2))
             )
-            .end()
     })
 
-    describe('without callback', () => {
+    describe('without callback @medium', () => {
 
         it('should return device selection', () => {
             let options = {
@@ -345,7 +342,6 @@ describe('MultiDevice - selectById', function () {
                 .getCount().then(count => assert.equal(count, 2))
                 .selectById('A')
                 .getCount().then(count => assert.equal(count, 1))
-                .end()
         })
 
         it('should execute the commands in order', () => {
@@ -365,7 +361,6 @@ describe('MultiDevice - selectById', function () {
                 .getCount().then(count => assert.equal(count, 1))
                 .then(() => queue += '3')
                 .then(() => assert.equal(queue, '0123'))
-                .end()
         })
 
         it('should allow to break the selection chain and run async forks', () => {

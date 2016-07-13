@@ -7,6 +7,7 @@ function scrollToCheckpoint(checkpointName) {
     var checkpoint = elements.iterateNext()
     while (checkpoint) {
         checkpoint.scrollIntoView();
+        $(checkpoint).closest('.checkpoint-row').effect('highlight', {}, 1000)
         checkpoint = elements.iterateNext()
     }
 }
@@ -19,9 +20,14 @@ function showCommands(visiblity) {
     }
 }
 
+
 $(function () {
-    var input = $('input#show-commands')
-    input.on('change', function () {
-        showCommands(this.checked)
+    var updateView = function() {
+        var checked = $('input#show-commands')[0].checked
+        showCommands(checked)
+    }
+    $('input#show-commands').on('change', function() {
+        updateView()
     })
+    updateView()
 })

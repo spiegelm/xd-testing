@@ -1,5 +1,8 @@
 "use strict"
 
+/**
+ * @type {Chai.Assert}
+ */
 var assert = require('chai').assert
 var xdTesting = require('../../lib/index')
 var templates = require('../../lib/templates')
@@ -21,7 +24,6 @@ describe('MultiDevice - any', function () {
         return xdTesting.multiremote(options)
             .getAddressingOptions()
             .then(addr => assert.equal(addr.any, false))
-            .end()
     })
 
     it('should set `any` device selection @medium', function () {
@@ -34,7 +36,6 @@ describe('MultiDevice - any', function () {
                 .getAddressingOptions()
                 .then(addr => assert.equal(addr.any, true))
             )
-            .end()
     })
 
     it('should imply the implicit selection context @medium', () => {
@@ -49,7 +50,6 @@ describe('MultiDevice - any', function () {
                 .getAddressingOptions().then(addr => assert.equal(addr.any, true))
                 .getAddressingOptions().then(addr => assert.equal(addr.implicit, true))
             )
-            .end()
 
     })
 
@@ -66,7 +66,6 @@ describe('MultiDevice - any', function () {
                 .forEach(device => counter++)
             )
             .then(() => assert.equal(counter, 1, "Failed asserting that callback was called exactly once"))
-            .end()
     })
 
     it('.getCount should return 1 @medium', function () {
@@ -79,7 +78,6 @@ describe('MultiDevice - any', function () {
             .any(devices => devices
                 .getCount().then(count => assert.equal(count, 1, "Failed asserting that getCount returns 1"))
             )
-            .end()
     })
 
     it('should select a single matching device for each command with element selector @large', function () {
@@ -102,6 +100,110 @@ describe('MultiDevice - any', function () {
             .end()
     })
 
+    describe('wait commands', () => {
+        it('should only wait for the first device', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            return xdTesting.multiremote(options).init()
+                .selectById('A', device => device
+                    .url(urlWithButton(true))
+                    .isVisible(buttonSelector).then(visible => assert.isTrue(visible))
+                )
+                .selectById('B', device => device
+                    .url(urlWithButton(false))
+                    .isVisible(buttonSelector).then(visible => assert.isFalse(visible))
+                )
+                .any(devices => devices
+                    .waitForVisible(buttonSelector, 1000)
+                )
+                .end()
+        })
+
+        it('should support chaining', () => {
+            var options = {
+                A: templates.devices.chrome(),
+                B: templates.devices.chrome()
+            }
+
+            return xdTesting.multiremote(options).init()
+                .selectById('A', device => device
+                    .url(urlWithButton(true))
+                    .isVisible(buttonSelector).then(visible => assert.isTrue(visible))
+                )
+                .selectById('B', device => device
+                    .url(urlWithButton(false))
+                    .isVisible(buttonSelector).then(visible => assert.isFalse(visible))
+                )
+                .any(devices => devices
+                    .waitForVisible(buttonSelector, 1000)
+                    .waitForVisible(buttonSelector, 1000)
+                )
+                .end()
+        })
+
+        it('should fail if all devices timeout @large', () => {
+            var options = {
+                A: templates.devices.chrome()
+            }
+
+            let device = xdTesting.multiremote(options).init()
+            return device
+                .url(urlWithButton(false))
+                .any(devices => devices
+                    .waitForVisible(buttonSelector, 1000)
+                    .then(result => {
+                        throw new Error('Promise was unexpectedly fulfilled. Result: ' + result)
+                    }, err => {
+                        assert.instanceOf(err, Error)
+                        assert.match(err.message, /element.*still not visible/)
+                    })
+                )
+                .end()
+        })
+
+        it('should fail if all devices timeout @medium', () => {
+            var options = {
+                A: templates.devices.chrome()
+            }
+
+            let device = xdTesting.multiremote(options).init()
+            return device
+                .url(urlWithButton(false))
+                .any(devices => devices
+                    .waitForVisible(buttonSelector, 1000)
+                    .then(result => {
+                        throw new Error('Promise was unexpectedly fulfilled. Result: ' + result)
+                    }, err => {
+                        assert.instanceOf(err, Error)
+                        assert.match(err.message, /element.*still not visible/)
+                    })
+                )
+                .end()
+        })
+    })
+
+    it('should fail if no device matches', () => {
+        var options = {
+            A: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options).init()
+            .url(urlWithButton(false))
+            .any(devices => devices
+                .click('#button')
+                .then(result => {
+                    throw new Error('Promise was unexpectedly fulfilled. Result: ' + result)
+                }, error => {
+                    assert.instanceOf(error, Error)
+                    assert.match(error.message, /Failed to select a device with visible element.*#button.*No such device/)
+                })
+            )
+            .end()
+    })
+
     it('should execute callback in order @medium', function () {
         var options = {
             A: templates.devices.chrome(),
@@ -119,7 +221,6 @@ describe('MultiDevice - any', function () {
             })
             .then(() => queue += '3')
             .then(() => assert.equal(queue, '0123'))
-            .end()
     })
 
     it('should return the any selection context when no callback argument is given @medium', () => {
@@ -131,6 +232,5 @@ describe('MultiDevice - any', function () {
             .getAddressingOptions().then(addr => assert.equal(addr.any, false))
             .any()
             .getAddressingOptions().then(addr => assert.equal(addr.any, true))
-            .end()
     })
 })

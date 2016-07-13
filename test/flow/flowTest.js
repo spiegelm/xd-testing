@@ -158,10 +158,6 @@ describe('Flow @small', function () {
             }, TypeError)
 
             assert.throws(() => {
-                new Flow().setName(null)
-            }, TypeError)
-
-            assert.throws(() => {
                 new Flow().setName(1)
             }, TypeError)
         })

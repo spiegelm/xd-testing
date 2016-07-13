@@ -17,7 +17,8 @@ app.get('/', function (req, res) {
     // Read files from query
     let selectedFiles = req.query['files'] || []
     // Make absolute file names
-    let absoluteFileNames = selectedFiles.map(file => path.join(FLOW_DIRECTORY, file) )
+    let absoluteFileName = file => path.join(FLOW_DIRECTORY, file)
+    let absoluteFileNames = selectedFiles.map(absoluteFileName)
 
 
     let allFiles = fs.readdirSync(FLOW_DIRECTORY)
@@ -38,14 +39,34 @@ app.get('/', function (req, res) {
         'desktop': 'Desktop'
     }
     let view = {
-        'file': selectedFiles[0],
-        'allFiles': allFiles,
+        'selectedFile': selectedFiles[0],
+        'allFiles': allFiles.map(file => {
+            let flow = Flow.load(absoluteFileName(file))
+            return {
+                name: file,
+                flow: flow,
+                status: flow.checkpoints().find(checkpoint => checkpoint.name === 'ERROR') === undefined
+                    ? "" : "error"
+            }
+        }),
         'flowDirectory': FLOW_DIRECTORY,
         'messages': [],
         'flows': [],
         'checkpoints': [],
+        'selected-file-class': function() {
+            return this.name === selectedFiles[0] ? 'selected-file' : ''
+        },
+        'compared-file-class': function() {
+            return this.name === selectedFiles[1] ? 'selected-file' : ''
+        },
         'flow-cardinality-class': function() {
             return this.flows.length === 1 ? 'flow-single' : 'flow-multiple'
+        },
+        'flow-status-icon': function() {
+            let iconClass = {
+                'error': 'error fa fa-exclamation-triangle'
+            }[this.status]
+            return iconClass ? '<i class="' + iconClass + '"></i>' : ''
         },
         'img': function() {
             return function(value, render) {
@@ -74,13 +95,8 @@ app.get('/', function (req, res) {
     }
 
     q.all(absoluteFileNames.map(fileName => fsp.access(fileName, fs.F_OK)
-        .catch(err => {
-            let message = "Error loading file. " + (err.path || "")
-            console.log(message)
-            view.messages.push(message)
-            res.status(404)
-        })
         .then(() => {
+            console.log("Flow.load(fileName)", fileName)
             let flow = Flow.load(fileName)
 
             view.flows.push({
@@ -89,6 +105,11 @@ app.get('/', function (req, res) {
             })
 
             view.checkpoints = view.checkpoints.concat(flow.checkpoints().map(c => c.name))
+        }, err => {
+            let message = "Error loading file. " + (err.path || "")
+            console.log(message)
+            view.messages.push(message)
+            res.status(404)
         })
     )).then(() => {
         // Filter duplicates

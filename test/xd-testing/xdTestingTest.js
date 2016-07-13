@@ -12,6 +12,7 @@ var q = require('q')
 describe('xdTesting', function() {
 
     let test = this
+    test.retries(3)
     test.fixture = {
         xd_gallery: {
             url: 'http://localhost:8082/gallery.html'
@@ -83,7 +84,7 @@ describe('xdTesting', function() {
         })
     })
 
-    describe('#reset', () => {
+    describe('#reset @medium', () => {
         it('should set baseUrl to null', () => {
             xdTesting.baseUrl = 'http://localhost/'
             xdTesting.reset()
@@ -112,9 +113,17 @@ describe('xdTesting', function() {
                 .checkpoint('check')
                 .getFlow().then(flow => {
                     let steps = flow.steps()
-                    let stepCommandNames = steps.map(step => step.commands)
-                        .filter(commands => commands.length > 0)
-                    assert.lengthOf(stepCommandNames, 3)
+                    let commandNames = steps
+                        .map(step => step.commands)
+                        .reduce((previous, current) => previous.concat(current), [])
+                        .filter(commandName => commandName.length > 0)
+                    let url = commandNames.filter(name => name.startsWith('url'))
+                    let click = commandNames.filter(name => name.startsWith('click'))
+
+                    assert.deepEqual(
+                        [url, click],
+                        [["url('" + test.fixture.basic_app.url + "')"], ["click('#button')"]]
+                    )
                 })
                 .end()
         })
@@ -183,7 +192,7 @@ describe('xdTesting', function() {
                 assert.property(app, 'devices')
                 assert.isDefined(app.devices)
 
-                return devices.end()
+                return devices
             })
 
             it('app property should have getEventCounter @medium', () => {
@@ -198,7 +207,7 @@ describe('xdTesting', function() {
                 assert.property(app, 'getEventCounter')
                 assert.instanceOf(app.getEventCounter, Function)
 
-                return devices.end()
+                return devices
             })
 
             it('should get the event counter @large', () => {
@@ -263,7 +272,7 @@ describe('xdTesting', function() {
                 })
             })
 
-            describe('getConnectedDeviceCount', () => {
+            describe('getConnectedDeviceCount @large', () => {
                 it('for 1 device should return 0', () => {
                     let options = {
                         A: templates.devices.chrome()
@@ -356,7 +365,6 @@ describe('xdTesting', function() {
                         .then(() => queue += '2')
                         .app().waitForEvent('customEvent')
                         .then(() => queue += '9')
-                        .end()
 
                     let trigger = devices
                         .then(() => q.delay(1000))
@@ -394,7 +402,6 @@ describe('xdTesting', function() {
                         .then(() => queue += '4')
                         .app().waitForEventCount('customEvent', 2)
                         .then(() => queue += '9')
-                        .end()
 
                     let trigger = devices
                         .then(() => q.delay(1000))
@@ -415,7 +422,7 @@ describe('xdTesting', function() {
             })
 
             describe('hooks', () => {
-                it('should inject event logger after loading url', () => {
+                it('should inject event logger after loading url @large', () => {
                     let options = {
                         A: templates.devices.chrome()
                     }

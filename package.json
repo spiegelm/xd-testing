@@ -1,9 +1,13 @@
 {
   "name": "xd-testing",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "",
   "author": "Michael Spiegel <spiagl.m@gmail.com>",
   "main": "lib/index.js",
+  "bin": {
+    "xd-testing-visualizer": "./visualizer/app.js",
+    "xd-generate-scenarios": "./lib/generate-scenarios.js"
+  },
   "scripts": {
     "postinstall": "./node_modules/.bin/bower install && npm run less",
     "less": "./node_modules/.bin/lessc visualizer/public/flow.less visualizer/public/flow.css",
@@ -24,5 +28,12 @@
     "webdriverio": "^3.4.0",
     "yargs": "^3.32.0"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "engines": {
+    "node": "~4.2.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://eday.inf.ethz.ch/spiegelm/xd-testing"
+  }
 }

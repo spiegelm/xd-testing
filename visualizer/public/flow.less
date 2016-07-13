@@ -1,3 +1,7 @@
+body {
+  padding-left: 5px;
+}
+
 tr {
   display: table-row;
 }
@@ -35,6 +39,22 @@ label {
 
   &> div {
     flex: 1 1 auto;
+  }
+
+  .error {
+    color: red;
+  }
+
+  a {
+    padding-left: 3px;
+  }
+
+  .selected-file {
+    background-color: #337ab7;
+
+    a {
+      color: white;
+    }
   }
 }
 
@@ -114,8 +134,13 @@ label {
         max-width: 100%;
       }
 
-      .commands, .command {
+      .commands {
         display: block;
+        .command {
+          display: block;
+          background-color: #eee;
+          margin: 2px;
+        }
       }
     }
   }

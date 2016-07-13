@@ -63,7 +63,6 @@ describe('MultiDevice - implicit', function () {
         return xdTesting.multiremote(options)
             .getAddressingOptions()
             .then(addr => assert.equal(addr.implicit, false))
-            .end()
     })
 
     it('should set implicit device selection @medium', function () {
@@ -76,7 +75,6 @@ describe('MultiDevice - implicit', function () {
                 .getAddressingOptions()
                 .then(addr => assert.equal(addr.implicit, true))
             )
-            .end()
     })
 
     describe('.forEach callback @medium', () => {
@@ -106,7 +104,6 @@ describe('MultiDevice - implicit', function () {
             .implicit(devices => devices
                 .getCount().then(count => assert.strictEqual(count, undefined, "Failed asserting that getCount returns undefined."))
             )
-            .end()
     })
 
     it('should execute callback in order @medium', function () {
@@ -126,7 +123,6 @@ describe('MultiDevice - implicit', function () {
             })
             .then(() => queue += '3')
             .then(() => assert.equal(queue, '0123'))
-            .end()
     })
 
     it('should return the implicit selection context when no callback is given @medium', () => {
@@ -138,12 +134,11 @@ describe('MultiDevice - implicit', function () {
             .getAddressingOptions().then(addr => assert.equal(addr.implicit, false))
             .implicit()
             .getAddressingOptions().then(addr => assert.equal(addr.implicit, true))
-            .end()
     })
 
 
-    describe('should select matching devices', () => {
-        it('for element related commands @large', () => {
+    describe('should select matching devices @large', () => {
+        it('for element related commands', () => {
             var options = {
                 A: templates.devices.chrome(),
                 B: templates.devices.chrome()
@@ -209,7 +204,7 @@ describe('MultiDevice - implicit', function () {
     })
 
     describe('should select all devices', () => {
-        it('for optional element related commands without provided selector', () => {
+        it('for optional element related commands without provided selector @large', () => {
             var options = {
                 A: templates.devices.nexus4(),
                 B: templates.devices.nexus4()
@@ -269,5 +264,24 @@ describe('MultiDevice - implicit', function () {
                 .end()
         })
 
+    })
+
+    it('should fail if no device matches', () => {
+        var options = {
+            A: templates.devices.chrome()
+        }
+
+        return xdTesting.multiremote(options).init()
+            .url(urlWithButton(false))
+            .implicit(devices => devices
+                .click('#button')
+                .then(result => {
+                    throw new Error('Promise was unexpectedly fulfilled. Result: ' + result)
+                }, error => {
+                    assert.instanceOf(error, Error)
+                    assert.match(error.message, /Failed to select a device with visible element.*#button.*No such device/)
+                })
+            )
+            .end()
     })
 })

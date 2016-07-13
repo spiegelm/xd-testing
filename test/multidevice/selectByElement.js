@@ -73,6 +73,24 @@ describe('MultiDevice - selectByElement', function () {
             .end()
     });
 
+    it('should ignore commands on empty selections @medium', function () {
+        var options = {
+            A: templates.devices.chrome()
+        };
+
+        return xdTesting.multiremote(options).init()
+            .url(test.baseUrl)
+            .isVisible('#none')
+            .then(visible => assert.isFalse(visible))
+            .selectByElement('#none', devices => devices
+                .getCount()
+                .then(count => assert.equal(count, 0))
+                .click('#none')
+            )
+            .end()
+    });
+
+
     describe.skip('todo', function () {
 
         it('should adapt options to selection @medium', function () {
@@ -95,23 +113,6 @@ describe('MultiDevice - selectByElement', function () {
                 );
         });
 
-        it('should handle empty selections @medium', function () {
-            var options = {
-                A: templates.devices.nexus10(),
-                B: templates.devices.nexus4(),
-                C: templates.devices.nexus4()
-            };
-
-            let queue = '';
-            return test.devices = xdTesting.multiremote(options)
-                .selectBySize('medium', selectedDevices => selectedDevices
-                    .then(() => queue += '0')
-                    .forEach((device, index) => queue += device.options.id)
-                    .then(() => queue += '1')
-                ).then(() => {
-                    assert.equal(queue, '01');
-                });
-        });
     })
 
 });
