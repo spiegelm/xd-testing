@@ -19,6 +19,7 @@ it('should show the selected image on any device', () => {
         .name('should show the selected image on any device')
         .app().pairDevicesViaURL(baseUrl)
         .checkpoint('pair devices')
+        // Dynamically select any matching device to execute each command
         .any(device => device
             .click('.controller img:nth-of-type(2)')
             .waitForVisible('.viewer img[src="img/02.jpg"]', 10000)
