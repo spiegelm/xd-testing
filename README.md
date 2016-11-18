@@ -2,7 +2,7 @@
 
 A testing library for cross-device (XD) web applications.
 Based on [WebdriverIO](http://webdriver.io/) and uses the [Selenium](http://www.seleniumhq.org/) browser automation stack.
-This project was developed at ETH Zurich by Michael Spiegel and supervised by Maria Husmann and Alfonso Murolo.
+This project was developed at ETH Zurich by Michael Spiegel and supervised by Maria Husmann and Alfonso Murolo.  An associated paper with the title *UI Testing Cross-Device Applications* was presented at the 11th ACM International Conference on Interactive Surfaces and Spaces (ISS 2016) and can be found in the [ACM digital library](http://dl.acm.org/authorize?N26860).
 
 Here is an example test case using Mocha:
 
